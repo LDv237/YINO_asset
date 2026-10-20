@@ -93,7 +93,7 @@ python -m tickforge live --config config/spot_long_only_durable.toml   --duratio
 
 ## Docker 的现状
 
-Docker 这块本机没跑起来：Docker Desktop 装了，但 WSL2 虚拟化组件不完整，引擎起不来。不过镜像已经在 GitHub Actions 的干净环境里完成 build、容器版本、离线 sample replay、60 秒 live、verify 和 replay，全部通过；run 是 https://github.com/LDv237/YINO_asset/actions/runs/39457220374 ，image ID 是 sha256:e67c76fd6a54d1011248c59acdc3d1522e00659d5495beaeed4ba4356b46e949。CI 证据在 `artifacts/experiments/docker/ci/`，本机或其他 Docker 主机可以按 [docs/Docker构建验证.md](docs/Docker构建验证.md) 和 [scripts/docker_verify.sh](scripts/docker_verify.sh) 复跑。
+Docker 这块本机没跑起来：Docker Desktop 装了，但 WSL2 虚拟化组件不完整，引擎起不来。不过镜像已经在 GitHub Actions 的干净环境里完成 build、容器版本、离线 sample replay、60 秒 live、verify 和 replay，全部通过；run 是 https://github.com/LDv237/YINO_asset/actions/runs/39460756722 ，image ID 是 sha256:921e78875645226c50d0184b5cbc4f84e90780f9a50847f5220ca4d1438a6012。CI 证据在 `artifacts/experiments/docker/ci/`，本机或其他 Docker 主机可以按 [docs/Docker构建验证.md](docs/Docker构建验证.md) 和 [scripts/docker_verify.sh](scripts/docker_verify.sh) 复跑。
 
 ```bash
 docker compose build
