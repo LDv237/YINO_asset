@@ -2,7 +2,7 @@
 
 > 笔试项目：YINO ASSET 量化开发工程师
 > 作者：LDv237（GitHub）
-> 代码与文档：https://github.com/LDv237/YIKO_asset
+> 代码与文档：https://github.com/LDv237/YINO_asset
 > 实测日期：2026-10-20
 
 ## 摘要

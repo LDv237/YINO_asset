@@ -30,7 +30,7 @@
 ## 2. GitHub 公开仓库（已发布）
 
 ```text
-https://github.com/LDv237/YIKO_asset
+https://github.com/LDv237/YINO_asset
 ```
 
 本地仓库已有 `main` 分支和提交历史，`origin` 指向上述仓库；`.gitignore` 排除了 `artifacts/`、完整 WAL、日志和缓存，公开仓库只包含代码、测试、文档、配置和 `samples/demo_run` 离线样本。
@@ -89,7 +89,7 @@ cp artifacts/runs/<run_id>/manifest.json tickforge_manifest.json
 >
 > 以下是我的笔试项目 TickForge（实时高频行情交易系统 demo）提交材料：
 >
-> 1. 项目代码与文档：https://github.com/LDv237/YIKO_asset
+> 1. 项目代码与文档：https://github.com/LDv237/YINO_asset
 > 2. Docker：仓库根目录 Dockerfile / docker-compose.yml；构建与运行命令见 README
 > 3. 15 分钟实测数据：附件 `tickforge_raw_15m.tar.gz`（原始 WAL，含全部 WS 帧与 REST 快照）、`tickforge_raw_15m.jsonl.gz`（可读视图）、`tickforge_csv_15m.zip`（CSV 表格视图）、`tickforge_summary.json`
 > 4. 现货只做多变体：`config/spot_long_only.toml`、`spot_long_only_summary.json`、`spot_long_only_same_wal_summary.json`；严格落盘版：`config/spot_long_only_durable.toml`、`spot_long_only_durable_summary.json`、`crash_recovery_report.json`。设计与对照见 `docs/SPOT_LONG_ONLY.md`。
