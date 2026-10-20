@@ -3,6 +3,7 @@
 一个接入 Binance 现货公开行情的实时高频数据流水线 demo：WebSocket 原始帧无损落盘 → L2 订单簿重建 → 因子计算 → 做市策略信号 → 模拟成交，并支持从 WAL 逐字节确定性回放与校验。
 
 > 笔试题目：YINO ASSET 量化开发工程师（实时高频行情交易系统 demo）。
+> GitHub: https://github.com/LDv237/YIKO_asset
 > 设计与取舍见 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)，模块接口与 WAL 格式见 [docs/INTERFACES.md](docs/INTERFACES.md)，实测与复现见 [docs/PERFORMANCE.md](docs/PERFORMANCE.md)，完整报告见 [REPORT.md](REPORT.md)。
 
 ## 核心特性

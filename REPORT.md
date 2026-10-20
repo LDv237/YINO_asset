@@ -1,8 +1,8 @@
 # TickForge：实时高频行情交易系统 demo 报告
 
 > 笔试项目：YINO ASSET 量化开发工程师
-> 作者：`<姓名>`
-> 代码与文档：公开仓库地址见 `DELIVERY.md`（本会话按候选人的选择未执行 git 发布）
+> 作者：LDv237（GitHub）
+> 代码与文档：https://github.com/LDv237/YIKO_asset
 > 实测日期：2026-10-20
 
 ## 摘要

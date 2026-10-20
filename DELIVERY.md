@@ -27,26 +27,21 @@
 | 持久化口径 | 正常关闭 flush+fsync（0 丢失）；`interval` 每 250ms 尝试组提交，未同步尾部可能丢失（目标间隔非硬上界）；`always` 每条 fsync 后才处理，延迟更高（见 docs/PERFORMANCE.md） |
 | 两种执行语义成交 CSV | `artifacts/abstract_fills.csv`、`artifacts/spot_long_only_fills.csv`、`artifacts/spot_long_only_same_wal_fills.csv`、`artifacts/spot_long_only_durable_fills.csv` |
 
-## 2. 发布到 GitHub（本会话按你的选择未执行 git）
+## 2. GitHub 公开仓库（已发布）
 
-题目要求公开仓库。若你还没有仓库，在项目根目录执行：
-
-```bash
-git init
-git add tickforge tests tools scripts docs config README.md REPORT.md DELIVERY.md \
-        Dockerfile docker-compose.yml .dockerignore requirements.txt \
-        requirements-dev.txt pyproject.toml
-git commit -m "TickForge: real-time Binance market-data pipeline with WAL and deterministic replay"
-git branch -M main
-git remote add origin https://github.com/<你的用户名>/tickforge.git
-git push -u origin main
+```text
+https://github.com/LDv237/YIKO_asset
 ```
 
-注意：
+本地仓库已有 `main` 分支和提交历史，`origin` 指向上述仓库；`.gitignore` 排除了 `artifacts/`、完整 WAL、日志和缓存，公开仓库只包含代码、测试、文档、配置和 `samples/demo_run` 离线样本。
 
-- `.gitignore` 已排除 `artifacts/`、WAL、日志与缓存；**原始行情 WAL 不要直接提交**，用 Release/网盘或随邮件附件交付；
-- 小样本 `samples/demo_run/` 可以提交（如果体积 < 50 MB）；
-- 如果 GitHub 网络不可用，可先在 Gitee 建公开仓库，再同步到 GitHub，或使用 GitHub 网页上传 zip。
+后续修改后的推送方式：
+
+```bash
+git add <files>
+git commit -m "<message>"
+git push origin main
+```
 
 ## 3. 构建与验证 Docker 镜像（必做；当前尚未在本机验证）
 
@@ -94,7 +89,7 @@ cp artifacts/runs/<run_id>/manifest.json tickforge_manifest.json
 >
 > 以下是我的笔试项目 TickForge（实时高频行情交易系统 demo）提交材料：
 >
-> 1. 项目代码与文档：<GitHub 公开仓库地址>
+> 1. 项目代码与文档：https://github.com/LDv237/YIKO_asset
 > 2. Docker：仓库根目录 Dockerfile / docker-compose.yml；构建与运行命令见 README
 > 3. 15 分钟实测数据：附件 `tickforge_raw_15m.tar.gz`（原始 WAL，含全部 WS 帧与 REST 快照）、`tickforge_raw_15m.jsonl.gz`（可读视图）、`tickforge_csv_15m.zip`（CSV 表格视图）、`tickforge_summary.json`
 > 4. 现货只做多变体：`config/spot_long_only.toml`、`spot_long_only_summary.json`、`spot_long_only_same_wal_summary.json`；严格落盘版：`config/spot_long_only_durable.toml`、`spot_long_only_durable_summary.json`、`crash_recovery_report.json`。设计与对照见 `docs/SPOT_LONG_ONLY.md`。
@@ -123,6 +118,6 @@ cp artifacts/runs/<run_id>/manifest.json tickforge_manifest.json
 - [x] `lost_raw_frames == 0`、`drained == true`；
 - [x] `verify` 与 `replay --verify` 通过；
 - [x] 报告中的数字与 `summary.json` 一致；
-- [ ] GitHub 仓库公开可访问，README 首屏有运行命令（本会话按你的选择未发布）；
+- [x] GitHub 仓库公开可访问，README 首屏有运行命令；
 - [ ] Dockerfile 在干净环境构建成功（本机无 Docker；已用干净虚拟环境验证依赖与入口，见 RUNBOOK）；
 - [ ] 邮件附件不含密钥、Cookie、个人路径。
