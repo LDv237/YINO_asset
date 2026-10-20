@@ -1,0 +1,140 @@
+# 两种执行语义：抽象做市 vs 现货只做多
+
+## 1. 为什么保留两套
+
+评审指出：数据源是 Binance **现货**，但 `Simulator` 允许负仓位，例如 BTCUSDT position = -0.003。严格来说，现货账户不能卖出未持有的 BTC（除非借币/杠杆），所以“负仓位”与现货语义不一致。
+
+处理方式不是删掉原结果，而是**保留抽象做市结果**，同时新增一个独立的**现货只做多**变体：
+
+| 变体 | 配置 | 语义 | 用途 |
+|---|---|---|---|
+| 抽象做市 | `config/default.toml`，`allow_short=true`，`initial_cash_usd=0` | 带符号记账，允许负仓/负现金；从零库存运行双边做市 | 性能/链路基准，验证双边做市和确定性回放 |
+| 现货只做多 | `config/spot_long_only.toml`，`allow_short=false`，`initial_cash_usd=10000` | 不允许裸卖；卖出数量不超过持仓；买入受 USDT 现金限制 | 演示“现货账户可执行”的保守版本 |
+
+两者使用**同一套行情、因子、WAL、回放和验证代码**，只改变执行语义。
+
+## 2. 只做多变体的实现
+
+### 2.1 策略层
+
+`MarketMaker` 在 `allow_short=false` 时：
+
+- `position <= 0` 时不发 ask，只保留 bid；
+- `position > 0` 时 ask 数量 = `min(常规报价量, position)`，向下取整到 1e-8；
+- 买入报价仍可发，但能否成交由模拟器的现金约束决定。
+
+因此信号本身就不会出现“没有币却挂卖单”的情况。
+
+### 2.2 执行层
+
+`Simulator` 在 `allow_short=false` 时：
+
+- 卖出最大数量 = 当前持仓，`position` 不会变成负数；
+- 买入最大数量受 `cash / (price * (1 + fee_rate))` 限制，现金不会变成负数；
+- 每个 symbol 初始 USDT 现金为 `initial_cash_usd`，本变体取 10,000；
+- `total_pnl = cash + position*mark - initial_cash`，不与初始资金混淆；
+- 不建模借币、保证金、强平、资金费率。
+
+### 2.3 一个自然的后果
+
+从零基础币库存开始，做市商一开始只能买、不能卖；只有买到库存后才会出现 ask。某些交易对在 15 分钟内可能一直等不到买入成交，因此 `fills=0`、`position=0` 是可能且合理的结果。这不是程序错误，而是现货长仓约束的直接体现。
+
+若希望从第一秒就能双边报价，应额外预置基础币库存；本变体没有这样做，以避免引入任意的初始持仓假设。
+
+## 3. 运行方式
+
+```bash
+# 抽象做市（性能/链路基准）
+python -m tickforge live --config config/default.toml --duration 900 --out artifacts
+
+# 现货只做多
+python -m tickforge live \
+  --config config/spot_long_only.toml \
+  --duration 900 \
+  --symbols BTCUSDT,ETHUSDT,SOLUSDT,BNBUSDT,XRPUSDT,DOGEUSDT \
+  --out artifacts
+```
+
+回放与校验对两个变体完全一样：
+
+```bash
+python -m tickforge verify --run <run_dir>
+python -m tickforge replay --run <run_dir> --verify
+```
+
+## 4. 结果
+
+### 4.1 同一份 WAL 的受控对照
+
+把正式抽象运行的 15 分钟 WAL 原样重放，只把执行语义切换为只做多。市场数据、订单簿、因子完全相同；信号数量相同，但 ask 字段和成交结果按现货约束变化。
+
+```bash
+python tools/replay_spot_long_only.py   --run artifacts/runs/20261020T072820Z-53b5   --out artifacts/variants/spot_long_only_same_wal_final
+```
+
+| 指标 | 抽象做市（性能基准） | 只做多（现货执行语义） |
+|---|---:|---:|
+| 原始帧 / WAL 记录 | 388,388 / 388,394 | 388,388 / 388,394 |
+| 因子快照 / 信号 | 43,309 / 43,309 | 43,309 / 43,309 |
+| fills | 10,066 | 3,082 |
+| 负仓位 symbol 数 | 1 | **0** |
+| 负现金 symbol 数 | 6 | **0** |
+| 期末各 symbol cash 最小值 | -9,295.79 | 8,499.84 |
+| 过程最低现金（逐笔） | -9,375.83 | 8,010.05 |
+| 结束 position（各 symbol） | 含负值（BNBUSDT -0.30767748） | 全部 0 |
+| 初始现金合计 | 0 | 60,000（6 × 10,000） |
+| 总 PnL（相对初始） | -19,087.87 | -3,731.32 |
+
+这份对照最能说明问题：**同样的行情和因子，只做多版没有出现任何负仓位或负现金**；因为它不能裸卖，成交数从 10,066 降到 3,082，并且最终全部平仓。
+
+### 4.2 独立 15 分钟实盘采样（只做多）
+
+`run_id=20261020T074416Z-91ac`，2026-10-20 07:44–07:59 UTC（15:44–15:59 CST），使用同一 6 个交易对和 `config/spot_long_only.toml`。
+
+| 指标 | 值 |
+|---|---:|
+| 原始帧 / WAL 记录 | 325,280 / 325,286 |
+| 因子快照 / 信号 / fills | 41,265 / 41,265 / 2,131 |
+| 负仓位 / 负现金 symbol 数 | 0 / 0 |
+| 期末各 symbol cash 最小值 | 8,810.30 |
+| 过程最低现金（逐笔） | 8,318.71 |
+| 结束 position | BNBUSDT 0.07000001、DOGEUSDT 76.0，其余 0 |
+| 总 PnL（相对 60,000 初始现金） | -2,571.74 |
+| 端到端延迟 p50 / p99 / p999 | 0.431 / 1.722 / 3.444 ms |
+| 丢失 / 未处理 | 0 / 0 |
+| `clean_shutdown` | true |
+| WAL 校验 / 回放摘要 | 通过 / 三项一致 |
+
+过程最低现金来自逐笔成交后的 cash 序列；审计数据见 [cash_minima.json](artifacts/cash_minima.json)。
+
+成交明细已导出为 [spot_long_only_fills.csv](artifacts/spot_long_only_fills.csv) 与 [spot_long_only_same_wal_fills.csv](artifacts/spot_long_only_same_wal_fills.csv)，可直接用 Excel 对照。
+
+只做多版 15 分钟内 6 个 symbol 都有成交（BTC 674、ETH 717、BNB 222、SOL 237、XRP 163、DOGE 118），期末 BNB 与 DOGE 仍有库存，其余回到 0；这是“买入后才能卖出”的自然结果。
+
+### 4.3 严格落盘版（spot long-only + fsync always）
+
+`config/spot_long_only_durable.toml` 只把 WAL 改为 `fsync_policy="always"`，保持现货只做多约束。15 分钟结果：
+
+- `run_id=20261020T082850Z-6db8`，900.172 s；
+- 272,784 原始帧 / 272,802 条 WAL（18 个快照），每条记录 fsync 后才处理；
+- 37,802 信号 / 1,576 fills，负仓位/负现金均为 0；
+- 过程最低现金 8,967.80，期末各 symbol cash 最小值 9,458.09；
+- p50 3.444 ms / p99 5.793 ms / p999 9.742 ms；
+- 2 次网络重连（data gap 1.151 s / 0.925 s），触发 12 次 resync、18 个快照；收到的原始帧 0 丢失；
+- `verify` 与 `replay --verify` 通过。
+
+这版的定位是**严格持久化合规证据**；interval 版仍是性能/语义对照。重连造成的 gap 是网络未收到的数据，不是 WAL 丢帧，记录在 `summary.data_gaps`。
+
+### 4.4 结论
+
+- 抽象做市版保留原结果，用于展示双边做市/回放；它明确不代表现货账户。
+- 只做多版在同一 WAL 和独立 15 分钟运行中都没有出现负仓位/负现金，满足现货“不能卖未持有的币”的约束。
+- 只做多版不是“更高收益”的版本，fills 更少、期末库存不同；题目不考察收益，重点是语义正确和链路可复现。
+
+## 5. 解释与局限
+
+- 抽象做市版不是现货账户，允许负仓位是刻意选择，用于从零库存跑双边做市；不能据此声称现货可做空。
+- 只做多版是更严格的“现货执行语义”，但仍不是真实账户：没有真实下单、订单队列、撤单延迟、借币、保证金、交易所风控。
+- 只做多版每 symbol 初始 10,000 USDT 是人为设置的模拟资金；不同初始资金会影响 fills 和 PnL。
+- 两个版本都不以收益为评价目标；比较重点是仓位/现金约束、信号行为、回放确定性。
+- 性能数据以抽象做市版为基准；**现货执行语义以只做多版为准**。不要把抽象版的负仓位当成现货事实，也不要用它的 PnL 评价现货策略。

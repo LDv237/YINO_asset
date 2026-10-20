@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.idea/
+.venv/
+artifacts/
+*.log
+
+# generated delivery archive
+tickforge_delivery.zip

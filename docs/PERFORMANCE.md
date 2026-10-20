@@ -1,0 +1,147 @@
+# 性能实测
+
+> 本文所有数字来自抽象做市性能基准运行 `artifacts/runs/20261020T072820Z-53b5/summary.json` 与 `replay/replay_summary.json`，命令见文末。
+
+## 1. 测试环境
+
+| 项 | 值 |
+|---|---|
+| 机器 | Windows 11 Home China，Intel 6 核 12 线程 |
+| 内存 / 磁盘 | 15.8 GiB / 195 GB 可用 |
+| Python | 3.14.7（官方 Windows amd64 构建） |
+| 关键依赖 | aiohttp 3.14.5 / orjson 3.13.0 / websockets 17.3 / psutil 7.2.2；完整锁见 `requirements-lock.txt` |
+| 进程模型 | 单进程 asyncio + 1 个 WAL 写线程 |
+| 数据源 | `wss://data-stream.binance.vision/stream`，REST `data-api.binance.vision` |
+| 交易对 | BTCUSDT, ETHUSDT, SOLUSDT, BNBUSDT, XRPUSDT, DOGEUSDT |
+| 流 | `depth@100ms` + `aggTrade` + `bookTicker`，共 18 条 |
+| 测试窗口 | 2026-10-20 07:28:20–07:43:23 UTC（15:28–15:43 CST，亚洲时段），900.116 s（从第一条行情起算） |
+| WAL 策略 | 64 MiB 分段，`fsync_policy=interval`, 250 ms |
+| 网络 | 公网 WebSocket，无 colocation |
+| 交易活跃度 | 抽象/只做多 interval：07:00–08:00 UTC 桶 73.96M / 125,770 笔，排名 3/47；严格版：08:00–09:00 UTC 桶 73.08M / 115,018 笔，排名 4/47；见 `artifacts/market_activity*.json` |
+
+## 2. 方法
+
+- **持续时间**：进程启动后先建连，收到第一条行情才开始计时；`--duration 900` 在 900 秒后请求停止，停止过程包括断开连接、排空队列、fsync、写摘要。
+- **吞吐**：以 WAL 原始帧计数、`aggTrade`/depth 事件计数、派生因子/信号计数分别报告；速率 = 计数 / `window_s`。
+- **延迟**：在每个 WebSocket 帧 `recv()` 返回后立即取 `perf_counter_ns()`；`e2e` 为该时间戳到该帧完成流水线处理的差值。直方图为 1 µs–60 s 的固定对数桶，分位数为桶上界（偏保守），所以报告值不会优于真实值。
+- **资源**：`psutil.Process().memory_info().rss` 与 `cpu_percent()` 每秒采样；CPU 为单核百分比口径（100% = 一个逻辑核跑满）。
+- **不丢数据**：`reconciliation` 比较接收帧、WAL 记录、处理事件、队列剩余；`clean_shutdown` 要求 `lost_raw_frames=0` 且所有队列排空。
+- **确定性**：运行结束后 `replay` 使用同一份 WAL、同一份 `config.json` 再跑一遍，比较三个派生文件的 SHA-256。
+
+## 3. 15 分钟实测
+
+### 3.1 原始数据与处理量
+
+正式数据来自最终重跑（`run_id=20261020T072820Z-53b5`），该版本已包含 `trade_quality` 与健康语义修复。原始 WAL 另经 `tools/wal_export.py` 导出为 `artifacts/tickforge_raw_15m.jsonl.gz`（388,394 行，约 14 MB），供人工检查。
+
+| 指标 | 值 |
+|---|---|
+| WebSocket 原始帧 | 388,388 |
+| 原始字节 | 76.10 MiB（79,799,645 B） |
+| WAL 记录（WS / snapshot / total） | 388,388 / 6 / 388,394 |
+| WAL 字节 / 分段数 | 92.61 MiB（97,108,807 B）/ 2 |
+| depth / aggTrade / bookTicker 事件 | 44,315 / 24,932 / 319,141 |
+| 因子快照 / 信号 / 模拟成交 | 43,309 / 43,309 / 10,066 |
+| 平均帧率 | 431.49 msg/s（88,654.9 B/s） |
+| 峰值帧率（1 s 采样） | 2,691.89 msg/s（含启动时补发/突发，非稳态） |
+
+### 3.2 延迟
+
+单位为人类可读值；分位数为直方图桶上界（偏保守）。原始 ns 值见 `summary.json.latency_ns`。
+
+| 阶段 | n | p50 | p90 | p99 | p999 | max |
+|---|---:|---:|---:|---:|---:|---:|
+| 接收→入队（WAL 追加） | 388,388 | 32.000 µs | 90.510 µs | 128.000 µs | 256.000 µs | 85.569 ms |
+| 解析 | 388,388 | 16.000 µs | 45.255 µs | 128.000 µs | 608.874 µs | 63.667 ms |
+| 订单簿应用 | 44,315 | 32.000 µs | 64.000 µs | 215.269 µs | 724.077 µs | 23.642 ms |
+| 因子计算 | 44,289 | 53.817 µs | 90.510 µs | 128.000 µs | 256.000 µs | 13.731 ms |
+| 信号生成 | 43,309 | 19.027 µs | 26.909 µs | 45.255 µs | 107.635 µs | 11.001 ms |
+| **端到端** | 388,388 | **512.000 µs** | **1.024 ms** | **2.435 ms** | **27.554 ms** | **243.132 ms** |
+
+### 3.3 资源与稳定性
+
+| 指标 | 值 |
+|---|---|
+| RSS（峰值 / 结束） | 82,710,528 B（78.88 MiB）/ 82,710,528 B |
+| CPU（平均 / 结束，单核百分比口径） | 10.52% / 19.9% |
+| 重连次数 / 数据缺口 | 0 / 0 |
+| 快照请求（成功 / 失败 / 重试） | 6 / 0 / 0 |
+| 订单簿 gap / resync / crossed | 0 / 0 / 0 |
+| WAL 反压 / 处理反压 | 0 / 0 |
+| 丢失原始帧 / 未处理事件 / 未入队 | 0 / 0 / 0 |
+| `clean_shutdown` / `drained` | true / true |
+| aggTrade duplicates / backwards / gaps / missing IDs | 0 / 0 / 0 / 0 |
+
+本次正式 summary 已包含健康语义修复：`health_before_shutdown.ok=true`、`health_final.ok=true`、`health_final_context=after_intentional_shutdown`、`reasons=[]`。主动关停造成的 feed 断开不再被误报为异常；`clean_shutdown=true` 与 `lost_raw_frames=0` 仍是最终判定。
+
+### 3.4 确定性回放
+
+| 项目 | 实时运行 | 回放 | 一致 |
+|---|---|---|---|
+| `factors.jsonl` SHA-256 | `df2fbee57a9b9268bc24050d76951ea59c8ae2b5c73a32b09a1d5495ea08b2a5` | 同左 | 是 |
+| `signals.jsonl` SHA-256 | `7e7f239afdef826aaf196fdb5b40b039bfa6682f6fd395294964c332a82c3b39` | 同左 | 是 |
+| `fills.jsonl` SHA-256 | `4412758276bb3069aa862ab42de4c8b227e3a9d7ce9013588f38abac94432315` | 同左 | 是 |
+| 因子快照 / 信号 / 成交计数 | 43,309 / 43,309 / 10,066 | 43,309 / 43,309 / 10,066 | 是 |
+| WAL 记录数 | 388,394 | 388,394 | 是 |
+
+回放（写派生文件）耗时 13.732 s，吞吐 28,283.4 events/s；相对 431.5 msg/s 的实时输入，处理余量约 **66×**。不写派生文件的 bench 数据来自较早样本，不作为本次正式吞吐；本次 replay 已足以说明处理余量。
+
+## 4. fsync 策略对比
+
+先明确持久化契约：正式性能基准使用 `interval`，**正常关闭**会排空并 fsync（0 丢失）；**崩溃/掉电**时未同步尾部可能丢失，250ms 是**尝试组提交的目标间隔，不是硬上界**。严格落盘使用 `always`（每条 fsync 后才处理）；若只追求吞吐，`never` 仅作基线。以下为三种策略的实测。
+
+在同一数据源上分别运行 60 秒（或 30 秒），只改变 `fsync_policy`：
+
+| 策略 | 记录数 | p50 e2e | p99 e2e | fsync 次数 | 说明 |
+|---|---:|---:|---:|---:|---|
+| `interval` 250 ms | 3,696 | 0.362 ms | 1.218 ms | 116 | 默认 |
+| `always` | 3,509 | 2.048 ms | 4.871 ms | 3,510 | 每条 fsync 后才处理；应用层强持久性，非物理绝对保证 |
+| `never` | 2,696 | 0.256 ms | 1.024 ms | 1 | 仅关闭/轮转时同步，吞吐基线 |
+
+三次实验均为 30 s、仅 BTCUSDT；行情活跃度不同，因此记录数不可直接当作吞吐对比，延迟按事件统计仍可比。数据见 `artifacts/fsync/<policy>/runs/*/summary.json`。
+
+解释：`always` 把每个事件的端到端延迟抬高约一个数量级；它不是物理介质的绝对保证，但应用层做到“每条记录 fsync 后才处理”。`never` 延迟最低，但进程被杀会丢尾部。默认 `interval` 是延迟/持久性的中间点；严格口径使用 `always`。
+
+### 4.1 严格落盘 15 分钟（spot long-only + always）
+
+`run_id=20261020T082850Z-6db8`，2026-10-20 08:28–08:43 UTC：
+
+| 指标 | 值 |
+|---|---:|
+| 原始帧 / WAL 记录 | 272,784 / 272,802（18 个快照） |
+| fsync | 每条记录 1 次，共 272,802 次 |
+| 信号 / fills | 37,802 / 1,576 |
+| 负仓位 / 负现金 | 0 / 0 |
+| 过程最低现金 / 期末最小值 | 8,967.80 / 9,458.09 |
+| e2e p50 / p99 / p999 | 3.444 / 5.793 / 9.742 ms |
+| 重连 / data gap / book resync | 2 / 1.151 s + 0.925 s / 12 |
+| 原始帧丢失 / `clean_shutdown` | 0 / true |
+| `verify` / `replay --verify` | 通过 / 一致 |
+
+严格版的吞吐与延迟比 interval 基准更差，这是每条 fsync 的直接代价。网络重连造成的 data gap 是未收到的交易所数据，不是 WAL 帧丢失；订单簿用快照恢复。异常终止恢复实验见 `docs/VERIFICATION.md`。
+
+## 5. 回放/处理能力
+
+- 15 分钟 WAL 全量回放（含派生文件）耗时 13.732 s，吞吐 28,283.4 events/s（冷缓存首回 13.732 s / 28,283.1 events/s）；
+- `python -m tickforge bench --run <run_id> --repeat 3`：29,044.1 / 29,380.8 / 30,583.4 events/s；
+- 对比实时 431.5 msg/s 的输入，处理余量约 71×（带派生）/ 74×（纯处理），说明 Python 单进程不是本 demo 的瓶颈；瓶颈在公网 WebSocket、REST 快照与 Python 解释器开销。
+
+## 6. 解释与局限
+
+1. 延迟是**用户态处理延迟**，不含交易所撮合、网络 RTT、内核调度；不能与 colocation/HFT 指标直接比较。
+2. 分位数为直方图桶上界，p99 等数字偏保守；`max` 可能包含一次 GC/调度抖动。
+3. 单机单进程，未做 CPU 绑核、NUMA、内核旁路、FPGA；真实 HFT 需要这些。
+4. 成交流使用交易所侧 `@aggTrade`（按 taker 订单聚合），不是 `@trade` 的逐笔 fill；原始 WAL 保存完整 payload（含 `f/l` 首尾成交编号），但组内每一笔的明细不可还原。成交量不平衡使用汇总总量/方向，足够；若需要逐笔微观结构，应切换到 `@trade`。
+5. 模拟撮合不排队、不建模撤单延迟，收益无意义；`Simulator` 还是抽象记账器，允许负仓位/负现金，不代表 Binance 现货账户可执行性，也不建模借币/保证金/强平。本项目只验证链路完整性。
+6. 网络与交易所限频会随时间和地区变化；复现时以 `summary.data_gaps` 与 `snapshot_errors` 为准。
+
+## 7. 复现命令
+
+```bash
+python -m tickforge live --config config/default.toml --duration 900 --out artifacts
+RUN_DIR=$(ls -td artifacts/runs/* | head -1)
+python -m tickforge verify --run "$RUN_DIR"
+python -m tickforge replay --run "$RUN_DIR" --verify
+python -m tickforge bench --run "$RUN_DIR" --repeat 3
+python tools/analyze_run.py "$RUN_DIR"
+```

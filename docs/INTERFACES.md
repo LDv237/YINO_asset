@@ -1,0 +1,408 @@
+# TickForge 接口与模块契约
+
+本文档是实现的"冻结接口"。各模块可以独立实现和测试，但不得修改本文件约定的公共签名；如需变更，先在集成层解决。
+
+## 0. 总原则
+
+- Python 3.14，`from __future__ import annotations`，仅使用 `requirements.txt` 中的依赖。
+- 价格、数量一律使用 **整数 tick（1e-8）**；只有对外展示/因子计算时才转 float。
+- 热路径（`on_message` → 解析 → 订单簿 → 因子 → 策略）必须是同步、非阻塞的；只有 WAL 写线程、REST 快照、HTTP 服务是异步/线程。
+- 所有派生输出（因子、信号、成交）必须**只依赖事件内容**，不得使用 `time.time()`、随机数或 wall-clock 做决策；接收时间只用于延迟统计，不写进派生记录。这样 WAL 回放才能逐字节复现。
+- 不允许静默丢弃原始行情。队列满时施加反压并计数，不能 `drop`。
+- 日志用 `logging.getLogger(__name__)`，不要 `print`（CLI 的用户输出除外）。
+- 测试从项目根目录运行：`python -m pytest tests/test_xxx.py -q`。
+
+## 1. 事件模型（已实现 `tickforge/events.py`）
+
+`DepthEvent`, `TradeEvent`, `BookTickerEvent`, `SnapshotEvent`, `FactorSnapshot`, `Signal`, `Fill` 的字段见源码。要点：
+
+- `DepthEvent.bids/asks` 是 `tuple[(price_ticks, qty_ticks), ...]`，qty 为 0 表示删除该档。
+- `SnapshotEvent` 同样使用 tick；`requested_mono_ns` 用于统计 REST 往返。
+- `FactorSnapshot.to_dict()`、`Signal.to_dict()`、`Fill.to_dict()` 的键顺序固定，是回放摘要的哈希输入，**不得改动**。
+
+`tickforge/normalize.py` 已实现：`str_to_ticks`, `parse_ws_message(payload, seq=, recv_mono_ns=, recv_wall_ns=)`, `encode_snapshot`, `decode_snapshot`。解析失败抛 `ParseError`。
+
+## 2. WAL 存储（模块负责人：WAL agent）
+
+文件：`tickforge/store/wal.py`、`tickforge/store/derived.py`、`tests/test_wal.py`、`tests/test_derived.py`。
+
+### 2.1 二进制格式
+
+每条记录（little-endian）：
+
+| 偏移 | 类型 | 含义 |
+|---|---|---|
+| 0 | 4s | magic `b"TFW1"` |
+| 4 | B | kind：1=WS 原始帧，2=REST 快照 JSON |
+| 5 | 3x | 对齐填充 |
+| 8 | I | payload 长度（字节） |
+| 12 | I | `zlib.crc32(payload)` |
+| 16 | q | recv_wall_ns（`time.time_ns()`） |
+| 24 | q | recv_mono_ns（`time.perf_counter_ns()`） |
+| 32 | Q | seq（全局单调递增） |
+| 40 | ... | payload |
+
+`HEADER = struct.Struct("<4sB3xIIqqQ")`，大小必须为 40。分段文件 `raw-000001.wal`，按 `segment_bytes` 轮转。
+
+### 2.2 API
+
+```python
+KIND_WS = 1
+KIND_SNAPSHOT = 2
+
+class WalQueueFull(Exception): ...
+class WalClosed(Exception): ...
+class WalError(Exception): ...
+class WalCorruptionError(WalError): ...
+
+@dataclass(slots=True, frozen=True)
+class WalRecord:
+    kind: int
+    seq: int
+    recv_wall_ns: int
+    recv_mono_ns: int
+    payload: bytes
+
+@dataclass(slots=True)
+class WalManifest:
+    directory: str
+    segments: list[dict]   # {"name","records","bytes","sha256"}
+    records: int
+    bytes: int
+    first_seq: int | None
+    last_seq: int | None
+    fsync_policy: str
+    durable_seq: int | None
+
+class WalWriter:
+    def __init__(self, directory: str | Path, *,
+                 segment_bytes: int = 64*1024*1024,
+                 fsync_interval_ms: int = 250,
+                 fsync_policy: str = "interval",   # interval|always|never
+                 queue_max: int = 500_000,
+                 record_max_bytes: int = 8*1024*1024,
+                 logger: logging.Logger | None = None,
+                 on_error: Callable[[BaseException], None] | None = None) -> None
+    def start(self) -> None
+    @property
+    def queue_depth(self) -> int
+    def append_ws(self, payload: bytes, *, recv_wall_ns: int,
+                  recv_mono_ns: int, seq: int) -> None   # 非阻塞；满则 WalQueueFull
+    def append_snapshot(self, payload: bytes, *, recv_wall_ns: int,
+                        recv_mono_ns: int, seq: int) -> None
+    def flush_and_sync(self) -> None   # 可跨线程调用；等待 durable_seq 追上当前写入序号
+    def stats(self) -> dict            # records_ws/records_snapshot/bytes/segments/
+                                       # queue_depth/fsyncs/fsync_total_ns/written_seq/durable_seq/error
+    def close(self, timeout: float = 30.0) -> WalManifest
+```
+
+行为要求：
+
+- 后台单线程顺序写；`fsync_policy=interval` 每 `fsync_interval_ms` 执行 `flush+os.fsync`；`always` 每条一 fsync；`never` 只在轮转/关闭时 flush。
+- `append_*` 由事件循环调用，必须立即返回（除非队列满抛异常），不能阻塞 I/O。
+- 队列满不能丢数据；调用方负责等待/重试。`WalQueueFull` 后调用方可重试。
+- 线程内 I/O 异常必须记录到 `stats()["error"]`，唤醒等待者，后续 append 抛 `WalClosed`；不得吞异常。
+- `close()` 先停止接收、排空队列、flush+fsync、计算每个分段 SHA-256、返回 manifest；重复调用幂等。
+- `flush_and_sync()` 用于强持久性模式：等待所有已入队记录 fsync 完成（应用层保证，不是物理介质绝对保证）。
+
+```python
+class WalReader:
+    def __init__(self, directory: str | Path, *,
+                 verify_crc: bool = True,
+                 allow_truncated_tail: bool = False) -> None
+    def __iter__(self) -> Iterator[WalRecord]
+    def scan(self) -> WalScanResult
+
+@dataclass(slots=True)
+class WalScanResult:
+    records: int
+    records_by_kind: dict[int, int]
+    bytes: int
+    segments: list[str]
+    first_seq: int | None
+    last_seq: int | None
+    truncated_tail_bytes: int
+    errors: list[str]
+```
+
+- `scan()` 校验 magic、长度（0 < len <= record_max）、CRC、seq 单调性；错误抛 `WalCorruptionError`，只有 `allow_truncated_tail=True` 且最后一条不完整时可容忍并记录字节数。
+- 迭代顺序按分段文件名排序。
+
+### 2.3 派生 JSONL
+
+```python
+@dataclass(slots=True)
+class SinkResult:
+    path: str
+    records: int
+    bytes: int
+    sha256: str
+
+class JsonlSink:
+    def __init__(self, path: str | Path, *,
+                 flush_interval_s: float = 1.0,
+                 fsync: bool = False) -> None
+    def write(self, obj: dict) -> None       # orjson.dumps + b"\n"
+    def close(self) -> SinkResult            # 幂等；计算内容 SHA-256
+```
+
+- 只能从事件循环线程调用（无需线程安全）。
+- 文件先写 `.tmp` 再原子 rename？不必；关闭时 rename 可选。要求 `close()` 后 digest 可复现。
+
+## 3. 订单簿（BOOK agent）
+
+文件：`tickforge/book/orderbook.py`、`tests/test_book.py`。
+
+```python
+@dataclass(slots=True, frozen=True)
+class BestQuote:
+    bid_px: int
+    bid_qty: int
+    ask_px: int
+    ask_qty: int
+
+@dataclass(slots=True, frozen=True)
+class BookResult:
+    status: str          # applied|buffered|duplicate|gap|crossed|ignored
+    synced: bool
+    needs_snapshot: bool
+    best_changed: bool
+    buffered: int
+
+class OrderBook:
+    def __init__(self, symbol: str, *, max_buffer: int = 50_000) -> None
+    def apply_depth(self, ev: DepthEvent) -> BookResult
+    def apply_snapshot(self, ev: SnapshotEvent) -> BookResult
+    def begin_resync(self) -> None       # 清空簿、丢弃缓冲、进入等待快照
+    def best(self) -> BestQuote | None
+    def top_levels(self, n: int = 5) -> tuple[list[tuple[int,int]], list[tuple[int,int]]]
+    def mid(self) -> float | None
+    def microprice(self) -> float | None
+    def depth_imbalance(self, n: int = 5) -> float   # [-1,1]，无簿返回 0.0
+    def stats(self) -> dict
+    @property
+    def synced(self) -> bool: ...
+    @property
+    def needs_snapshot(self) -> bool: ...
+    @property
+    def last_update_id(self) -> int: ...
+```
+
+同步状态机（必须严格实现 Binance spot 规则）：
+
+1. 初始为 `awaiting_snapshot`。未同步时收到的 depth 事件进入有界缓冲（保留全部，≤ max_buffer；溢出时丢最旧、置 `needs_snapshot=True` 并计数），返回 `buffered`。
+2. `apply_snapshot`：用快照重建簿，`last_update_id = lastUpdateId`；顺序重放缓冲：
+   - 丢弃 `final_update_id <= last_update_id` 的事件；
+   - 第一条有效事件必须满足 `first_update_id <= last_update_id + 1 <= final_update_id`；
+   - 之后要求 `first_update_id <= last_update_id + 1`（允许重叠），且 `final_update_id > last_update_id`；否则视为 gap。
+   - 若缓冲非空但第一条的 `U > last+1`，快照过旧：保持等待、保留缓冲、返回 `buffered`/`needs_snapshot=True`（不要误判为已同步）。
+   - 缓冲为空：快照本身视为有效，`synced=True`。
+3. 已同步时：`u <= last` 为 duplicate；`U > last+1` 为 gap（当前事件入缓冲、清空同步状态、返回 `gap`）；`U <= last+1 <= u` 应用，`last=u`。
+4. 应用后若 best bid >= best ask：计数并进入等待快照（`crossed`），返回 `needs_snapshot=True`。不得让交叉簿参与因子/策略。
+5. `begin_resync()`：清空两侧、缓冲、`last=0`、synced=False，等新快照。
+6. `top_levels(n)` 跳过零量档位；返回 `(bids 降序, asks 升序)`。
+7. 用 dict 存价格→数量，用 heapq 懒删除维护最优档；不能每次全量排序。
+8. `stats()` 至少包含：`symbol, synced, last_update_id, bids, asks, buffered, applied, duplicates, gaps, snapshots, crossed, buffer_overflow`。
+
+测试至少覆盖：快照+首事件边界（Binance 文档示例）、连续更新、重复、gap→缓冲→新快照恢复、快照过旧、交叉簿、零量删除、top_levels、重新同步、缓冲溢出、随机差分与朴素全量簿对拍。
+
+## 4. 因子引擎（FACTOR agent）
+
+文件：`tickforge/factor/engine.py`、`tests/test_factors.py`。
+
+```python
+class FactorEngine:
+    def __init__(self, *, interval_ms: int = 100,
+                 ofi_window_ms: int = 1000,
+                 trade_window_ms: int = 1000,
+                 momentum_window_ms: int = 5000,
+                 vol_alpha: float = 0.97) -> None
+    def on_depth(self, book: OrderBook, ev: DepthEvent) -> FactorSnapshot | None
+    def on_trade(self, ev: TradeEvent) -> None
+    def reset_book_state(self, symbol: str) -> None
+    def stats(self) -> dict
+```
+
+- 只在该 symbol 的簿已同步且 depth 事件已应用后调用。
+- 每 symbol 独立状态；按 `ev.event_time_ms` 节流，`interval_ms` 到了才产出 `FactorSnapshot`（第一条立即产出）。时间不得倒退（用 max）。
+- 字段定义：
+  - `mid = (best_bid + best_ask)/2`（价格单位）
+  - `microprice = (bid_px*ask_qty + ask_px*bid_qty)/(bid_qty+ask_qty)`（tick 加权后转 float）
+  - `spread_bps = (ask-bid)/mid*1e4`
+  - `ofi_1s`：经典 Cont–Kukanov–Stoikov order-flow imbalance，使用相邻最优档变化：bid 价升→+cur_bid_qty；价平→qty 差；价降→-prev_bid_qty；ask 价降→-cur_ask_qty；价平→-(qty 差)；价升→+prev_ask_qty。滑动 1s 求和，单位为基础币数量。
+  - `depth_imbalance_5 = (Σbid_qty5 - Σask_qty5)/(Σbid_qty5 + Σask_qty5)`，无簿为 0。
+  - `trade_imbalance_1s = (buy_qty - sell_qty)/(buy_qty + sell_qty)`，1s 滑动，无成交为 0；`is_buyer_maker=True` 记为卖。
+  - `realized_vol_bps`：EWMA（`vol_alpha`）对 log(mid_t/mid_{t-1})²，输出 `sqrt(ewma)*1e4`；无前值或 mid≤0 时不更新。
+  - `momentum_5s = mid/mid_5s_ago - 1`；窗口内最早点不足 4s 时返回 0.0（避免伪造动量）。
+  - `best_bid/ask` 为价格 float，`bid_qty/ask_qty` 为基础币数量 float。
+- `reset_book_state(symbol)`：清空该 symbol 的最优档/OFI/mid 历史/波动状态（成交窗口可保留），下次 `on_depth` 重新初始化，避免快照重建后与旧簿比较产生假 OFI。
+- 所有算术需防止除零；输出 float，不 NaN/Inf。
+- `FactorSnapshot.seq` 用触发它的 depth 事件的 `seq`，`ts_ms` 用有效事件时间。
+- `stats()`：每 symbol 的 `depth_updates, trades, snapshots, last_ts_ms`。
+
+测试覆盖：microprice/价差手算、OFI 四种情形、成交不平衡、动量窗口、波动非负、节流与乱序时间、reset、无簿容错。
+
+## 5. 策略与模拟执行（STRAT agent）
+
+文件：`tickforge/strategy/mm.py`、`tickforge/exec/simulator.py`、`tests/test_strategy.py`、`tests/test_simulator.py`。
+
+```python
+class MarketMaker:
+    def __init__(self, cfg: StrategyConfig, *, logger=None) -> None
+    def on_snapshot(self, snap: FactorSnapshot, *, position: float) -> Signal | None
+    def stats(self) -> dict
+```
+
+- 仅演示完整链路，不追求收益。`position` 为当前基础币持仓（由 Simulator 传入）。
+- 公允价：`fair = microprice * (1 + momentum_coeff*momentum_5s + ofi_coeff_bps*1e-4*ofi_norm)`，
+  `ofi_norm = clamp(ofi_1s / max(bid_qty+ask_qty, 1e-9), -3, 3)`。
+- 目标持仓 base = `max_position_notional_usd / fair`；库存偏移 `reservation = fair * (1 - inventory_skew * position/target_base)`，clamp 到 `[0.5*fair, 1.5*fair]`。
+- 半价差 bps = `clamp(min_half_spread_bps + vol_half_spread_coeff*realized_vol_bps, min_half_spread_bps, max_half_spread_bps)`。
+- 双边报价：bid=`reservation*(1-half/1e4)`，ask=`reservation*(1+half/1e4)`，qty=`quote_notional_usd/fair`（保留 8 位小数，最小 1e-8）。
+- 风控：position ≥ target_base 时不发 bid；≤ -target_base 时不发 ask；fair ≤ 0 返回 None；`quote_cooldown_ms` 内不重复发信号（用 `snap.ts_ms`）。
+- 每次通过冷却都返回 `Signal`（即使单边），`seq=snap.seq`，`reason="mm"`；`cfg.enabled=False` 返回 None。
+- 不持有仓位状态，不使用墙钟/随机数。
+
+```python
+class Simulator:
+    def __init__(self, cfg: StrategyConfig, *, symbols: list[str] | None = None,
+                 logger=None) -> None
+    def apply_signal(self, sig: Signal) -> None       # 替换该 symbol 双边挂单
+    def on_trade(self, ev: TradeEvent) -> list[Fill]  # 成交检查，按事件顺序确定性
+    def mark(self, symbol: str, mid: float) -> None
+    def cancel(self, symbol: str) -> None
+    def position(self, symbol: str) -> float
+    def summary(self) -> dict
+```
+
+- 挂单模型：信号存在则挂 bid/ask；`on_trade` 时若 `trade.price <= bid_price` 则买入 `min(quote_qty, trade.qty)`；若 `trade.price >= ask_price` 则卖出；同一笔成交可分别触发两边（先买后卖固定顺序）。
+- 成交受 `max_position_notional_usd` 约束；超限部分缩减/跳过并计数。
+- 平均成本法：卖出实现盈亏 `(price-avg_cost)*qty - fee`；买入手续费计入 cash，卖出实现盈亏再扣卖出手续费；`Fill.realized_pnl` 为累计已实现盈亏。
+- **语义边界**：Simulator 是抽象信号-成交记账器，不是 Binance 现货账户；允许负仓位/负现金以支持从零库存开始的做市路径，不建模借币、保证金或强平。若要模拟现货只做多，需预置库存或禁止 `position <= 0` 时卖出。
+- 费率 `fee_bps`；`Fill.trade_id=ev.agg_trade_id`，`ts_ms=ev.event_time_ms`。
+- `summary()` 每 symbol：`position, avg_cost, cash, initial_cash, realized_pnl, unrealized_pnl, total_pnl, fees, fills, open_bid, open_ask, max_abs_position`；总计同理。`total_pnl = cash + position*mark - initial_cash`。浮点值即可。
+- 不使用墙钟/随机数；相同信号+成交流必须产生完全相同的 Fill 序列。
+- 测试：买卖成交、部分成交、超限、平均成本、费率、取消、summary 对账。
+
+## 6. Binance 连接与快照（FEED agent）
+
+文件：`tickforge/feed/binance.py`、`tickforge/feed/rest.py`、`tickforge/feed/__init__.py`、`tests/test_feed.py`、`tests/test_rest.py`。
+
+```python
+class FeedError(Exception): ...
+class FeedStale(FeedError): ...
+
+class BinanceFeed:
+    def __init__(self, cfg: FeedConfig, *,
+                 on_message: Callable[[bytes, int, int], Awaitable[None]],
+                 on_connect: Callable[[int, bool], Awaitable[None]] | None = None,
+                 on_disconnect: Callable[[int, str], Awaitable[None]] | None = None,
+                 logger=None, metrics=None) -> None
+    async def run(self) -> None
+    async def stop(self) -> None
+    @property
+    def connected(self) -> bool: ...
+    @property
+    def last_msg_mono_ns(self) -> int: ...
+    @property
+    def connections(self) -> int: ...
+    @property
+    def messages(self) -> int: ...
+```
+
+- `on_message(payload: bytes, recv_wall_ns: int, recv_mono_ns: int)`：在 `ws.recv()` 返回后**立即**取两个时间戳再 await。payload 必须保持原始字节（str 用 UTF-8 编码）。
+- `run()` 外层重连循环：指数退避 `initial * 2^n`，上限 `reconnect_max_s`，加 ±20% 抖动；stop 时立即退出。连接成功后重置退避。
+- `websockets.connect` 参数：`ping_interval`, `ping_timeout`, `open_timeout`, `close_timeout`, `max_size=message_max_bytes`。`ws.recv()` 用 `wait_for(timeout=stale_timeout_ms/1000)`，超时抛 `FeedStale` 触发重连。
+- `on_connect(conn_id, is_reconnect)`：首次连接 `is_reconnect=False`，之后 True；`on_disconnect(conn_id, reason)` 在连接退出时调用。回调异常只记录，不打断重连。
+- 消息计数/字节数、连接/断线/重连、陈旧重连写入 metrics（存在时）。
+- `stop()` 幂等：置停止标志、关闭当前 ws、唤醒退避等待；`run()` 返回前确保 `connected=False`。
+- URL 用 `cfg.combined_ws_url()`。
+- metrics 调用采用 `metrics.inc(name, labels, value)` / `metrics.observe_ns(name, value, labels)` / `metrics.set_gauge(name, value, labels)`；允许传 `None`。
+- 单条消息回调异常：记录 `callback_errors`，继续读取（回调方负责自己的持久化）。
+
+```python
+@dataclass(slots=True, frozen=True)
+class SnapshotData:
+    symbol: str
+    last_update_id: int
+    bids: list[list[str]]
+    asks: list[list[str]]
+    requested_mono_ns: int
+    recv_mono_ns: int
+    recv_wall_ns: int
+
+class SnapshotError(Exception): ...
+
+class SnapshotClient:
+    def __init__(self, cfg: FeedConfig, *, logger=None, metrics=None) -> None
+    async def fetch(self, symbol: str) -> SnapshotData
+    async def close(self) -> None
+```
+
+- GET `{rest_url}/api/v3/depth?symbol=...&limit={snapshot_limit}`，aiohttp session 懒加载，`timeout=snapshot_timeout_s`，User-Agent。
+- 重试 `snapshot_retries` 次，指数退避 `snapshot_retry_backoff_s`；4xx（限频 429 除外）不重试；失败抛 `SnapshotError`。
+- 校验 `lastUpdateId`、`bids/asks` 非空；保留原始字符串列表（供 WAL 持久化）。
+- 时间戳：请求前 `perf_counter_ns`，响应读完后取 mono/wall。
+- 指标：`tickforge_snapshot_requests_total{symbol,status}`、`tickforge_snapshot_latency_ns`。
+- 测试用本地 aiohttp server / 本地 websockets server，不访问公网。
+
+## 7. 指标与 HTTP（OBS agent）
+
+文件：`tickforge/metrics/histogram.py`、`tickforge/metrics/registry.py`、`tickforge/metrics/__init__.py`、`tickforge/server/http.py`、`tickforge/server/__init__.py`、`tests/test_metrics.py`、`tests/test_http.py`。
+
+```python
+class MetricsRegistry:
+    def __init__(self) -> None
+    def inc(self, name: str, labels: dict[str,str] | None = None, value: float = 1.0) -> None
+    def set_gauge(self, name: str, value: float, labels: dict[str,str] | None = None) -> None
+    def observe_ns(self, name: str, value_ns: int, labels: dict[str,str] | None = None) -> None
+    def counter_value(self, name: str, labels=None) -> float
+    def gauge_value(self, name: str, labels=None) -> float
+    def snapshot(self) -> dict   # {"counters": {key: value}, "gauges": {...},
+                                 #  "histograms": {key: {...}}}
+    def render_prometheus(self) -> str
+```
+
+- key 格式：无标签为 `name`，有标签为 `name{k="v",k2="v2"}`（标签名排序）。
+- histogram 为 ns 对数桶（至少 1us..60s，边界固定），snapshot 返回 `count,min_ns,max_ns,sum_ns,mean_ns,p50_ns,p90_ns,p99_ns,p999_ns,buckets`；分位数取桶上界（保守），并在文档说明。
+- 线程安全（WAL 写线程会调用 inc/set_gauge）；热路径开销要小。
+- `render_prometheus`：counters→`# TYPE ... counter`，gauges→gauge，histograms→summary（quantile 0.5/0.9/0.99/0.999 + `_count`/`_sum`）。名称必须符合 Prometheus 规范，标签值需转义。
+- `NullMetrics` 提供相同接口的空实现（测试/基准用）。
+
+```python
+class HttpServer:
+    def __init__(self, metrics: MetricsRegistry, *,
+                 health_fn: Callable[[], dict],
+                 status_fn: Callable[[], dict],
+                 host: str = "127.0.0.1", port: int = 9100,
+                 logger=None) -> None
+    async def start(self) -> None
+    async def stop(self) -> None
+    @property
+    def port(self) -> int
+```
+
+- aiohttp AppRunner/TCPSite；`port=0` 时自动选端口并暴露实际端口。
+- `GET /healthz`、`/readyz`：`health_fn()` 返回 `{"ok": bool, ...}`，ok 为 true→200，否则 503，JSON。
+- `GET /status`：`status_fn()` JSON。
+- `GET /metrics`：`text/plain; version=0.0.4; charset=utf-8`。
+- `GET /`：简单文本，列出端点。
+- 启动/停止幂等；端口占用时抛异常让主程序失败。
+
+## 8. 运行时（集成层，主控实现）
+
+运行时负责 WAL 先行、队列、快照调度、健康、生命周期、摘要与回放。模块只能通过上述接口被调用。
+
+## 9. Metrics 名称约定（各模块使用）
+
+所有名称以 `tickforge_` 开头：
+
+- `tickforge_ws_messages_total`, `tickforge_ws_bytes_total`, `tickforge_ws_connect_total`, `tickforge_ws_disconnect_total`, `tickforge_ws_reconnect_total`, `tickforge_ws_stale_reconnect_total`, `tickforge_ws_callback_errors_total`
+- `tickforge_snapshot_requests_total{symbol,status}`, `tickforge_snapshot_latency_ns`, `tickforge_snapshot_bytes_total`
+- `tickforge_wal_records_total{kind}`, `tickforge_wal_bytes_total`, `tickforge_wal_queue_depth`, `tickforge_wal_fsync_total`, `tickforge_wal_fsync_latency_ns`, `tickforge_wal_errors_total`, `tickforge_wal_backpressure_total`
+- `tickforge_pipeline_events_total`, `tickforge_pipeline_parse_errors_total`, `tickforge_pipeline_queue_depth`, `tickforge_pipeline_backpressure_total`, `tickforge_pipeline_processing_lag_ms`
+- `tickforge_book_updates_total{symbol}`, `tickforge_book_snapshots_total{symbol}`, `tickforge_book_gaps_total{symbol}`, `tickforge_book_resyncs_total{symbol}`, `tickforge_book_crossed_total{symbol}`, `tickforge_book_buffered{symbol}`
+- `tickforge_factor_snapshots_total{symbol}`, `tickforge_signals_total{symbol}`, `tickforge_fills_total{symbol}`
+- `tickforge_trade_duplicates_total{symbol,kind}`、`tickforge_trade_gaps_total{symbol}`、`tickforge_trade_missing_ids_total{symbol}`、`tickforge_last_agg_trade_id{symbol}`
+- 延迟直方图：`tickforge_latency_ingest_enqueue_ns`, `tickforge_latency_parse_ns`, `tickforge_latency_book_ns`, `tickforge_latency_factor_ns`, `tickforge_latency_signal_ns`, `tickforge_latency_e2e_ns`
+- 资源：`tickforge_process_rss_bytes`, `tickforge_process_cpu_percent`, `tickforge_ingest_rate_per_s`, `tickforge_process_rate_per_s`

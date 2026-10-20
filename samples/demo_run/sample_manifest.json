@@ -1,0 +1,20 @@
+{
+  "source_run": "artifacts\\runs\\20261020T072820Z-53b5",
+  "created_at": "2026-10-20T08:00:52Z",
+  "records": 20000,
+  "ws_records": 19994,
+  "snapshot_records": 6,
+  "source_window_s": 64.884,
+  "copy_elapsed_s": 0.327,
+  "first_seq": 1,
+  "last_seq": 20000,
+  "wal_bytes": 6577970,
+  "segments": [
+    {
+      "name": "raw-000001.wal",
+      "records": 20000,
+      "bytes": 6577970,
+      "sha256": "9c47b3f0e1b15856c6c4411c26b9e443197a1e7fdd00ab77d0f3e8b7c3d92021"
+    }
+  ]
+}

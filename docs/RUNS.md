@@ -1,0 +1,38 @@
+# 运行产物索引
+
+| 运行 | run_id | 用途 |
+|---|---|---|
+| 正式 15 分钟 | `20261020T072820Z-53b5` | 报告与性能文档采用的干净实测；388,388 帧，零丢失，回放三项摘要一致 |
+| 首轮 15 分钟（并发磁盘压力） | `20261020T024737Z-e0b3` | 与评审期磁盘压力重叠，仍零丢失/零 gap；用于压力下的完整性旁证，不用于延迟数字 |
+| 现货只做多（独立实盘） | `20261020T074416Z-91ac` | 325,280 帧，2,131 fills，负仓位/负现金 0 |
+| 现货只做多（同一 WAL 对照） | `artifacts/variants/spot_long_only_same_wal_final` | 同一 388,394 条 WAL，3,082 fills，负仓位/负现金 0 |
+| 严格落盘（spot long-only + always） | `20261020T082850Z-6db8` | 272,784 帧，272,802 次 fsync，0 负仓位/负现金 |
+| 异常终止恢复实验 | `20261020T084432Z-9768` | 强制终止后 WAL 229 条记录 CRC/seq 有效，无残缺尾部 |
+| fsync 对比 | `fsync/interval/...`、`fsync/always/...`、`fsync/never/...` | 30 s BTCUSDT 对照实验 |
+| 离线样本 | `samples/demo_run` | 20,000 条 WAL 记录（约 64.9 s），可无网络回放 |
+
+正式运行产物：
+
+```text
+runs/20261020T072820Z-53b5/
+  raw/                     2 个 WAL 分段，388,394 条记录
+  derived/                 factors / signals / fills JSONL
+  logs/tickforge.log       结构化运行日志
+  summary.json             计数、速率、延迟分位、资源、对账、摘要
+  manifest.json            文件与 WAL 分段 SHA-256
+  sha256sums.txt           产物校验和
+  raw_events.jsonl.gz      WAL 的可读 JSONL 导出（可选）
+  replay/                  回放产物与 replay_summary.json
+```
+
+附件压缩包：
+
+```text
+artifacts/tickforge_raw_15m.tar.gz   正式运行 raw/ 的 tar.gz（15 MB）
+artifacts/tickforge_raw_15m.jsonl.gz 人类可读 JSONL 导出（13 MB）
+artifacts/tickforge_csv_15m.zip       CSV 表格视图（4.9 MB）
+artifacts/tickforge_summary.json     正式运行 summary.json
+artifacts/tickforge_manifest.json    正式运行 manifest.json
+artifacts/tickforge_sha256.txt       上述文件校验和
+tickforge_delivery.zip               代码、文档、测试、样本（1.2 MB）
+```

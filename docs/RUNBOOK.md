@@ -1,0 +1,164 @@
+# 运行手册
+
+## 1. 环境
+
+- Python 3.11+（本机实测 3.14.7，Windows 11，12 逻辑核，195 GB 可用磁盘）
+- 依赖：`requirements-lock.txt`（aiohttp 3.14.5 / orjson 3.13.0 / websockets 17.3 / psutil 7.2.2 及传递依赖）
+- 无需 API Key；需要能访问：
+  - `wss://data-stream.binance.vision/stream`
+  - `https://data-api.binance.vision/api/v3/depth`
+
+连通性自检：
+
+```bash
+curl -sS -m 8 -o /dev/null -w '%{http_code}\n' https://data-api.binance.vision/api/v3/ping
+```
+
+返回 `200` 即可。若网络无法访问该域名，可把 `config/default.toml` 中的 `ws_url` / `rest_url` 换成其他公开行情源（需保持相同消息结构，或在 `feed/` 中新增适配器）。
+
+## 2. 安装
+
+```bash
+cd 一诺资产
+python -m pip install -r requirements-lock.txt
+```
+
+Windows PowerShell 建议先：
+
+```powershell
+$env:PYTHONUTF8 = "1"
+```
+
+## 3. 15 分钟实测
+
+```bash
+# bash / Git Bash
+bash scripts/run_live_15m.sh
+
+# Windows PowerShell
+powershell -ExecutionPolicy Bypass -File scripts/run_live_15m.ps1
+
+# 直接命令（可覆盖参数）
+python -m tickforge live \
+  --config config/default.toml \
+  --duration 900 \
+  --symbols BTCUSDT,ETHUSDT,SOLUSDT,BNBUSDT,XRPUSDT,DOGEUSDT \
+  --out artifacts
+```
+
+运行时另开终端：
+
+```bash
+curl http://127.0.0.1:9100/healthz
+curl http://127.0.0.1:9100/status
+curl http://127.0.0.1:9100/metrics | head
+```
+
+- `/healthz` 200 表示：连接正常、行情新鲜、所有订单簿已同步、WAL 无错误、处理队列未滞后。
+- 运行时间从**收到第一条行情**开始计算 900 秒；启动阶段连接耗时不计入测量窗口。
+- 正常结束后进程退出码为 0；`summary.json.clean_shutdown` 应为 `true`。
+
+如需更严格的落盘语义（每条 fsync，延迟显著上升）：
+
+```bash
+python -m tickforge live --duration 60 --fsync-policy always --out artifacts
+```
+
+## 4. 产物
+
+```text
+artifacts/runs/<run_id>/
+  config.json           运行参数与环境快照（回放使用）
+  raw/raw-000001.wal    原始 WS 帧 + REST 快照，二进制格式见 docs/INTERFACES.md
+  raw_events.jsonl.gz   WAL 的人类可读导出（tools/wal_export.py 生成，可选）
+  csv/                  按事件类型拆分的 CSV（tools/wal_export_csv.py 生成）
+  derived/factors.jsonl 因子快照
+  derived/signals.jsonl 策略信号
+  derived/fills.jsonl   模拟成交
+  logs/tickforge.log    结构化 JSON 日志（滚动）
+  summary.json          计数、速率、延迟分位、WAL、对账、摘要哈希
+  manifest.json         文件清单 + WAL 分段 SHA-256
+  sha256sums.txt        产物校验和
+  replay/               （运行回放后生成）
+```
+
+## 5. 校验与回放
+
+```bash
+RUN_DIR=$(ls -td artifacts/runs/* | head -1)
+
+python -m tickforge verify --run "$RUN_DIR"
+python -m tickforge replay --run "$RUN_DIR" --verify
+python -m tickforge show --run "$RUN_DIR"
+python tools/analyze_run.py "$RUN_DIR"
+
+# 人类可读的原始行情（WAL 的只读视图）
+python tools/wal_export.py --run "$RUN_DIR" --out "$RUN_DIR/raw_events.jsonl.gz"
+
+# 按事件类型导出 CSV
+python tools/wal_export_csv.py --run "$RUN_DIR" --out-dir "$RUN_DIR/csv"
+```
+
+判定标准：
+
+- `verify`：`ok=true`，WAL 每条记录 CRC 通过，记录数与 `summary.json` 一致，manifest 分段哈希一致；
+- `replay --verify`：`deterministic=true`、`verified=true`，因子/信号/成交三个 SHA-256 与实时运行一致，计数一致；
+- `summary.json.reconciliation.lost_raw_frames == 0`，`drained == true`。
+
+## 6. 制作离线样本
+
+从一次真实运行裁剪前 N 条 WAL 记录（含快照），生成可离线回放的样本：
+
+```bash
+python tools/trim_run.py \
+  --run artifacts/runs/<run_id> \
+  --out samples/demo_run \
+  --records 20000
+python -m tickforge replay --run samples/demo_run --verify
+```
+
+样本目录包含 `config.json`、`raw/`、`sample_manifest.json`、`summary.json` 与可读 JSONL/CSV；`summary.json` 是离线参考摘要（由 `tools/make_sample_reference.py` 生成），不是 live 运行。无需访问交易所。
+
+## 7. Docker
+
+```bash
+docker compose build
+docker compose up --abort-on-container-exit
+```
+
+- 输出挂载：`./artifacts` → `/data`，容器内运行目录为 `/data/runs/<run_id>`；
+- 服务端口：`127.0.0.1:9100`；
+- 回放：`docker compose run --rm tickforge replay --run /data/runs/<run_id> --verify`；
+- 构建慢时可使用镜像：`PIP_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple docker compose build`；
+- 容器为 demo 便利以 root 运行，以便写 bind mount；生产应改固定 UID 并匹配卷权限。
+
+本机（Windows）已安装 Docker Desktop，但 WSL2 虚拟化组件不完整、Docker 引擎无法启动，镜像构建与运行未在本机执行；这是 P0 交付缺口，不能把 Docker 说成可选项。请在有 Docker 的环境执行 [DOCKER_VERIFICATION.md](DOCKER_VERIFICATION.md) 与 [scripts/docker_verify.sh](../scripts/docker_verify.sh)，并保存构建/运行/verify/replay 日志。Dockerfile 使用官方 `python:3.14-slim`，入口与本地 `python -m tickforge` 完全一致。
+
+## 8. 常见问题
+
+| 现象 | 排查 |
+|---|---|
+| 启动 120 秒无数据后退出 | 检查 `data-stream.binance.vision` 连通性；查看 `logs/tickforge.log` 的 connect 错误 |
+| `/healthz` 一直 503 | 看 `reasons`：`waiting_for_data` / `feed_disconnected` / `books_unsynced` / `processing_lag` |
+| 端口 9100 被占用 | `--http-port 0`（随机端口，启动日志/状态中可见）或换端口 |
+| `books_unsynced` 持续 | 检查 REST `/api/v3/depth` 是否被限频；日志中 `snapshot fetch failed` |
+| WAL 错误 | 检查磁盘空间/权限；`wal.error` 非空时程序会停止接收，已落盘数据仍可回放 |
+| replay 摘要不一致 | 先 `verify`；若 WAL 尾部截断或曾手工改配置，回放使用的参数来自运行时的 `config.json`，不应被当前环境覆盖 |
+| 想只跑 1 分钟 | `--duration 60`；`summary.window_s` 应约为 60 |
+| 想减少磁盘 | `--symbols BTCUSDT`；或调大 `wal.segment_bytes` 不减少总量，需在运行后归档/删除 |
+
+## 9. 归档与交付
+
+```bash
+# WAL 压缩（原始 JSON 文本压缩比通常 >8x）
+cd artifacts/runs/<run_id>
+tar -czf raw-<run_id>.tar.gz raw
+sha256sum raw-<run_id>.tar.gz
+
+# 代码/文档/样本（不含完整 artifacts）
+cd ../../..
+zip -r tickforge_delivery.zip tickforge tests tools scripts config docs README.md REPORT.md \
+  Dockerfile docker-compose.yml requirements*.txt pyproject.toml samples
+```
+
+邮件交付时附上：代码压缩包、`summary.json`、`manifest.json`、WAL 压缩包或离线样本、性能/验证文档与报告。
