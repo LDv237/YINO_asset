@@ -4,7 +4,8 @@
 
 > 笔试题目：YINO ASSET 量化开发工程师（实时高频行情交易系统 demo）。
 > GitHub: https://github.com/LDv237/YINO_asset
-> 设计与取舍见 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)，模块接口与 WAL 格式见 [docs/INTERFACES.md](docs/INTERFACES.md)，实测与复现见 [docs/PERFORMANCE.md](docs/PERFORMANCE.md)，完整报告见 [REPORT.md](REPORT.md)。
+> 文件名说明：GitHub 首页固定读取 `README.md`；其余设计、报告、验证文档均使用中文文件名。
+> 设计与取舍见 [docs/系统架构.md](docs/系统架构.md)，模块接口与 WAL 格式见 [docs/接口设计.md](docs/接口设计.md)，实测与复现见 [docs/性能实测.md](docs/性能实测.md)，完整报告见 [笔试报告.md](笔试报告.md)。
 
 ## 核心特性
 
@@ -69,7 +70,7 @@ python tools/wal_export_csv.py --run "$RUN_DIR" --out-dir "$RUN_DIR/csv"
 ## 两种执行语义
 
 - **默认：抽象做市**（`config/default.toml`）。允许负仓位/负现金，用于从零库存跑双边做市；它不是 Binance 现货账户；它是本文的性能/链路基准，不代表现货执行语义，现货执行版本见只做多配置。
-- **现货只做多**（`config/spot_long_only.toml`）。禁止裸卖，卖出不超过持仓，买入受每 symbol 10,000 USDT 初始现金限制；`position<=0` 时策略不发 ask。设计与实测见 [docs/SPOT_LONG_ONLY.md](docs/SPOT_LONG_ONLY.md)。
+- **现货只做多**（`config/spot_long_only.toml`）。禁止裸卖，卖出不超过持仓，买入受每 symbol 10,000 USDT 初始现金限制；`position<=0` 时策略不发 ask。设计与实测见 [docs/现货只做多设计.md](docs/现货只做多设计.md)。
 
 ```bash
 # 现货只做多 15 分钟
@@ -82,11 +83,11 @@ python -m tickforge live --config config/spot_long_only.toml   --duration 900 --
 python -m tickforge live --config config/spot_long_only_durable.toml   --duration 900 --out artifacts
 ```
 
-严格版实测：272,784 帧、272,802 条 WAL、1,576 fills、0 负仓位/负现金；p50 3.444 ms / p99 5.793 ms；2 次网络重连导致 data gap，但收到的原始帧 0 丢失，订单簿通过快照恢复。异常终止恢复实验见 `docs/VERIFICATION.md`。
+严格版实测：272,784 帧、272,802 条 WAL、1,576 fills、0 负仓位/负现金；p50 3.444 ms / p99 5.793 ms；2 次网络重连导致 data gap，但收到的原始帧 0 丢失，订单簿通过快照恢复。异常终止恢复实验见 `docs/正确性与可靠性验证.md`。
 
 ## Docker
 
-> **当前状态：Docker Desktop 已安装，但本机 WSL2 虚拟化组件不完整，Docker 引擎无法启动；镜像尚未实际构建/运行。** 提交前必须在有 Docker 的环境执行 [docs/DOCKER_VERIFICATION.md](docs/DOCKER_VERIFICATION.md) 中的命令，并保存构建日志、容器 summary、verify/replay 证据；一键脚本为 [scripts/docker_verify.sh](scripts/docker_verify.sh)。
+> **当前状态：Docker Desktop 已安装，但本机 WSL2 虚拟化组件不完整，Docker 引擎无法启动；镜像尚未实际构建/运行。** 提交前必须在有 Docker 的环境执行 [docs/Docker构建验证.md](docs/Docker构建验证.md) 中的命令，并保存构建日志、容器 summary、verify/replay 证据；一键脚本为 [scripts/docker_verify.sh](scripts/docker_verify.sh)。
 
 ```bash
 docker compose build
@@ -107,7 +108,7 @@ tools/               运行分析、样本裁剪
 scripts/             15 分钟运行、回放校验、Docker 运行
 config/default.toml  默认配置
 docs/                架构、接口、性能、验证、AI 协作、运行手册
-REPORT.md            笔试交付报告
+笔试报告.md            笔试交付报告
 artifacts/           运行产物（WAL、可读 JSONL/CSV、派生 JSONL、日志、摘要、清单）
 ```
 
@@ -122,7 +123,7 @@ python -m pytest -q
 
 ## 15 分钟实测摘要
 
-> 完整数据、延迟分位数、资源占用和复现命令见 [docs/PERFORMANCE.md](docs/PERFORMANCE.md)。
+> 完整数据、延迟分位数、资源占用和复现命令见 [docs/性能实测.md](docs/性能实测.md)。
 
 | 指标 | 结果 |
 |---|---|
