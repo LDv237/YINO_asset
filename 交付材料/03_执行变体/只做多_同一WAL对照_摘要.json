@@ -1,0 +1,443 @@
+{
+  "run_id": "20261020T072820Z-53b5",
+  "replayed_at": "2026-10-20T07:59:53Z",
+  "elapsed_s": 13.494,
+  "records": 388394,
+  "events": {
+    "ws": 388388,
+    "snapshot": 6
+  },
+  "throughput_events_per_s": 28783.3,
+  "scan": {
+    "records": 388394,
+    "records_by_kind": {
+      "1": 388388,
+      "2": 6
+    },
+    "first_seq": 1,
+    "last_seq": 388394,
+    "truncated_tail_bytes": 0,
+    "errors": []
+  },
+  "pipeline": {
+    "counts": {
+      "envelopes": 388394,
+      "ws_frames": 388388,
+      "snapshots": 6,
+      "snapshots_synced": 6,
+      "depth_events": 44315,
+      "trade_events": 24932,
+      "bookticker_events": 319141,
+      "unknown_events": 0,
+      "parse_errors": 0,
+      "applied": 44289,
+      "buffered": 26,
+      "duplicates": 0,
+      "gaps": 0,
+      "crossed": 0,
+      "snapshot_requests": 26,
+      "resyncs": 0,
+      "factor_snapshots": 43309,
+      "signals": 43309,
+      "fills": 3082,
+      "trade_duplicates": 0,
+      "trade_backwards": 0,
+      "trade_gaps": 0,
+      "trade_missing_ids": 0,
+      "internal_errors": 0
+    },
+    "books": {
+      "BTCUSDT": {
+        "symbol": "BTCUSDT",
+        "synced": true,
+        "last_update_id": 101671580050,
+        "bids": 4863,
+        "asks": 5645,
+        "buffered": 0,
+        "applied": 8984,
+        "duplicates": 5,
+        "gaps": 0,
+        "snapshots": 1,
+        "crossed": 0,
+        "buffer_overflow": 0,
+        "stale_snapshots": 0
+      },
+      "ETHUSDT": {
+        "symbol": "ETHUSDT",
+        "synced": true,
+        "last_update_id": 82270175360,
+        "bids": 5458,
+        "asks": 5111,
+        "buffered": 0,
+        "applied": 8924,
+        "duplicates": 4,
+        "gaps": 0,
+        "snapshots": 1,
+        "crossed": 0,
+        "buffer_overflow": 0,
+        "stale_snapshots": 0
+      },
+      "SOLUSDT": {
+        "symbol": "SOLUSDT",
+        "synced": true,
+        "last_update_id": 30408416327,
+        "bids": 4998,
+        "asks": 5003,
+        "buffered": 0,
+        "applied": 7102,
+        "duplicates": 2,
+        "gaps": 0,
+        "snapshots": 1,
+        "crossed": 0,
+        "buffer_overflow": 0,
+        "stale_snapshots": 0
+      },
+      "BNBUSDT": {
+        "symbol": "BNBUSDT",
+        "synced": true,
+        "last_update_id": 21012651576,
+        "bids": 5005,
+        "asks": 5024,
+        "buffered": 0,
+        "applied": 6880,
+        "duplicates": 2,
+        "gaps": 0,
+        "snapshots": 1,
+        "crossed": 0,
+        "buffer_overflow": 0,
+        "stale_snapshots": 0
+      },
+      "XRPUSDT": {
+        "symbol": "XRPUSDT",
+        "synced": true,
+        "last_update_id": 26778300523,
+        "bids": 4979,
+        "asks": 5017,
+        "buffered": 0,
+        "applied": 6522,
+        "duplicates": 4,
+        "gaps": 0,
+        "snapshots": 1,
+        "crossed": 0,
+        "buffer_overflow": 0,
+        "stale_snapshots": 0
+      },
+      "DOGEUSDT": {
+        "symbol": "DOGEUSDT",
+        "synced": true,
+        "last_update_id": 25717988857,
+        "bids": 3033,
+        "asks": 5010,
+        "buffered": 0,
+        "applied": 5885,
+        "duplicates": 1,
+        "gaps": 0,
+        "snapshots": 1,
+        "crossed": 0,
+        "buffer_overflow": 0,
+        "stale_snapshots": 0
+      }
+    },
+    "factors": {
+      "BNBUSDT": {
+        "depth_updates": 6879,
+        "trades": 2057,
+        "snapshots": 6737,
+        "last_ts_ms": 1792482199206
+      },
+      "BTCUSDT": {
+        "depth_updates": 8982,
+        "trades": 10761,
+        "snapshots": 8750,
+        "last_ts_ms": 1792482199316
+      },
+      "DOGEUSDT": {
+        "depth_updates": 5885,
+        "trades": 490,
+        "snapshots": 5782,
+        "last_ts_ms": 1792482199274
+      },
+      "ETHUSDT": {
+        "depth_updates": 8922,
+        "trades": 9304,
+        "snapshots": 8682,
+        "last_ts_ms": 1792482199315
+      },
+      "SOLUSDT": {
+        "depth_updates": 7100,
+        "trades": 1102,
+        "snapshots": 6975,
+        "last_ts_ms": 1792482199295
+      },
+      "XRPUSDT": {
+        "depth_updates": 6521,
+        "trades": 1218,
+        "snapshots": 6383,
+        "last_ts_ms": 1792482199217
+      }
+    },
+    "strategy": {
+      "snapshots": 43309,
+      "signals": 43309,
+      "disabled": 0,
+      "cooldown_suppressed": 0,
+      "invalid": 0,
+      "bid_skipped": 0,
+      "ask_skipped": 31631,
+      "last_signal_ts_ms": {
+        "ETHUSDT": 1792482199315,
+        "BTCUSDT": 1792482199314,
+        "DOGEUSDT": 1792482199274,
+        "XRPUSDT": 1792482199217,
+        "SOLUSDT": 1792482199295,
+        "BNBUSDT": 1792482199206
+      }
+    },
+    "simulator": {
+      "symbols": {
+        "BNBUSDT": {
+          "symbol": "BNBUSDT",
+          "position": 0.0,
+          "avg_cost": 0.0,
+          "mark": 728.715,
+          "cash": 9755.875604875504,
+          "initial_cash": 10000.0,
+          "realized_pnl": -244.1243951245023,
+          "unrealized_pnl": 0.0,
+          "total_pnl": -244.124395124496,
+          "fees": 2.785605125149595,
+          "fills": 362,
+          "open_bid": 728.54589245,
+          "open_ask": null,
+          "open_bid_qty": 0.68624039,
+          "open_ask_qty": 0.0,
+          "max_abs_position": 0.68714426,
+          "trades": 2057,
+          "signals": 6737,
+          "risk_truncated": 0,
+          "risk_rejected": 0
+        },
+        "BTCUSDT": {
+          "symbol": "BTCUSDT",
+          "position": 0.0,
+          "avg_cost": 0.0,
+          "mark": 81616.005,
+          "cash": 8499.83972672916,
+          "initial_cash": 10000.0,
+          "realized_pnl": -1500.160273270841,
+          "unrealized_pnl": 0.0,
+          "total_pnl": -1500.1602732708398,
+          "fees": 13.71958876583357,
+          "fills": 759,
+          "open_bid": 81608.27277118,
+          "open_ask": null,
+          "open_bid_qty": 0.00612633,
+          "open_ask_qty": 0.0,
+          "max_abs_position": 0.00613531,
+          "trades": 10761,
+          "signals": 8750,
+          "risk_truncated": 0,
+          "risk_rejected": 0
+        },
+        "DOGEUSDT": {
+          "symbol": "DOGEUSDT",
+          "position": 0.0,
+          "avg_cost": 0.0,
+          "mark": 0.079255,
+          "cash": 9874.757643744653,
+          "initial_cash": 10000.0,
+          "realized_pnl": -125.24235625535742,
+          "unrealized_pnl": 0.0,
+          "total_pnl": -125.24235625534675,
+          "fees": 1.4747512139058856,
+          "fills": 195,
+          "open_bid": 0.07925603,
+          "open_ask": null,
+          "open_bid_qty": 6308.13520329,
+          "open_ask_qty": 0.0,
+          "max_abs_position": 6325.38013264,
+          "trades": 490,
+          "signals": 5782,
+          "risk_truncated": 0,
+          "risk_rejected": 0
+        },
+        "ETHUSDT": {
+          "symbol": "ETHUSDT",
+          "position": 0.0,
+          "avg_cost": 0.0,
+          "mark": 2392.675,
+          "cash": 8805.628400573665,
+          "initial_cash": 10000.0,
+          "realized_pnl": -1194.3715994263382,
+          "unrealized_pnl": 0.0,
+          "total_pnl": -1194.3715994263348,
+          "fees": 11.957427506075854,
+          "fills": 1050,
+          "open_bid": 2392.01756819,
+          "open_ask": null,
+          "open_bid_qty": 0.20901018,
+          "open_ask_qty": 0.0,
+          "max_abs_position": 0.21144717,
+          "trades": 9304,
+          "signals": 8682,
+          "risk_truncated": 0,
+          "risk_rejected": 0
+        },
+        "SOLUSDT": {
+          "symbol": "SOLUSDT",
+          "position": 0.0,
+          "avg_cost": 0.0,
+          "mark": 104.475,
+          "cash": 9753.666365099574,
+          "initial_cash": 10000.0,
+          "realized_pnl": -246.33363490044616,
+          "unrealized_pnl": 0.0,
+          "total_pnl": -246.33363490042575,
+          "fees": 3.2369305819068224,
+          "fills": 339,
+          "open_bid": 104.45375607,
+          "open_ask": null,
+          "open_bid_qty": 4.78637236,
+          "open_ask_qty": 0.0,
+          "max_abs_position": 4.79159495,
+          "trades": 1102,
+          "signals": 6975,
+          "risk_truncated": 0,
+          "risk_rejected": 0
+        },
+        "XRPUSDT": {
+          "symbol": "XRPUSDT",
+          "position": 0.0,
+          "avg_cost": 0.0,
+          "mark": 1.29745,
+          "cash": 9578.914364699931,
+          "initial_cash": 10000.0,
+          "realized_pnl": -421.08563530005694,
+          "unrealized_pnl": 0.0,
+          "total_pnl": -421.08563530006904,
+          "fees": 5.739256250483764,
+          "fills": 377,
+          "open_bid": 1.29733752,
+          "open_ask": null,
+          "open_bid_qty": 385.3710808,
+          "open_ask_qty": 0.0,
+          "max_abs_position": 385.62082218,
+          "trades": 1218,
+          "signals": 6383,
+          "risk_truncated": 0,
+          "risk_rejected": 0
+        }
+      },
+      "totals": {
+        "position": 0.0,
+        "avg_cost": 0.0,
+        "cash": 56268.68210572249,
+        "initial_cash": 60000.0,
+        "realized_pnl": -3731.317894277542,
+        "unrealized_pnl": 0.0,
+        "total_pnl": -3731.317894277512,
+        "fees": 38.913559443355496,
+        "fills": 3082,
+        "open_bid": 2999.741535697034,
+        "open_ask": 0.0,
+        "open_bid_qty": 6699.194033350001,
+        "open_ask_qty": 0.0,
+        "max_abs_position": 6716.69727651,
+        "trades": 24932,
+        "signals": 43309,
+        "risk_truncated": 0,
+        "risk_rejected": 0
+      }
+    },
+    "trade_quality": {
+      "BNBUSDT": {
+        "last_agg_trade_id": 866935209,
+        "accepted": 2057,
+        "duplicates": 0,
+        "backwards": 0,
+        "gaps": 0,
+        "missing_ids": 0
+      },
+      "BTCUSDT": {
+        "last_agg_trade_id": 4093713476,
+        "accepted": 10761,
+        "duplicates": 0,
+        "backwards": 0,
+        "gaps": 0,
+        "missing_ids": 0
+      },
+      "DOGEUSDT": {
+        "last_agg_trade_id": 721035167,
+        "accepted": 490,
+        "duplicates": 0,
+        "backwards": 0,
+        "gaps": 0,
+        "missing_ids": 0
+      },
+      "ETHUSDT": {
+        "last_agg_trade_id": 2104227237,
+        "accepted": 9304,
+        "duplicates": 0,
+        "backwards": 0,
+        "gaps": 0,
+        "missing_ids": 0
+      },
+      "SOLUSDT": {
+        "last_agg_trade_id": 679165643,
+        "accepted": 1102,
+        "duplicates": 0,
+        "backwards": 0,
+        "gaps": 0,
+        "missing_ids": 0
+      },
+      "XRPUSDT": {
+        "last_agg_trade_id": 730424713,
+        "accepted": 1218,
+        "duplicates": 0,
+        "backwards": 0,
+        "gaps": 0,
+        "missing_ids": 0
+      }
+    },
+    "uptime_s": 14.8212413
+  },
+  "digests": {
+    "factors_sha256": "df2fbee57a9b9268bc24050d76951ea59c8ae2b5c73a32b09a1d5495ea08b2a5",
+    "signals_sha256": "cae2bc873957927eb4a46ab3abec5c70efb6fbeaa634a5f8758b6d7f989b3b38",
+    "fills_sha256": "94a4e7786448d4477369004afa299054f5a3257c5ea30609caa2cc8a3feb5efe"
+  },
+  "derived": {
+    "factors": {
+      "path": "artifacts\\variants\\spot_long_only_same_wal_final\\derived\\factors.jsonl",
+      "records": 43309,
+      "bytes": 16130416,
+      "sha256": "df2fbee57a9b9268bc24050d76951ea59c8ae2b5c73a32b09a1d5495ea08b2a5"
+    },
+    "signals": {
+      "path": "artifacts\\variants\\spot_long_only_same_wal_final\\derived\\signals.jsonl",
+      "records": 43309,
+      "bytes": 8198461,
+      "sha256": "cae2bc873957927eb4a46ab3abec5c70efb6fbeaa634a5f8758b6d7f989b3b38"
+    },
+    "fills": {
+      "path": "artifacts\\variants\\spot_long_only_same_wal_final\\derived\\fills.jsonl",
+      "records": 3082,
+      "bytes": 719220,
+      "sha256": "94a4e7786448d4477369004afa299054f5a3257c5ea30609caa2cc8a3feb5efe"
+    }
+  },
+  "comparison": {
+    "verified": true,
+    "deterministic": null,
+    "reference_compared": false,
+    "reasons": [],
+    "note": "variant execution semantics; derived output intentionally differs from the reference run",
+    "replay_counts": {
+      "ws_frames": 388388,
+      "snapshots": 6,
+      "factor_snapshots": 43309,
+      "signals": 43309,
+      "fills": 3082
+    }
+  }
+}

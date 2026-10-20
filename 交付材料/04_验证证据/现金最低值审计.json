@@ -1,0 +1,87 @@
+{
+  "abstract": {
+    "initial_cash_per_symbol": 0.0,
+    "running_min": -9375.830898317161,
+    "ending_min": -9295.785094088333,
+    "per_symbol_running_min": {
+      "BNBUSDT": -1543.260014,
+      "BTCUSDT": -9375.830898,
+      "DOGEUSDT": -837.552729,
+      "ETHUSDT": -5687.605767,
+      "SOLUSDT": -1728.0067,
+      "XRPUSDT": -2363.599791
+    },
+    "fills": {
+      "XRPUSDT": 1086,
+      "DOGEUSDT": 406,
+      "ETHUSDT": 3070,
+      "SOLUSDT": 957,
+      "BNBUSDT": 1400,
+      "BTCUSDT": 3147
+    }
+  },
+  "long_only_live": {
+    "initial_cash_per_symbol": 10000.0,
+    "running_min": 8318.709254276164,
+    "ending_min": 8810.299252232324,
+    "per_symbol_running_min": {
+      "BNBUSDT": 9398.186865,
+      "BTCUSDT": 8318.709254,
+      "DOGEUSDT": 9443.993572,
+      "ETHUSDT": 8652.449278,
+      "SOLUSDT": 9339.739274,
+      "XRPUSDT": 9352.170173
+    },
+    "fills": {
+      "ETHUSDT": 717,
+      "XRPUSDT": 163,
+      "BTCUSDT": 674,
+      "SOLUSDT": 237,
+      "BNBUSDT": 222,
+      "DOGEUSDT": 118
+    }
+  },
+  "long_only_same_wal": {
+    "initial_cash_per_symbol": 10000.0,
+    "running_min": 8010.051944707815,
+    "ending_min": 8499.83972672916,
+    "per_symbol_running_min": {
+      "BNBUSDT": 9265.309451,
+      "BTCUSDT": 8010.051945,
+      "DOGEUSDT": 9383.924838,
+      "ETHUSDT": 8316.641584,
+      "SOLUSDT": 9265.946112,
+      "XRPUSDT": 9105.754973
+    },
+    "fills": {
+      "XRPUSDT": 377,
+      "DOGEUSDT": 195,
+      "SOLUSDT": 339,
+      "BNBUSDT": 362,
+      "ETHUSDT": 1050,
+      "BTCUSDT": 759
+    }
+  },
+  "method": "min(initial_cash, cash after every fill) per symbol; ending_min is the minimum of final cash balances; not portfolio mark-to-market",
+  "strict_long_only": {
+    "initial_cash_per_symbol": 10000.0,
+    "running_min": 8967.803826897685,
+    "ending_min": 9458.087008982277,
+    "per_symbol_running_min": {
+      "BNBUSDT": 9403.747837,
+      "BTCUSDT": 9032.093977,
+      "DOGEUSDT": 9456.581672,
+      "ETHUSDT": 8967.803827,
+      "SOLUSDT": 9284.003918,
+      "XRPUSDT": 9282.619836
+    },
+    "fills": {
+      "SOLUSDT": 205,
+      "BTCUSDT": 307,
+      "BNBUSDT": 220,
+      "DOGEUSDT": 87,
+      "XRPUSDT": 198,
+      "ETHUSDT": 559
+    }
+  }
+}

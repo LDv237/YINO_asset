@@ -11,6 +11,9 @@ tickforge_delivery.zip
 
 # generated delivery archive
 一诺笔试交付包.zip
+!交付材料/01_代码与文档/一诺笔试交付包.zip
 
-# interview delivery folder (generated copies)
-交付材料/
+!交付材料/05_运行日志/*.log
+
+# complete email attachment archive
+一诺笔试完整交付包.zip

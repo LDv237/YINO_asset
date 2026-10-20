@@ -1,0 +1,15 @@
+完整运行目录（未复制到本交付文件夹，避免重复占用空间）：
+
+正式性能基准（抽象做市 / interval）:
+  artifacts/runs/20261020T072820Z-53b5
+
+现货只做多 / interval:
+  artifacts/runs/20261020T074416Z-91ac
+
+现货只做多 / always 严格落盘:
+  artifacts/runs/20261020T082850Z-6db8
+
+同一 WAL 只做多对照:
+  artifacts/experiments/variants/spot_long_only_same_wal_final
+
+每个目录包含 raw/、derived/、logs/、summary.json、manifest.json，正式运行另含 replay/。

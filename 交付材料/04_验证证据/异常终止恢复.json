@@ -1,0 +1,21 @@
+{
+  "ok": true,
+  "run_dir": "artifacts\\crash_recovery\\runs\\20261020T084432Z-9768",
+  "child_returncode": 1,
+  "note": "Process was killed without graceful shutdown. This is an application-level crash test, not a power-loss test; no clean_shutdown/summary is expected.",
+  "wal": {
+    "records": 229,
+    "records_by_kind": {
+      "1": 228,
+      "2": 1
+    },
+    "bytes": 382628,
+    "segments": [
+      "raw-000001.wal"
+    ],
+    "first_seq": 1,
+    "last_seq": 229,
+    "truncated_tail_bytes": 0,
+    "errors": []
+  }
+}
