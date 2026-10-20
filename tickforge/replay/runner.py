@@ -83,10 +83,26 @@ def config_from_run(run_dir: str | Path) -> Config:
 
     Reproducibility requires using the *same* factor/strategy parameters as
     the original run, not whatever happens to be in the caller's environment.
+    A missing/corrupt ``config.json`` falls back to ``summary.json``'s config
+    (written by the same run); if neither exists, fail instead of silently
+    using defaults.
     """
 
-    doc = _load_json(Path(run_dir) / "config.json") or {}
-    raw = doc.get("config") or {}
+    run_dir = Path(run_dir)
+    doc = _load_json(run_dir / "config.json")
+    if doc is not None:
+        raw = doc.get("config")
+        if not raw:
+            raise ValueError(f"config.json has no config section: {run_dir}")
+    else:
+        summary = _load_json(run_dir / "summary.json") or {}
+        raw = summary.get("config")
+        if not raw:
+            raise FileNotFoundError(
+                f"config.json is missing and summary.json has no config: {run_dir}"
+            )
+        log.warning("config.json missing; using summary.json config for %s", run_dir)
+
     cfg = Config(
         feed=_build(FeedConfig, raw.get("feed", {})),
         wal=_build(WalConfig, raw.get("wal", {})),
@@ -162,7 +178,12 @@ class ReplayRunner:
             logger=self.log,
         )
 
-        reader = WalReader(self.raw_dir, verify_crc=True, allow_truncated_tail=True)
+        reader = WalReader(
+            self.raw_dir,
+            verify_crc=True,
+            allow_truncated_tail=True,
+            record_max_bytes=self.cfg.wal.record_max_bytes,
+        )
         started = time.perf_counter()
         records = 0
         events = {"ws": 0, "snapshot": 0}
@@ -202,7 +223,9 @@ class ReplayRunner:
                     "sha256": result.sha256,
                 }
 
-        scan = reader.scan()
+        scan = WalReader(
+            self.raw_dir, record_max_bytes=self.cfg.wal.record_max_bytes
+        ).scan()
         if self.compare_reference:
             live_summary = _load_json(self.run_dir / "summary.json") or {}
             comparison = self._compare(scan, pipeline, digests, live_summary)
@@ -381,8 +404,13 @@ def verify_run(run_dir: str | Path) -> dict:
             "checks": checks,
         }
 
+    record_max_bytes = None
     try:
-        reader = WalReader(raw_dir)
+        record_max_bytes = config_from_run(run_dir).wal.record_max_bytes
+    except Exception:
+        pass
+    try:
+        reader = WalReader(raw_dir, record_max_bytes=record_max_bytes)
         scan = reader.scan()
     except WalCorruptionError as exc:
         return {

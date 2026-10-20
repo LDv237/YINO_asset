@@ -45,6 +45,7 @@ _LABEL_INVALID_CHARS = re.compile(r"[^a-zA-Z0-9_]")
 _QUANTILE_FIELDS: tuple[tuple[float, str], ...] = (
     (0.5, "p50_ns"),
     (0.9, "p90_ns"),
+    (0.95, "p95_ns"),
     (0.99, "p99_ns"),
     (0.999, "p999_ns"),
 )

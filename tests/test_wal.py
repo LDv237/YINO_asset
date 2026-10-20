@@ -574,6 +574,31 @@ def test_close_empty_writer(tmp_path: Path) -> None:
     assert scan.first_seq is None and scan.last_seq is None
 
 
+def test_durable_lag_callback_receives_sample(tmp_path: Path) -> None:
+    samples: list[int] = []
+    writer = make_writer(
+        tmp_path / "wal",
+        fsync_policy="always",
+        on_durable_lag_ns=samples.append,
+    )
+    append_record(writer, b"payload", seq=1, mono=time.monotonic_ns())
+    writer.flush_and_sync()
+    assert samples and samples[-1] >= 0
+    writer.close()
+
+
+def test_reader_uses_configured_record_limit(tmp_path: Path) -> None:
+    wal_dir = tmp_path / "wal"
+    writer = make_writer(wal_dir, record_max_bytes=2048)
+    append_record(writer, b"x" * 2000, seq=1)
+    writer.close()
+
+    with pytest.raises(WalCorruptionError):
+        WalReader(wal_dir, record_max_bytes=1024).scan()
+    scan = WalReader(wal_dir, record_max_bytes=2048).scan()
+    assert scan.records == 1
+
+
 def test_close_propagates_finalize_failure(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

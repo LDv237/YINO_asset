@@ -116,6 +116,8 @@ class LiveCounts:
     processed_envelopes: int = 0
     not_enqueued_on_shutdown: int = 0
     fatal_errors: int = 0
+    wal_queue_max: int = 0
+    pipeline_queue_max: int = 0
 
 
 class LiveEngine:
@@ -178,6 +180,7 @@ class LiveEngine:
             queue_max=cfg.wal.queue_max,
             record_max_bytes=cfg.wal.record_max_bytes,
             logger=self.log,
+            on_durable_lag_ns=self._observe_durable_lag,
         )
         self.pipeline = Pipeline(
             cfg,
@@ -362,6 +365,9 @@ class LiveEngine:
                             recv_mono_ns=recv_mono_ns,
                             seq=seq,
                         )
+                    self.live.wal_queue_max = max(
+                        self.live.wal_queue_max, self.wal.queue_depth
+                    )
                     break
                 except WalQueueFull:
                     self.live.wal_backpressure += 1
@@ -400,6 +406,9 @@ class LiveEngine:
                     self.queue.put_nowait(env)
                     self.metrics.set_gauge(
                         "tickforge_pipeline_queue_depth", self.queue.qsize()
+                    )
+                    self.live.pipeline_queue_max = max(
+                        self.live.pipeline_queue_max, self.queue.qsize()
                     )
                     return seq
                 except asyncio.QueueFull:
@@ -908,6 +917,9 @@ class LiveEngine:
         end = time.time_ns()
         return max(0.0, (end - self._first_event_wall_ns) / 1e9)
 
+    def _observe_durable_lag(self, lag_ns: int) -> None:
+        self.metrics.observe_ns("tickforge_latency_wal_durable_ns", lag_ns)
+
     def _build_summary(
         self,
         *,
@@ -1016,6 +1028,8 @@ class LiveEngine:
                 "pipeline_backpressure_events": self.live.pipeline_backpressure,
                 "processing_errors": self.live.processing_errors,
                 "fatal_errors": self.live.fatal_errors,
+                "wal_queue_max": self.live.wal_queue_max,
+                "pipeline_queue_max": self.live.pipeline_queue_max,
                 "pipeline": dict(pipe),
             },
             "rates": rates,

@@ -166,6 +166,15 @@ async def test_live_pipeline_verifies_and_replays(tmp_path: Path) -> None:
     assert summary["health_final"]["ok"] is True
     assert summary["health_final_context"] == "after_intentional_shutdown"
 
+    assert "wal_queue_max" in summary["counts"]
+    assert "pipeline_queue_max" in summary["counts"]
+    latency = summary["latency_ns"]
+    assert "p95_ns" in latency["tickforge_latency_e2e_ns"]
+    assert "tickforge_latency_e2e_depth_ns" in latency
+    assert "tickforge_latency_e2e_trade_ns" in latency
+    assert "tickforge_latency_e2e_bookticker_ns" in latency
+    assert "tickforge_latency_wal_durable_ns" in latency
+
     verified = verify_run(run_dir)
     assert verified["ok"] is True, verified
 

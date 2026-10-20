@@ -133,6 +133,7 @@ def test_empty_histogram_snapshot() -> None:
         "mean_ns",
         "p50_ns",
         "p90_ns",
+        "p95_ns",
         "p99_ns",
         "p999_ns",
         "buckets",
@@ -142,7 +143,7 @@ def test_empty_histogram_snapshot() -> None:
     assert snap["max_ns"] == 0
     assert snap["sum_ns"] == 0
     assert snap["mean_ns"] == 0.0
-    for key in ("p50_ns", "p90_ns", "p99_ns", "p999_ns"):
+    for key in ("p50_ns", "p90_ns", "p95_ns", "p99_ns", "p999_ns"):
         assert snap[key] == 0
     assert len(snap["buckets"]) == len(BUCKET_BOUNDS_NS)
     assert all(bucket["count"] == 0 for bucket in snap["buckets"])
@@ -162,7 +163,13 @@ def test_histogram_aggregates_and_percentile_ordering() -> None:
     assert snap["sum_ns"] == sum(values)
     assert snap["mean_ns"] == pytest.approx(sum(values) / len(values))
 
-    quantiles = [snap["p50_ns"], snap["p90_ns"], snap["p99_ns"], snap["p999_ns"]]
+    quantiles = [
+        snap["p50_ns"],
+        snap["p90_ns"],
+        snap["p95_ns"],
+        snap["p99_ns"],
+        snap["p999_ns"],
+    ]
     assert quantiles == sorted(quantiles)
     for reported in quantiles:
         assert snap["min_ns"] <= reported <= MAX_BUCKET_NS
@@ -211,7 +218,9 @@ def test_histogram_quantile_property_randomized() -> None:
     assert snap["max_ns"] == max(values)
     assert snap["sum_ns"] == sum(values)
     ordered = sorted(values)
-    reported = [snap[k] for k in ("p50_ns", "p90_ns", "p99_ns", "p999_ns")]
+    reported = [
+        snap[k] for k in ("p50_ns", "p90_ns", "p95_ns", "p99_ns", "p999_ns")
+    ]
     assert reported == sorted(reported)
     for q, value in zip(HISTOGRAM_QUANTILES, reported):
         rank = max(1, math.ceil(q * len(ordered)))
@@ -490,6 +499,7 @@ def test_prometheus_histogram_quantiles_match_snapshot() -> None:
     assert values == {
         "0.5": float(snap["p50_ns"]),
         "0.9": float(snap["p90_ns"]),
+        "0.95": float(snap["p95_ns"]),
         "0.99": float(snap["p99_ns"]),
         "0.999": float(snap["p999_ns"]),
     }

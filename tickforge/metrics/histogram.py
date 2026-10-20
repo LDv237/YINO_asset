@@ -42,7 +42,7 @@ MIN_BUCKET_NS: int = 1_000
 MAX_BUCKET_NS: int = 60_000_000_000
 
 #: Quantiles exposed in snapshots and Prometheus summaries, in order.
-HISTOGRAM_QUANTILES: tuple[float, ...] = (0.5, 0.9, 0.99, 0.999)
+HISTOGRAM_QUANTILES: tuple[float, ...] = (0.5, 0.9, 0.95, 0.99, 0.999)
 
 
 def _build_bucket_bounds() -> tuple[int, ...]:
@@ -180,7 +180,7 @@ class Histogram:
                 cumulative += count
                 buckets.append({"le": int(bound), "count": cumulative})
 
-        p50, p90, p99, p999 = (
+        p50, p90, p95, p99, p999 = (
             quantile_ns(counts, total, q) for q in HISTOGRAM_QUANTILES
         )
         mean = (total_sum / total) if total else 0.0
@@ -192,6 +192,7 @@ class Histogram:
             "mean_ns": mean,
             "p50_ns": p50,
             "p90_ns": p90,
+            "p95_ns": p95,
             "p99_ns": p99,
             "p999_ns": p999,
             "buckets": buckets,

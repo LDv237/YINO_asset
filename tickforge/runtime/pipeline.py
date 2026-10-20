@@ -202,15 +202,15 @@ class Pipeline:
             # The full-depth book is authoritative; bookTicker is retained in
             # the WAL as an independent freshness/reference stream.
             self.counts["bookticker_events"] += 1
-            self._observe_e2e(env)
+            self._observe_e2e(env, "bookticker")
             return
         if isinstance(event, TradeEvent):
             self._process_trade(event)
-            self._observe_e2e(env)
+            self._observe_e2e(env, "trade")
             return
         if isinstance(event, DepthEvent):
             self._process_depth(event, parse_end)
-            self._observe_e2e(env)
+            self._observe_e2e(env, "depth")
             return
         self.counts["unknown_events"] += 1
         self._observe_e2e(env)
@@ -327,15 +327,19 @@ class Pipeline:
             self.simulator.apply_signal(signal)
         self.simulator.mark(event.symbol, snapshot.mid)
 
-    def _observe_e2e(self, env: Envelope) -> None:
+    def _observe_e2e(self, env: Envelope, kind: str | None = None) -> None:
         if self.observe_latency:
             now = time.perf_counter_ns()
             if env.recv_mono_ns > 0 and now >= env.recv_mono_ns:
                 delta = now - env.recv_mono_ns
                 # Aggregate series is what the report cites; the per-symbol
-                # copy preserves attribution for /metrics without making the
-                # headline percentile depend on label aggregation.
+                # and per-stream copies preserve attribution without making
+                # the headline percentile depend on label aggregation.
                 self.metrics.observe_ns("tickforge_latency_e2e_ns", delta)
+                if kind is not None:
+                    self.metrics.observe_ns(
+                        f"tickforge_latency_e2e_{kind}_ns", delta
+                    )
                 if env.kind == KIND_WS:
                     self.metrics.observe_ns(
                         "tickforge_latency_e2e_by_symbol_ns",

@@ -189,6 +189,7 @@ def cmd_show(args: argparse.Namespace) -> int:
         print("e2e latency:", json.dumps({
             "count": e2e.get("count"),
             "p50_ns": e2e.get("p50_ns"),
+            "p95_ns": e2e.get("p95_ns"),
             "p99_ns": e2e.get("p99_ns"),
             "p999_ns": e2e.get("p999_ns"),
             "max_ns": e2e.get("max_ns"),

@@ -37,6 +37,7 @@ import hashlib
 import logging
 import os
 import queue
+import errno
 import re
 import struct
 import threading
@@ -256,6 +257,7 @@ class WalWriter:
         record_max_bytes: int = DEFAULT_RECORD_MAX_BYTES,
         logger: logging.Logger | None = None,
         on_error: Callable[[BaseException], None] | None = None,
+        on_durable_lag_ns: Callable[[int], None] | None = None,
     ) -> None:
         if fsync_policy not in _FSYNC_POLICIES:
             raise ValueError(f"fsync_policy must be one of {_FSYNC_POLICIES}")
@@ -276,6 +278,7 @@ class WalWriter:
         self._record_max_bytes = int(record_max_bytes)
         self._log = logger or _log
         self._on_error = on_error
+        self._on_durable_lag_ns = on_durable_lag_ns
 
         self._queue: queue.Queue[object] = queue.Queue(maxsize=self._queue_max)
 
@@ -312,6 +315,7 @@ class WalWriter:
         self._current_bytes = 0
         self._needs_sync = False
         self._pending_fsync: list[Path] = []
+        self._pending_recv_mono: int | None = None
 
     # ------------------------------------------------------------------
     # Lifecycle
@@ -699,6 +703,32 @@ class WalWriter:
         with self._lock:
             self._segment_names.append(name)
             self._segment_records[name] = 0
+        if self._fsync_policy in ("interval", "always"):
+            self._fsync_dir()
+
+    def _fsync_dir(self) -> None:
+        """Persist the new segment's directory entry on POSIX.
+
+        The record contents are fsynced separately; without a directory fsync
+        a newly created/rotated segment can disappear after an OS crash even
+        when its data blocks were durable.  Windows has no equivalent
+        directory handle fsync, so this is a no-op there.
+        """
+
+        if os.name != "posix":
+            return
+        fd = os.open(self._dir, os.O_RDONLY)
+        try:
+            os.fsync(fd)
+        except OSError as exc:
+            if exc.errno in (errno.EINVAL, errno.ENOTSUP, errno.EOPNOTSUPP):
+                self._log.warning(
+                    "directory fsync unsupported on %s: %s", self._dir, exc
+                )
+                return
+            raise
+        finally:
+            os.close(fd)
 
     def _write_record(self, record: _QueuedRecord) -> None:
         payload = record.payload
@@ -747,6 +777,11 @@ class WalWriter:
             )
         self._current_bytes += record_len
         self._needs_sync = True
+        if (
+            self._pending_recv_mono is None
+            or record.recv_mono_ns < self._pending_recv_mono
+        ):
+            self._pending_recv_mono = record.recv_mono_ns
 
     def _rotate(self) -> None:
         """Flush and close the current segment; called before a record won't fit."""
@@ -794,6 +829,14 @@ class WalWriter:
         self._needs_sync = False
         with self._lock:
             self._durable_seq = self._written_seq
+        if self._pending_recv_mono is not None:
+            lag_ns = max(0, time.monotonic_ns() - self._pending_recv_mono)
+            self._pending_recv_mono = None
+            if self._on_durable_lag_ns is not None:
+                try:
+                    self._on_durable_lag_ns(lag_ns)
+                except Exception:  # metrics must never break durability
+                    self._log.exception("durable-lag callback failed")
 
     def _finalize_close(self) -> None:
         self._flush_sync()
@@ -856,11 +899,18 @@ class WalReader:
         *,
         verify_crc: bool = True,
         allow_truncated_tail: bool = False,
+        record_max_bytes: int | None = None,
     ) -> None:
         self._dir = Path(directory)
         self._verify_crc = bool(verify_crc)
         self._allow_truncated_tail = bool(allow_truncated_tail)
-        self._record_max_bytes = DEFAULT_RECORD_MAX_BYTES
+        if record_max_bytes is not None and record_max_bytes <= 0:
+            raise ValueError("record_max_bytes must be positive")
+        self._record_max_bytes = (
+            DEFAULT_RECORD_MAX_BYTES
+            if record_max_bytes is None
+            else int(record_max_bytes)
+        )
 
     def segment_paths(self) -> list[Path]:
         """Return segment files sorted by numeric suffix."""
