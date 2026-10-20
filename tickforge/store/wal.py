@@ -286,6 +286,7 @@ class WalWriter:
         self._thread: threading.Thread | None = None
         self._accepting = True
         self._error: BaseException | None = None
+        self._close_error: BaseException | None = None
         self._manifest: WalManifest | None = None
 
         # Counters below are updated by the writer thread and read by stats().
@@ -531,6 +532,7 @@ class WalWriter:
 
         with self._close_lock:
             if self._manifest is not None:
+                self._raise_if_error()
                 return self._manifest
 
             # Make sure queued records (if any) are drained even when the
@@ -574,9 +576,26 @@ class WalWriter:
                 if thread.is_alive():
                     raise WalError(f"WAL writer did not finish within {timeout}s")
 
+            self._raise_if_error()
             manifest = self._compute_manifest()
             self._manifest = manifest
             return manifest
+
+    def _raise_if_error(self) -> None:
+        """Surface a failure of the final close/fsync to the close() caller.
+
+        A writer error before close is exposed through stats() and the
+        engine's clean_shutdown check; close() still returns what reached
+        disk.  A failure *during* the final close must not be reported as a
+        successful clean close.
+        """
+
+        with self._lock:
+            error = self._close_error
+        if error is not None:
+            raise WalError(
+                f"WAL close failed: {type(error).__name__}: {error}"
+            ) from error
 
     def _compute_manifest(self) -> WalManifest:
         with self._lock:
@@ -655,7 +674,12 @@ class WalWriter:
                     self._flush_sync()
                     item.event.set()
                 elif isinstance(item, _CloseRequest):
-                    self._finalize_close()
+                    try:
+                        self._finalize_close()
+                    except BaseException as exc:
+                        with self._lock:
+                            self._close_error = exc
+                        raise
                     item.event.set()
                     self._log.debug("WAL writer stopped")
                     return

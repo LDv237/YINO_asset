@@ -113,16 +113,36 @@ class ReplayRunner:
     ) -> None:
         self.run_dir = Path(run_dir)
         self.raw_dir = self.run_dir / "raw"
-        self.out_dir = Path(out_dir) if out_dir else self.run_dir / "replay"
+        self.out_dir = (
+            Path(out_dir)
+            if out_dir
+            else self.run_dir.parent / f"{self.run_dir.name}-replay"
+        )
         self.write_derived = write_derived
         self.verify = verify
         self.log = logger or log
         self.cfg = cfg or config_from_run(self.run_dir)
         self.compare_reference = compare_reference
+        self._out_prepared = False
+
+    def prepare_out_dir(self) -> None:
+        """Create the replay output directory, refusing to overwrite evidence."""
+
+        if self.out_dir.exists() and (
+            not self.out_dir.is_dir() or any(self.out_dir.iterdir())
+        ):
+            raise FileExistsError(
+                f"replay output directory is not empty: {self.out_dir}; "
+                "choose --out or remove the old output"
+            )
+        self.out_dir.mkdir(parents=True, exist_ok=True)
+        self._out_prepared = True
 
     def run(self) -> dict:
         if not self.raw_dir.is_dir():
             raise FileNotFoundError(f"raw WAL directory not found: {self.raw_dir}")
+        if not self._out_prepared:
+            self.prepare_out_dir()
         self.out_dir.mkdir(parents=True, exist_ok=True)
         derived_dir = self.out_dir / "derived"
         derived_dir.mkdir(exist_ok=True)
@@ -235,6 +255,7 @@ class ReplayRunner:
                 "verified": comparison.get("verified"),
             },
         )
+        self._out_prepared = False
         return result
 
     def _compare(
@@ -270,6 +291,33 @@ class ReplayRunner:
         elif not deterministic:
             reasons.append("digest_mismatch")
 
+        # Re-hash the live derived files as well.  A tampered live file must
+        # fail replay verification even when summary.json still has the old
+        # digest.  Samples have no derived/ directory and no manifest.json, so
+        # they keep comparing against the reference summary.
+        live_derived_dir = self.run_dir / "derived"
+        live_manifest_present = (self.run_dir / "manifest.json").is_file()
+        live_file_digests: dict[str, str] = {}
+        missing_derived: list[str] = []
+        if live_derived_dir.is_dir():
+            for name in ("factors", "signals", "fills"):
+                path = live_derived_dir / f"{name}.jsonl"
+                if path.is_file():
+                    live_file_digests[f"{name}_sha256"] = _sha256_file(path)
+                else:
+                    missing_derived.append(name)
+        elif live_manifest_present:
+            missing_derived = ["factors", "signals", "fills"]
+        if missing_derived:
+            reasons.append("live_derived_missing")
+        live_derived_match = {
+            key: (live_file_digests.get(key) == digests.get(key))
+            for key in ("factors_sha256", "signals_sha256", "fills_sha256")
+            if key in live_file_digests or key in digests
+        }
+        if live_file_digests and not all(live_derived_match.values()):
+            reasons.append("live_derived_digest_mismatch")
+
         live_wal = live.get("wal") or {}
         wal_match = {
             "records": live_wal.get("records_total") == scan.records,
@@ -293,6 +341,7 @@ class ReplayRunner:
             "reasons": reasons,
             "count_match": count_match,
             "digest_match": digest_match,
+            "live_derived_digest_match": live_derived_match,
             "wal_match": wal_match,
             "live_counts": {key: live_counts.get(key) for key in count_keys},
             "replay_counts": {key: replay_counts.get(key) for key in count_keys},

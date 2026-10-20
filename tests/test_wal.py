@@ -574,6 +574,23 @@ def test_close_empty_writer(tmp_path: Path) -> None:
     assert scan.first_seq is None and scan.last_seq is None
 
 
+def test_close_propagates_finalize_failure(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A failed final fsync must not be reported as a clean close."""
+
+    wal_dir = tmp_path / "wal"
+    writer = make_writer(wal_dir, fsync_policy="always")
+    append_record(writer, b"payload", seq=1)
+
+    def boom() -> None:
+        raise OSError("injected ENOSPC")
+
+    monkeypatch.setattr(writer, "_finalize_close", boom)
+    with pytest.raises(WalError, match="injected ENOSPC"):
+        writer.close()
+
+
 def test_drain_before_start_via_close(tmp_path: Path) -> None:
     """Records enqueued before start() are never lost on close()."""
 

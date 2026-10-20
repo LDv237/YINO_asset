@@ -59,14 +59,14 @@ echo "=== verify ===" | tee artifacts/experiments/docker/verify.log
   | tee -a artifacts/experiments/docker/verify.log
 
 echo "=== deterministic replay ===" | tee artifacts/experiments/docker/replay_verify.log
-"$DOCKER" compose run --rm tickforge replay --run "/data/runs/$RUN_ID" --verify 2>&1 \
+"$DOCKER" compose run --rm tickforge replay --run "/data/runs/$RUN_ID" --out "/data/runs/$RUN_ID-replay" --verify 2>&1 \
   | tee -a artifacts/experiments/docker/replay_verify.log
 
 "$DOCKER" image inspect tickforge:0.1.0 \
   > artifacts/experiments/docker/image_inspect.json 2>/dev/null || true
 
 cp "artifacts/runs/$RUN_ID/summary.json" artifacts/experiments/docker/container_summary.json
-cp "artifacts/runs/$RUN_ID/replay/replay_summary.json" artifacts/experiments/docker/container_replay_summary.json
+cp "artifacts/runs/$RUN_ID-replay/replay_summary.json" artifacts/experiments/docker/container_replay_summary.json
 
 echo
 echo "Docker verification evidence written to artifacts/experiments/docker/"

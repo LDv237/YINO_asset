@@ -965,7 +965,10 @@ class LiveEngine:
         clean = bool(
             drained
             and wal_error is None
+            and wal_stats.get("error") is None
             and wal_manifest is not None
+            and wal_manifest.durable_seq is not None
+            and wal_manifest.durable_seq == wal_manifest.last_seq
             and self.live.ws_frames > 0
             and self.live.fatal_errors == 0
             and self.live.processing_errors == 0

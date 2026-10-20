@@ -14,6 +14,7 @@ import logging
 from pathlib import Path
 
 import orjson
+import pytest
 from aiohttp import web
 from websockets.asyncio.server import serve
 
@@ -176,6 +177,24 @@ async def test_live_pipeline_verifies_and_replays(tmp_path: Path) -> None:
     assert comparison["digest_match"]["factors_sha256"] is True
     assert comparison["digest_match"]["signals_sha256"] is True
     assert comparison["digest_match"]["fills_sha256"] is True
+
+    # Fail-closed: a non-empty default replay output must not be overwritten.
+    default_out = run_dir.parent / f"{run_dir.name}-replay"
+    default_out.mkdir()
+    (default_out / "sentinel").write_text("keep", encoding="utf-8")
+    with pytest.raises(FileExistsError):
+        ReplayRunner(run_dir).run()
+
+    # Fail-closed: replay must re-hash the live derived files.
+    factors = run_dir / "derived" / "factors.jsonl"
+    original_factors = factors.read_bytes()
+    factors.write_bytes(original_factors + b"\n")
+    tampered_replay = ReplayRunner(
+        run_dir, out_dir=tmp_path / "replay_tampered", write_derived=True
+    ).run()
+    assert tampered_replay["comparison"]["verified"] is False
+    assert "live_derived_digest_mismatch" in tampered_replay["comparison"]["reasons"]
+    factors.write_bytes(original_factors)
 
     # Fail-closed: a non-clean shutdown must fail verify even if counts match.
     summary_path = run_dir / "summary.json"

@@ -117,14 +117,18 @@ def cmd_live(args: argparse.Namespace) -> int:
 
 def cmd_replay(args: argparse.Namespace) -> int:
     out_dir = Path(args.out) if args.out else None
-    log_dir = (out_dir or (Path(args.run) / "replay")) / "logs"
-    configure_logging(log_dir, level=args.log_level.upper())
     runner = ReplayRunner(
         args.run,
         out_dir=out_dir,
         write_derived=not args.no_derived,
         verify=True,
     )
+    try:
+        runner.prepare_out_dir()
+    except FileExistsError as exc:
+        print(json.dumps({"error": str(exc)}, ensure_ascii=False), file=sys.stderr)
+        return 1
+    configure_logging(runner.out_dir / "logs", level=args.log_level.upper())
     try:
         result = runner.run()
     except Exception:
@@ -140,7 +144,8 @@ def cmd_replay(args: argparse.Namespace) -> int:
             "reasons": comparison.get("reasons"),
             "count_match": comparison.get("count_match"),
             "digest_match": comparison.get("digest_match"),
-            "out": str(Path(args.out) if args.out else Path(args.run) / "replay"),
+            "live_derived_digest_match": comparison.get("live_derived_digest_match"),
+            "out": str(runner.out_dir),
         },
         indent=2,
     ))

@@ -59,7 +59,7 @@ docker compose run --rm tickforge \
 
 # 确定性回放
 docker compose run --rm tickforge \
-  replay --run "/data/runs/$RUN_ID" --verify
+  replay --run "/data/runs/$RUN_ID" --out "/data/runs/$RUN_ID-replay" --verify
 ```
 
 ## 4. 需要保存的证据

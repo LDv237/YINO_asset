@@ -54,7 +54,7 @@ curl http://127.0.0.1:9100/metrics
 RUN_DIR=$(ls -td artifacts/runs/* | head -1)
 python -m tickforge show --run "$RUN_DIR"
 python -m tickforge verify --run "$RUN_DIR"
-python -m tickforge replay --run "$RUN_DIR" --verify
+python -m tickforge replay --run "$RUN_DIR" --out "$RUN_DIR-replay" --verify
 python tools/analyze_run.py "$RUN_DIR"
 
 # 把二进制 WAL 导出为人类可读的原始 JSONL（可选）
@@ -100,7 +100,7 @@ docker compose build
 docker compose up --abort-on-container-exit
 
 # 回放（容器内）
-docker compose run --rm tickforge replay --run /data/runs/<run_id> --verify
+docker compose run --rm tickforge replay --run /data/runs/<run_id> --out /data/runs/<run_id>-replay --verify
 ```
 
 镜像内默认 `TICKFORGE_HTTP_HOST=0.0.0.0`、输出目录 `/data`；`docker-compose.yml` 将 `./artifacts` 挂载到 `/data`。如构建网络受限，可设置 `PIP_INDEX_URL` 指向镜像站。
