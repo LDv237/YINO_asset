@@ -7,6 +7,7 @@
 > 文件名说明：GitHub 首页固定读取 `README.md`；其余设计、报告、验证文档均使用中文文件名。
 > 提交材料清单与复现入口见 [交付说明.md](交付说明.md)。
 > 完整运行材料（原始 WAL、JSONL、CSV、验证证据、日志）见仓库根目录的 [`交付材料/`](交付材料/)；邮件发送版把全部内容打成一个完整压缩包。
+> 完整运行产物的打包下载（`artifacts/` 压缩包与邮件完整包）见 [GitHub Release delivery-20261020](https://github.com/LDv237/YINO_asset/releases/tag/delivery-20261020)。
 > 设计与取舍见 [docs/系统架构.md](docs/系统架构.md)，模块接口与 WAL 格式见 [docs/接口设计.md](docs/接口设计.md)，实测与复现见 [docs/性能实测.md](docs/性能实测.md)，完整报告见 [笔试报告.md](笔试报告.md)。
 
 ## 核心特性
