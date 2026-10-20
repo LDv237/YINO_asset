@@ -1,24 +1,26 @@
 # Docker 构建与运行验证（P0）
 
-题目要求“打包 Docker image 保证代码正常运行”。当前开发机已安装 Docker Desktop，但 WSL2 虚拟化组件不完整、Docker 引擎无法启动，因此 **Docker 尚未实际构建/运行，交付证据不完整**；不能把 Docker 描述成可选。本机排障记录见 `artifacts/experiments/docker/INSTALL_STATUS.md`。本文给出在有 Docker 的机器上应执行的命令和需要保存的证据。
+题目要求打包 Docker image，保证代码能正常运行。我先把本机的情况说清楚：开发机装了 Docker Desktop，但 WSL2 虚拟化组件不完整，Docker 引擎无法启动，所以 Docker 还没有实际构建和运行，交付证据是不完整的。这一点不能含糊，Docker 不是可选项。本机排障记录在 `artifacts/experiments/docker/INSTALL_STATUS.md`。下面是我在有 Docker 的机器上会执行的命令，以及需要保存的证据。
 
 ## 1. 环境要求
 
 - Docker Engine 24+ 或 Docker Desktop（含 Compose v2）
-- 能拉取 `python:3.14-slim`（或配置镜像加速）
-- 构建时如需国内 PyPI：
+- 能拉取 `python:3.14-slim`（拉不动就配置镜像加速）
+- 构建时如果走国内 PyPI：
   ```bash
   export PIP_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple
   ```
 
 ## 2. 一键验证
 
+有 Docker 的机器上，我一般直接跑这个脚本：
+
 ```bash
 cd 一诺资产
 bash scripts/docker_verify.sh
 ```
 
-脚本会：
+脚本会按顺序做这几件事：
 
 1. `docker compose build`，保存构建日志；
 2. 在容器内执行 `python -m tickforge --version`；
@@ -28,6 +30,8 @@ bash scripts/docker_verify.sh
 6. 保存 `docker version`、`docker compose version`、镜像 inspect 摘要。
 
 ## 3. 手动命令
+
+不想用脚本，或者某一步要单独重跑，就按下面的命令来：
 
 ```bash
 # 构建
@@ -58,7 +62,7 @@ docker compose run --rm tickforge \
 
 ## 4. 需要保存的证据
 
-提交材料中至少包含：
+提交材料里至少要有这些：
 
 - `artifacts/experiments/docker_build.log`：构建成功日志；
 - `docker compose run ... python -m tickforge --version` 输出；
@@ -69,7 +73,7 @@ docker compose run --rm tickforge \
 
 ## 5. 验收判定
 
-只有以下全部满足，才能认为 P0 关闭：
+下面六条全部满足，我才会认为 P0 关闭：
 
 - [ ] `docker compose build` 退出码 0；
 - [ ] 容器内 `python -m tickforge --version` 正常；
@@ -78,11 +82,11 @@ docker compose run --rm tickforge \
 - [ ] 容器内 `verify` 返回 `ok=true`；
 - [ ] 容器内 `replay --verify` 返回 `verified=true`，三个 SHA-256 与 live 一致。
 
-在此之前，报告和交付说明必须明确写“Docker 未实际构建验证”，不能写“已完成镜像交付”。
+在 Docker 验证完成之前，报告和交付说明里我都写的是“Docker 未实际构建验证”，没有写成已完成。
 
 ## 6. 已知构建注意事项
 
-- 镜像使用 `python:3.14-slim`；若 Docker Hub 不可达，需配置 registry mirror；
-- 容器以 root 运行，确保 bind mount 的 `./artifacts` 可写；生产应改非 root + 固定 UID；
+- 镜像使用 `python:3.14-slim`；Docker Hub 不可达时要配 registry mirror；
+- 容器以 root 运行，保证 bind mount 的 `./artifacts` 可写；生产环境应该改非 root 加固定 UID；
 - Compose 的 `./artifacts:/data` 会把容器输出持久化到宿主机；
-- 容器内 live 运行需要访问 `wss://data-stream.binance.vision` 和 `https://data-api.binance.vision`；离线 replay 不需要外网。
+- 容器内 live 运行要能访问 `wss://data-stream.binance.vision` 和 `https://data-api.binance.vision`；离线 replay 不需要外网。
