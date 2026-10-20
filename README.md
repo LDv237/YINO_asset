@@ -88,7 +88,7 @@ python -m tickforge live --config config/spot_long_only_durable.toml   --duratio
 
 ## Docker
 
-> **当前状态：Docker Desktop 已安装，但本机 WSL2 虚拟化组件不完整，Docker 引擎无法启动；镜像尚未实际构建/运行。** 提交前必须在有 Docker 的环境执行 [docs/Docker构建验证.md](docs/Docker构建验证.md) 中的命令，并保存构建日志、容器 summary、verify/replay 证据；一键脚本为 [scripts/docker_verify.sh](scripts/docker_verify.sh)。
+> **Docker 验证状态：Docker Desktop 已安装，但本机 WSL2 虚拟化组件不完整、引擎无法启动，镜像尚未实际构建/运行。** 验证步骤与证据清单见 [docs/Docker构建验证.md](docs/Docker构建验证.md)，一键脚本为 [scripts/docker_verify.sh](scripts/docker_verify.sh)；该未完成状态已在报告中如实记录。
 
 ```bash
 docker compose build
