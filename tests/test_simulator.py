@@ -83,6 +83,21 @@ def assert_fills_finite(fills: list[Fill]) -> None:
 # ---------------------------------------------------------------------------
 # Basic fills
 # ---------------------------------------------------------------------------
+def test_trade_before_quote_timestamp_does_not_fill() -> None:
+    sim = make_sim()
+    sim.apply_signal(
+        make_signal(bid=100.0, bid_qty=1.0, ask=101.0, ask_qty=1.0, ts_ms=200_000)
+    )
+
+    assert sim.on_trade(make_trade(price=99.0, ts_ms=199_999, seq=1)) == []
+    assert sim.on_trade(make_trade(price=102.0, ts_ms=199_999, seq=2)) == []
+
+    buy = sim.on_trade(make_trade(price=99.0, ts_ms=200_000, trade_id=3, seq=3))
+    sell = sim.on_trade(make_trade(price=102.0, ts_ms=200_001, trade_id=4, seq=4))
+    assert len(buy) == 1 and buy[0].side == "BUY"
+    assert len(sell) == 1 and sell[0].side == "SELL"
+
+
 def test_buy_fill_at_quote_price_with_fee() -> None:
     sim = make_sim(fee_bps=1.0)
     sim.apply_signal(make_signal(bid=100.0, bid_qty=2.0, ask=102.0, ask_qty=2.0))

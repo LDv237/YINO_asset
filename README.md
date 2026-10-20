@@ -89,7 +89,7 @@ python -m tickforge live --config config/spot_long_only.toml   --duration 900 --
 python -m tickforge live --config config/spot_long_only_durable.toml   --duration 900 --out artifacts
 ```
 
-严格落盘版我实跑了一轮：272,784 帧、272,802 条 WAL、1,576 fills、0 负仓位/负现金；p50 3.444 ms / p99 5.793 ms。中间有 2 次网络重连，出现了 data gap，但收到的原始帧 0 丢失，订单簿靠快照恢复了。异常终止恢复的实验在 `docs/正确性与可靠性验证.md`。
+严格落盘版我实跑了一轮：272,784 帧、272,802 条 WAL、1,577 fills、0 负仓位/负现金；p50 3.444 ms / p99 5.793 ms。中间有 2 次网络重连，出现了 data gap，但收到的原始帧 0 丢失，订单簿靠快照恢复了。异常终止恢复的实验在 `docs/正确性与可靠性验证.md`。
 
 ## Docker 的现状
 
@@ -138,7 +138,7 @@ python -m pytest -q
 | 测量窗口 | 900.116 s |
 | WebSocket 原始帧 | 388,388 |
 | WAL 原始记录 / 字节 | 388,394 / 92.61 MiB |
-| 处理事件 / 信号 / 成交 | 388,394 / 43,309 / 10,066 |
+| 处理事件 / 信号 / 成交 | 388,394 / 43,309 / 10,131 |
 | 端到端延迟 p50 / p99 / p999 | 0.512 ms / 2.435 ms / 27.554 ms |
 | 原始帧丢失 / 未处理（正常关闭） | 0 / 0 |
 | 回放摘要一致性 | 因子/信号/成交 SHA-256 全部一致 |
@@ -148,7 +148,7 @@ python -m pytest -q
 
 - 公开行情 WebSocket 不提供断线补发，断线期间真实成交补不回来，缺口会写进 `summary.json` 的 `data_gaps`；
 - Python 单进程不是生产级 HFT，这些延迟数据只用于工程验证，不能拿去和 C++/FPGA 系统比；
-- 模拟撮合没有建模排队位置、撤单延迟和市场冲击；成交判断也没有使用报价时间戳，极端乱序下可能有 look-ahead；
+- 模拟撮合没有建模排队位置、撤单延迟和市场冲击；历史 15 分钟 run 的执行结果由同一份 WAL 用 quote-time guard + tick 取整重算，延迟/资源仍是原始 live 采集；
 - `Simulator` 是抽象记账器，允许负仓位/负现金，不代表 Binance 现货账户的可执行性，也没有建模借币、保证金或强平；
 - 没有接私有下单 API 和真实风控前置。
 

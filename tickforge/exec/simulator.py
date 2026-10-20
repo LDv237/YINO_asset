@@ -63,6 +63,8 @@ class _SymbolState:
     bid_qty_ticks: int = 0
     ask_price_ticks: int | None = None
     ask_qty_ticks: int = 0
+    bid_ts_ms: int | None = None
+    ask_ts_ms: int | None = None
 
 
 class Simulator:
@@ -176,6 +178,8 @@ class Simulator:
         state.ask_price_ticks, state.ask_qty_ticks = self._to_quote_ticks(
             sig.ask_price, sig.ask_qty
         )
+        state.bid_ts_ms = int(sig.ts_ms)
+        state.ask_ts_ms = int(sig.ts_ms)
         state.signals += 1
 
     def cancel(self, symbol: str) -> None:
@@ -185,6 +189,8 @@ class Simulator:
         state.bid_qty_ticks = 0
         state.ask_price_ticks = None
         state.ask_qty_ticks = 0
+        state.bid_ts_ms = None
+        state.ask_ts_ms = None
 
     def mark(self, symbol: str, mid: float) -> None:
         """Record a mark price used for unrealised PnL.
@@ -213,11 +219,21 @@ class Simulator:
             return []
 
         fills: list[Fill] = []
-        if state.bid_price_ticks is not None and price_ticks <= state.bid_price_ticks:
+        bid_visible = state.bid_ts_ms is None or ev.event_time_ms >= state.bid_ts_ms
+        ask_visible = state.ask_ts_ms is None or ev.event_time_ms >= state.ask_ts_ms
+        if (
+            bid_visible
+            and state.bid_price_ticks is not None
+            and price_ticks <= state.bid_price_ticks
+        ):
             fill = self._try_fill(state, ev, side="BUY", price_ticks=state.bid_price_ticks)
             if fill is not None:
                 fills.append(fill)
-        if state.ask_price_ticks is not None and price_ticks >= state.ask_price_ticks:
+        if (
+            ask_visible
+            and state.ask_price_ticks is not None
+            and price_ticks >= state.ask_price_ticks
+        ):
             fill = self._try_fill(state, ev, side="SELL", price_ticks=state.ask_price_ticks)
             if fill is not None:
                 fills.append(fill)

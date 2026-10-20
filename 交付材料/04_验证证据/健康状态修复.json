@@ -72,7 +72,8 @@
       "quote_cooldown_ms": 100,
       "enabled": true,
       "allow_short": true,
-      "initial_cash_usd": 0.0
+      "initial_cash_usd": 0.0,
+      "round_to_tick": true
     },
     "http": {
       "host": "127.0.0.1",
@@ -81,7 +82,7 @@
     },
     "run": {
       "duration_s": 10.0,
-      "output_dir": "artifacts/healthfix_smoke",
+      "output_dir": "artifacts/experiments/healthfix_smoke",
       "run_id": "",
       "log_level": "INFO",
       "seed": 7
@@ -140,7 +141,7 @@
     "peak_ws_msgs_per_s_1s": 281.723,
     "depth_events_per_s": 10.158,
     "factor_snapshots_per_s": 8.963,
-    "signals_per_s": 8.963
+    "signals_per_s": 8.962
   },
   "resources": {
     "rss_bytes_last": 67952640,
@@ -3279,17 +3280,17 @@
         "BTCUSDT": {
           "symbol": "BTCUSDT",
           "position": 2.138e-05,
-          "avg_cost": 81684.21803349075,
+          "avg_cost": 81684.20912333495,
           "mark": 81681.095,
-          "cash": -26.705537800886418,
+          "cash": -26.705376531399736,
           "initial_cash": 0.0,
-          "realized_pnl": -24.95912921933056,
-          "unrealized_pnl": -6.677045603212813e-05,
-          "total_pnl": -24.95919598978642,
-          "fees": 0.19733247341367058,
+          "realized_pnl": -24.958968140343003,
+          "unrealized_pnl": -6.657995690119016e-05,
+          "total_pnl": -24.959034720299737,
+          "fees": 0.1973324717998,
           "fills": 5,
-          "open_bid": 81666.53733322,
-          "open_ask": 81679.92945448,
+          "open_bid": 81666.53,
+          "open_ask": 81679.93,
           "open_bid_qty": 0.00612142,
           "open_ask_qty": 0.00612142,
           "max_abs_position": 0.00612138,
@@ -3301,16 +3302,16 @@
       },
       "totals": {
         "position": 2.138e-05,
-        "avg_cost": 81684.21803349075,
-        "cash": -26.705537800886418,
+        "avg_cost": 81684.20912333495,
+        "cash": -26.705376531399736,
         "initial_cash": 0.0,
-        "realized_pnl": -24.95912921933056,
-        "unrealized_pnl": -6.677045603212813e-05,
-        "total_pnl": -24.95919598978642,
-        "fees": 0.19733247341367058,
+        "realized_pnl": -24.958968140343003,
+        "unrealized_pnl": -6.657995690119016e-05,
+        "total_pnl": -24.959034720299737,
+        "fees": 0.1973324717998,
         "fills": 5,
-        "open_bid": 499.91517496231955,
-        "open_ask": 499.997153761243,
+        "open_bid": 499.9151300726,
+        "open_ask": 499.99715710059996,
         "open_bid_qty": 0.00612142,
         "open_ask_qty": 0.00612142,
         "max_abs_position": 0.00612138,
@@ -3337,17 +3338,17 @@
       "BTCUSDT": {
         "symbol": "BTCUSDT",
         "position": 2.138e-05,
-        "avg_cost": 81684.21803349075,
+        "avg_cost": 81684.20912333495,
         "mark": 81681.095,
-        "cash": -26.705537800886418,
+        "cash": -26.705376531399736,
         "initial_cash": 0.0,
-        "realized_pnl": -24.95912921933056,
-        "unrealized_pnl": -6.677045603212813e-05,
-        "total_pnl": -24.95919598978642,
-        "fees": 0.19733247341367058,
+        "realized_pnl": -24.958968140343003,
+        "unrealized_pnl": -6.657995690119016e-05,
+        "total_pnl": -24.959034720299737,
+        "fees": 0.1973324717998,
         "fills": 5,
-        "open_bid": 81666.53733322,
-        "open_ask": 81679.92945448,
+        "open_bid": 81666.53,
+        "open_ask": 81679.93,
         "open_bid_qty": 0.00612142,
         "open_ask_qty": 0.00612142,
         "max_abs_position": 0.00612138,
@@ -3359,16 +3360,16 @@
     },
     "totals": {
       "position": 2.138e-05,
-      "avg_cost": 81684.21803349075,
-      "cash": -26.705537800886418,
+      "avg_cost": 81684.20912333495,
+      "cash": -26.705376531399736,
       "initial_cash": 0.0,
-      "realized_pnl": -24.95912921933056,
-      "unrealized_pnl": -6.677045603212813e-05,
-      "total_pnl": -24.95919598978642,
-      "fees": 0.19733247341367058,
+      "realized_pnl": -24.958968140343003,
+      "unrealized_pnl": -6.657995690119016e-05,
+      "total_pnl": -24.959034720299737,
+      "fees": 0.1973324717998,
       "fills": 5,
-      "open_bid": 499.91517496231955,
-      "open_ask": 499.997153761243,
+      "open_bid": 499.9151300726,
+      "open_ask": 499.99715710059996,
       "open_bid_qty": 0.00612142,
       "open_ask_qty": 0.00612142,
       "max_abs_position": 0.00612138,
@@ -3380,27 +3381,27 @@
   },
   "digests": {
     "factors_sha256": "39b174162630095e2f2072c1f68f44848354919767e82c40826fc00c279754bf",
-    "signals_sha256": "3531dda09b3c7b95160a5f5d96412a2f7d9a2b2f94a79b4110f3bb53669e1012",
-    "fills_sha256": "062c1be112512ce35e3d3a185962fc925566667d2575c7e6b2bcb63bf23fcaf2"
+    "signals_sha256": "b475bee7451617c81e40b30bc53cc8bd045c416c0aa8a7c6ea169b2e9f25c8be",
+    "fills_sha256": "a9da2ffb8070ae0a8281849db7861c164e2ed7f3ce41fd702ecadc83e4029a7e"
   },
   "derived": {
     "factors": {
-      "path": "artifacts\\healthfix_smoke\\runs\\20261020T072236Z-da9b\\derived\\factors.jsonl",
+      "path": "C:\\Users\\HP\\Desktop\\一诺资产\\artifacts\\experiments\\healthfix_smoke\\runs\\20261020T072236Z-da9b\\derived\\factors.jsonl",
       "records": 90,
       "bytes": 33916,
       "sha256": "39b174162630095e2f2072c1f68f44848354919767e82c40826fc00c279754bf"
     },
     "signals": {
-      "path": "artifacts\\healthfix_smoke\\runs\\20261020T072236Z-da9b\\derived\\signals.jsonl",
+      "path": "C:\\Users\\HP\\Desktop\\一诺资产\\artifacts\\experiments\\healthfix_smoke\\runs\\20261020T072236Z-da9b\\derived\\signals.jsonl",
       "records": 90,
-      "bytes": 18003,
-      "sha256": "3531dda09b3c7b95160a5f5d96412a2f7d9a2b2f94a79b4110f3bb53669e1012"
+      "bytes": 16391,
+      "sha256": "b475bee7451617c81e40b30bc53cc8bd045c416c0aa8a7c6ea169b2e9f25c8be"
     },
     "fills": {
-      "path": "artifacts\\healthfix_smoke\\runs\\20261020T072236Z-da9b\\derived\\fills.jsonl",
+      "path": "C:\\Users\\HP\\Desktop\\一诺资产\\artifacts\\experiments\\healthfix_smoke\\runs\\20261020T072236Z-da9b\\derived\\fills.jsonl",
       "records": 5,
-      "bytes": 1210,
-      "sha256": "062c1be112512ce35e3d3a185962fc925566667d2575c7e6b2bcb63bf23fcaf2"
+      "bytes": 1175,
+      "sha256": "a9da2ffb8070ae0a8281849db7861c164e2ed7f3ce41fd702ecadc83e4029a7e"
     }
   },
   "reconciliation": {
@@ -3477,5 +3478,12 @@
       "processed": 2042
     }
   },
-  "health_final_context": "after_intentional_shutdown"
+  "health_final_context": "after_intentional_shutdown",
+  "execution_replay": {
+    "quote_time_guard": true,
+    "round_to_tick": true,
+    "source": "WAL replay",
+    "replayed_at": "2026-10-20T17:59:46Z",
+    "note": "latency, resources, health and raw counts are from the original live capture"
+  }
 }
