@@ -1,6 +1,6 @@
 # Docker 构建与运行验证（P0）
 
-题目要求打包 Docker image，保证代码能正常运行。本机的情况是：开发机装了 Docker Desktop，但 WSL2 虚拟化组件不完整，Docker 引擎无法启动，所以本机没有构建和运行。为了不把这个缺口留到交付，我在 GitHub Actions 的干净 Docker 环境里跑了一遍：build、容器版本、离线 sample replay、60 秒 live、verify 和 replay 全部通过（run 39453274263，commit b7e07ce，image sha256:47d3409808940d6e25e05988dcd228bd5a80fd49343129fd2c909e2856c6435c，60 秒运行 40,201 帧、0 丢失、`clean_shutdown=true`）。证据在 `artifacts/experiments/docker/ci/`。下面的命令是给本机或其他 Docker 主机复跑用的。
+题目要求打包 Docker image，保证代码能正常运行。本机的情况是：开发机装了 Docker Desktop，但 WSL2 虚拟化组件不完整，Docker 引擎无法启动，所以本机没有构建和运行。为了不把这个缺口留到交付，我在 GitHub Actions 的干净 Docker 环境里跑了一遍：build、容器版本、离线 sample replay、60 秒 live、verify 和 replay 全部通过（run 39457220374，commit 536b181，image sha256:e67c76fd6a54d1011248c59acdc3d1522e00659d5495beaeed4ba4356b46e949，60 秒运行 30,444 帧、0 丢失、`clean_shutdown=true`）。证据在 `artifacts/experiments/docker/ci/`。下面的命令是给本机或其他 Docker 主机复跑用的。
 
 ## 1. 环境要求
 
@@ -84,17 +84,17 @@ docker compose run --rm tickforge \
 - [x] 容器内 `verify` 返回 `ok=true`；
 - [x] 容器内 `replay --verify` 返回 `verified=true`，三个 SHA-256 与 live 一致。
 
-2026-10-20 的 GitHub Actions run 39453274263 已满足以上六条；本机仍受 WSL2 限制，下面保留本机/其他 Docker 主机的复跑步骤。
+2026-10-20 的 GitHub Actions run 39457220374 已满足以上六条；本机仍受 WSL2 限制，下面保留本机/其他 Docker 主机的复跑步骤。
 
 ## 5.1 CI 证据
 
-- Run: https://github.com/LDv237/YINO_asset/actions/runs/39453274263
-- Commit: `b7e07ce`
-- Image: `sha256:47d3409808940d6e25e05988dcd228bd5a80fd49343129fd2c909e2856c6435c`
+- Run: https://github.com/LDv237/YINO_asset/actions/runs/39457220374
+- Commit: `536b181`
+- Image: `sha256:e67c76fd6a54d1011248c59acdc3d1522e00659d5495beaeed4ba4356b46e949`
 - Build: 成功，日志 `artifacts/experiments/docker/ci/docker_build.log`
 - 容器版本: `tickforge 0.1.0`
 - 离线 sample replay: `verified=true`，counts/digests 全部一致
-- 60 秒 live: `run_id=20261020T155845Z-738b`，40,201 帧，40,207 条 WAL，3,166 信号，648 fills，`clean_shutdown=true`，`lost_raw_frames=0`
+- 60 秒 live: `run_id=20261020T162519Z-a42f`，30,444 帧，30,450 条 WAL，3,016 信号，711 fills，`clean_shutdown=true`，`lost_raw_frames=0`
 - `verify`: `ok=true`，`summary_clean_shutdown=true`，`truncated_tail_bytes=0`
 - `replay --verify`: `verified=true`、`deterministic=true`，三个 SHA-256 与 live 一致
 - 证据: `artifacts/experiments/docker/ci/`，GitHub Actions artifact `docker-verify-evidence`
