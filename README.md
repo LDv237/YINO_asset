@@ -5,6 +5,7 @@
 > 笔试题目：YINO ASSET 量化开发工程师（实时高频行情交易系统 demo）。
 > GitHub: https://github.com/LDv237/YINO_asset
 > 文件名说明：GitHub 首页固定读取 `README.md`；其余设计、报告、验证文档均使用中文文件名。
+> 提交材料清单与复现入口见 [交付说明.md](交付说明.md)。
 > 设计与取舍见 [docs/系统架构.md](docs/系统架构.md)，模块接口与 WAL 格式见 [docs/接口设计.md](docs/接口设计.md)，实测与复现见 [docs/性能实测.md](docs/性能实测.md)，完整报告见 [笔试报告.md](笔试报告.md)。
 
 ## 核心特性
