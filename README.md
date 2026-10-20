@@ -108,7 +108,7 @@ tests/               单元、集成、混沌与端到端回放测试
 tools/               运行分析、样本裁剪
 scripts/             15 分钟运行、回放校验、Docker 运行
 config/default.toml  默认配置
-docs/                架构、接口、性能、验证、开发过程、运行手册
+docs/                架构、接口、性能、验证、开发过程、人工智能协作、运行手册
 笔试报告.md            笔试交付报告
 artifacts/           运行产物（WAL、可读 JSONL/CSV、派生 JSONL、日志、摘要、清单）
 ```
