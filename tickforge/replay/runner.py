@@ -8,6 +8,7 @@ signal and fill streams, byte for byte, and must reproduce the same counts.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
 import time
@@ -44,6 +45,32 @@ def _load_json(path: Path) -> dict | None:
             return json.load(fh)
     except (OSError, ValueError):
         return None
+
+
+def _read_required_json(path: Path, label: str, errors: list[str]) -> dict:
+    """Read a required JSON object, recording a failure instead of hiding it."""
+
+    if not path.is_file():
+        errors.append(f"{label} missing: {path.name}")
+        return {}
+    try:
+        with path.open("r", encoding="utf-8") as fh:
+            data = json.load(fh)
+    except (OSError, ValueError) as exc:
+        errors.append(f"{label} is not valid JSON: {exc}")
+        return {}
+    if not isinstance(data, dict):
+        errors.append(f"{label} must be a JSON object")
+        return {}
+    return data
+
+
+def _sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as fh:
+        for chunk in iter(lambda: fh.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def _build(cls, values: dict) -> Any:
@@ -226,7 +253,9 @@ class ReplayRunner:
         replay_counts = pipeline.counts
         count_keys = ("ws_frames", "snapshots", "factor_snapshots", "signals", "fills")
         count_match = {key: live_counts.get(key) == replay_counts.get(key) for key in count_keys}
-        if live_counts and not all(count_match.values()):
+        if not live_counts:
+            reasons.append("live_counts_missing")
+        elif not all(count_match.values()):
             reasons.append("count_mismatch")
 
         live_digests = live.get("digests") or {}
@@ -236,7 +265,9 @@ class ReplayRunner:
             if key in live_digests or key in digests
         }
         deterministic = bool(live_digests) and all(digest_match.values())
-        if live_digests and not deterministic:
+        if not live_digests:
+            reasons.append("live_digests_missing")
+        elif not deterministic:
             reasons.append("digest_mismatch")
 
         live_wal = live.get("wal") or {}
@@ -246,7 +277,9 @@ class ReplayRunner:
             "snapshot_records": live_wal.get("records_snapshot")
             == scan.records_by_kind.get(KIND_SNAPSHOT, 0),
         }
-        if live_wal and not all(wal_match.values()):
+        if not live_wal:
+            reasons.append("live_wal_missing")
+        elif not all(wal_match.values()):
             reasons.append("wal_count_mismatch")
 
         if scan.truncated_tail_bytes:
@@ -268,16 +301,36 @@ class ReplayRunner:
 
 
 def verify_run(run_dir: str | Path) -> dict:
-    """Check WAL integrity and reconcile it with the run summary/manifest."""
+    """Check WAL integrity and reconcile it with the run summary/manifest.
+
+    The check is fail-closed: a missing or corrupt summary/manifest, an empty
+    WAL, a non-clean shutdown, or a manifest file hash mismatch is a failure,
+    not a warning.
+    """
 
     run_dir = Path(run_dir)
-    raw_dir = run_dir / "raw"
-    if not raw_dir.is_dir():
-        raise FileNotFoundError(f"raw WAL directory not found: {raw_dir}")
-    summary = _load_json(run_dir / "summary.json") or {}
-    manifest = _load_json(run_dir / "manifest.json") or {}
     checks: dict[str, Any] = {}
     errors: list[str] = []
+    if not run_dir.is_dir():
+        return {
+            "run_id": run_dir.name,
+            "ok": False,
+            "errors": [f"run directory not found: {run_dir}"],
+        }
+
+    summary = _read_required_json(run_dir / "summary.json", "summary.json", errors)
+    manifest = _read_required_json(run_dir / "manifest.json", "manifest.json", errors)
+
+    raw_dir = run_dir / "raw"
+    if not raw_dir.is_dir():
+        errors.append(f"raw WAL directory not found: {raw_dir}")
+        return {
+            "run_id": run_dir.name,
+            "ok": False,
+            "errors": errors,
+            "checks": checks,
+        }
+
     try:
         reader = WalReader(raw_dir)
         scan = reader.scan()
@@ -285,15 +338,21 @@ def verify_run(run_dir: str | Path) -> dict:
         return {
             "run_id": run_dir.name,
             "ok": False,
-            "errors": [f"wal corruption: {exc}"],
+            "errors": errors + [f"wal corruption: {exc}"],
             "scan": None,
         }
 
     checks["wal_scan_ok"] = not scan.errors
     if scan.errors:
         errors.extend(scan.errors)
+    if scan.records == 0:
+        errors.append("WAL has no records")
+
     live_wal = summary.get("wal") or {}
-    if live_wal:
+    if not live_wal:
+        checks["records_match_summary"] = None
+        errors.append("summary.json is missing wal counts")
+    else:
         checks["records_match_summary"] = (
             live_wal.get("records_total") == scan.records
             and live_wal.get("records_ws") == scan.records_by_kind.get(KIND_WS, 0)
@@ -302,34 +361,59 @@ def verify_run(run_dir: str | Path) -> dict:
         )
         if not checks["records_match_summary"]:
             errors.append("WAL record counts do not match summary.json")
-        reconciliation = summary.get("reconciliation") or {}
+
+    reconciliation = summary.get("reconciliation")
+    if not isinstance(reconciliation, dict):
+        checks["no_lost_raw_frames"] = None
+        errors.append("summary.json is missing reconciliation")
+    else:
         checks["no_lost_raw_frames"] = int(reconciliation.get("lost_raw_frames", 0)) == 0
         if not checks["no_lost_raw_frames"]:
             errors.append("summary reports lost raw frames")
-    else:
-        checks["records_match_summary"] = None
 
-    # Verify manifest segment hashes when present.
+    checks["clean_shutdown"] = summary.get("clean_shutdown") is True
+    if not checks["clean_shutdown"]:
+        errors.append("summary.clean_shutdown is not true")
+
     manifest_segments = (manifest.get("wal") or {}).get("segments") or []
+    if not manifest_segments:
+        errors.append("manifest.json is missing wal.segments")
     hash_results = []
     for seg in manifest_segments:
-        path = raw_dir / seg.get("name", "")
+        name = seg.get("name", "")
         expected = seg.get("sha256")
-        if not path.is_file() or not expected:
-            hash_results.append({"name": seg.get("name"), "ok": False, "reason": "missing"})
-            errors.append(f"manifest segment missing: {seg.get('name')}")
+        path = raw_dir / name
+        if not name or not path.is_file() or not expected:
+            hash_results.append({"name": name, "ok": False, "reason": "missing"})
+            errors.append(f"manifest segment missing: {name}")
             continue
-        import hashlib
-
-        h = hashlib.sha256()
-        with path.open("rb") as fh:
-            for chunk in iter(lambda: fh.read(1024 * 1024), b""):
-                h.update(chunk)
-        ok = h.hexdigest() == expected
-        hash_results.append({"name": seg.get("name"), "ok": ok})
+        ok = _sha256_file(path) == expected
+        hash_results.append({"name": name, "ok": ok})
         if not ok:
-            errors.append(f"segment hash mismatch: {seg.get('name')}")
+            errors.append(f"segment hash mismatch: {name}")
     checks["segment_hashes"] = hash_results
+
+    manifest_files = manifest.get("files") or []
+    if not manifest_files:
+        errors.append("manifest.json is missing files")
+    file_results = []
+    for item in manifest_files:
+        rel = item.get("path")
+        expected = item.get("sha256")
+        if not rel or not expected:
+            file_results.append({"path": rel, "ok": False, "reason": "missing hash"})
+            errors.append(f"manifest file entry missing path/sha256: {rel}")
+            continue
+        path = run_dir / rel
+        if not path.is_file():
+            file_results.append({"path": rel, "ok": False, "reason": "missing"})
+            errors.append(f"manifest file missing: {rel}")
+            continue
+        ok = _sha256_file(path) == expected
+        file_results.append({"path": rel, "ok": ok})
+        if not ok:
+            errors.append(f"manifest file hash mismatch: {rel}")
+    checks["manifest_files"] = file_results
 
     return {
         "run_id": run_dir.name,

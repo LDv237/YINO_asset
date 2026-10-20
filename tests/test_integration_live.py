@@ -8,6 +8,7 @@ public network access is required.
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import json
 import logging
 from pathlib import Path
@@ -175,6 +176,35 @@ async def test_live_pipeline_verifies_and_replays(tmp_path: Path) -> None:
     assert comparison["digest_match"]["factors_sha256"] is True
     assert comparison["digest_match"]["signals_sha256"] is True
     assert comparison["digest_match"]["fills_sha256"] is True
+
+    # Fail-closed: a non-clean shutdown must fail verify even if counts match.
+    summary_path = run_dir / "summary.json"
+    summary_doc = json.loads(summary_path.read_text(encoding="utf-8"))
+    summary_doc["clean_shutdown"] = False
+    summary_path.write_text(
+        json.dumps(summary_doc, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    manifest_path = run_dir / "manifest.json"
+    manifest_doc = json.loads(manifest_path.read_text(encoding="utf-8"))
+    for entry in manifest_doc.get("files", []):
+        if entry.get("path") == "summary.json":
+            entry["bytes"] = summary_path.stat().st_size
+            entry["sha256"] = hashlib.sha256(summary_path.read_bytes()).hexdigest()
+    manifest_path.write_text(
+        json.dumps(manifest_doc, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    non_clean = verify_run(run_dir)
+    assert non_clean["ok"] is False
+    assert any("clean_shutdown" in error for error in non_clean["errors"])
+
+    # Fail-closed: tampering with a derived file must fail the manifest check.
+    factors = run_dir / "derived" / "factors.jsonl"
+    factors.write_bytes(factors.read_bytes() + b"\n")
+    tampered = verify_run(run_dir)
+    assert tampered["ok"] is False
+    assert any("manifest file hash mismatch" in error for error in tampered["errors"])
 
 
 def count_synced(summary: dict) -> bool:

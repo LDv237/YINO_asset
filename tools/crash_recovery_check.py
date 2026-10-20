@@ -48,13 +48,16 @@ def main() -> int:
         "--http-port",
         "0",
     ]
+    started_wall = time.time()
     with stdout_path.open("wb") as log:
         proc = subprocess.Popen(cmd, stdout=log, stderr=subprocess.STDOUT)
         # Wait for a few WAL bytes, then kill without clean shutdown.
+        killed_by_test = False
         deadline = time.monotonic() + args.warmup
         while time.monotonic() < deadline and proc.poll() is None:
             time.sleep(0.2)
         if proc.poll() is None:
+            killed_by_test = True
             proc.kill()
         proc.wait(timeout=args.timeout)
 
@@ -63,10 +66,20 @@ def main() -> int:
         print(json.dumps({"ok": False, "error": "no run directory produced"}))
         return 1
     run_dir = runs[-1]
+    checks = {
+        "killed_by_test": killed_by_test,
+        "run_dir_created_by_test": run_dir.stat().st_mtime >= started_wall - 2,
+    }
     report = {
         "ok": True,
         "run_dir": str(run_dir),
         "child_returncode": proc.returncode,
+        "checks": checks,
+        "limitations": [
+            "application-level forced termination, not power-loss or OS-crash safety",
+            "does not prove which records reached durable_seq (no clean summary)",
+            "does not replay derived factors/signals/fills after recovery",
+        ],
         "note": (
             "Process was killed without graceful shutdown. This is an "
             "application-level crash test, not a power-loss test; no "
@@ -87,8 +100,15 @@ def main() -> int:
             "truncated_tail_bytes": scan.truncated_tail_bytes,
             "errors": scan.errors,
         }
-        report["ok"] = not any(
-            error for error in scan.errors if not error.startswith("truncated tail")
+        checks["wal_has_records"] = scan.records > 0
+        report["checks"] = checks
+        report["ok"] = (
+            not any(
+                error
+                for error in scan.errors
+                if not error.startswith("truncated tail")
+            )
+            and all(checks.values())
         )
     except Exception as exc:
         report["ok"] = False
