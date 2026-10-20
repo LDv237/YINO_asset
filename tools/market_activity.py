@@ -7,7 +7,7 @@ and reports where a target run window sits.
 
 Usage:
   python tools/market_activity.py --target 2026-10-20T07:28:20Z \
-      --out artifacts/market_activity.json
+      --out artifacts/evidence/market_activity.json
 """
 
 from __future__ import annotations
@@ -30,7 +30,7 @@ def main() -> int:
     parser.add_argument("--symbol", default="BTCUSDT")
     parser.add_argument("--hours", type=int, default=48)
     parser.add_argument("--target", default="2026-10-20T07:28:20Z")
-    parser.add_argument("--out", default="artifacts/market_activity.json")
+    parser.add_argument("--out", default="artifacts/evidence/market_activity.json")
     args = parser.parse_args()
 
     url = (

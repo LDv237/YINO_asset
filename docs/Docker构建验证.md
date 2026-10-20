@@ -1,6 +1,6 @@
 # Docker 构建与运行验证（P0）
 
-题目要求“打包 Docker image 保证代码正常运行”。当前开发机已安装 Docker Desktop，但 WSL2 虚拟化组件不完整、Docker 引擎无法启动，因此 **Docker 尚未实际构建/运行，交付证据不完整**；不能把 Docker 描述成可选。本机排障记录见 `artifacts/docker/INSTALL_STATUS.md`。本文给出在有 Docker 的机器上应执行的命令和需要保存的证据。
+题目要求“打包 Docker image 保证代码正常运行”。当前开发机已安装 Docker Desktop，但 WSL2 虚拟化组件不完整、Docker 引擎无法启动，因此 **Docker 尚未实际构建/运行，交付证据不完整**；不能把 Docker 描述成可选。本机排障记录见 `artifacts/experiments/docker/INSTALL_STATUS.md`。本文给出在有 Docker 的机器上应执行的命令和需要保存的证据。
 
 ## 1. 环境要求
 
@@ -31,7 +31,7 @@ bash scripts/docker_verify.sh
 
 ```bash
 # 构建
-docker compose build 2>&1 | tee artifacts/docker_build.log
+docker compose build 2>&1 | tee artifacts/experiments/docker_build.log
 
 # 容器内版本
 docker compose run --rm tickforge python -m tickforge --version
@@ -60,7 +60,7 @@ docker compose run --rm tickforge \
 
 提交材料中至少包含：
 
-- `artifacts/docker_build.log`：构建成功日志；
+- `artifacts/experiments/docker_build.log`：构建成功日志；
 - `docker compose run ... python -m tickforge --version` 输出；
 - 容器内 live 运行生成的 `artifacts/runs/<run_id>/summary.json`（`clean_shutdown=true`、`lost_raw_frames=0`）；
 - 容器内 `verify` 输出（`ok=true`）；

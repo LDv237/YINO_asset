@@ -10,6 +10,6 @@ for policy in interval always never; do
     --duration 30 \
     --symbols BTCUSDT \
     --fsync-policy "$policy" \
-    --out "artifacts/fsync/$policy" \
+    --out "artifacts/experiments/fsync/$policy" \
     --http-port 0
 done

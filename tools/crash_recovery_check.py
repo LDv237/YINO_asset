@@ -26,7 +26,7 @@ def main() -> int:
     parser.add_argument("--symbols", default="BTCUSDT")
     parser.add_argument("--warmup", type=float, default=8.0)
     parser.add_argument("--timeout", type=float, default=30.0)
-    parser.add_argument("--out", default="artifacts/crash_recovery")
+    parser.add_argument("--out", default="artifacts/experiments/crash_recovery")
     args = parser.parse_args()
 
     out = Path(args.out)
