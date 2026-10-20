@@ -121,7 +121,6 @@ def cmd_replay(args: argparse.Namespace) -> int:
         args.run,
         out_dir=out_dir,
         write_derived=not args.no_derived,
-        verify=True,
     )
     try:
         runner.prepare_out_dir()
@@ -206,7 +205,7 @@ def cmd_bench(args: argparse.Namespace) -> int:
                 args.run,
                 out_dir=Path(args.run) / f"replay-bench-{i}",
                 write_derived=False,
-                verify=False,
+                compare_reference=False,
             )
             results.append(runner.run())
     except Exception:
@@ -274,10 +273,6 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
-    if args.command == "replay" and not args.verify:
-        # Default to strict verification for the documented command; --verify
-        # only controls the exit code, while comparison always runs.
-        pass
     return int(args.func(args))
 
 

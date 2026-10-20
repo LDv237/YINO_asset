@@ -122,7 +122,6 @@ class ReplayRunner:
         *,
         out_dir: str | Path | None = None,
         write_derived: bool = True,
-        verify: bool = True,
         cfg: Config | None = None,
         compare_reference: bool = True,
         logger: logging.Logger | None = None,
@@ -135,7 +134,6 @@ class ReplayRunner:
             else self.run_dir.parent / f"{self.run_dir.name}-replay"
         )
         self.write_derived = write_derived
-        self.verify = verify
         self.log = logger or log
         self.cfg = cfg or config_from_run(self.run_dir)
         self.compare_reference = compare_reference

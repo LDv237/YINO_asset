@@ -51,6 +51,7 @@ quote_cooldown_ms = 100
 enabled = true
 allow_short = false
 initial_cash_usd = 10000.0
+round_to_tick = true
 
 [http]
 host = "127.0.0.1"

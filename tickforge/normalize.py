@@ -43,6 +43,8 @@ def str_to_ticks(value: str | int) -> int:
     negative = s[0] == "-"
     if negative:
         s = s[1:]
+        if not s or s == ".":
+            raise ParseError(f"invalid decimal string: {value!r}")
     whole, dot, frac = s.partition(".")
     if not whole:
         whole = "0"

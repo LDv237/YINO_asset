@@ -29,7 +29,9 @@ def test_tick_conversion_roundtrip() -> None:
             assert str_to_ticks(ticks_to_str(ticks)) == ticks
 
 
-@pytest.mark.parametrize("bad", ["", "1.2.3", "abc", "1.", "0.123456789", " "])
+@pytest.mark.parametrize(
+    "bad", ["", "1.2.3", "abc", "1.", "0.123456789", " ", "-", "-.", "+"]
+)
 def test_tick_conversion_rejects_invalid(bad: str) -> None:
     with pytest.raises(ParseError):
         str_to_ticks(bad)

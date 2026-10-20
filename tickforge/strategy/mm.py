@@ -45,6 +45,27 @@ _MAX_OFI_NORM = 3.0
 _RESERVATION_MIN_FACTOR = 0.5
 _RESERVATION_MAX_FACTOR = 1.5
 
+#: Binance spot tick sizes for the demo symbols.  Unknown symbols use one
+#: base tick (1e-8), which is a no-op for the 8-decimal price grid.
+_TICK_SIZES = {
+    "BTCUSDT": 0.01,
+    "ETHUSDT": 0.01,
+    "SOLUSDT": 0.01,
+    "BNBUSDT": 0.01,
+    "XRPUSDT": 0.0001,
+    "DOGEUSDT": 0.00001,
+}
+_DEFAULT_TICK_SIZE = 1e-8
+
+
+def _round_quote(price: float, symbol: str, side: str) -> float:
+    """Round a quote to the exchange tick (bid down, ask up)."""
+
+    tick = _TICK_SIZES.get(symbol, _DEFAULT_TICK_SIZE)
+    if side == "bid":
+        return round(math.floor(price / tick) * tick, 8)
+    return round(math.ceil(price / tick) * tick, 8)
+
 
 def _clamp(value: float, low: float, high: float) -> float:
     """Return ``value`` clamped to ``[low, high]`` (finite inputs assumed)."""
@@ -87,6 +108,7 @@ class MarketMaker:
         self._cfg = cfg
         self._log = logger if logger is not None else _LOG
         self._allow_short = bool(cfg.allow_short)
+        self._round_to_tick = bool(cfg.round_to_tick)
         # Cooldown is per symbol: a shared timer would starve other symbols.
         self._last_signal_ts_ms: dict[str, int] = {}
         self._stats: dict[str, Any] = {
@@ -218,6 +240,9 @@ class MarketMaker:
 
         bid_price = reservation * (1.0 - half_bps / 1e4)
         ask_price = reservation * (1.0 + half_bps / 1e4)
+        if self._round_to_tick:
+            bid_price = _round_quote(bid_price, snap.symbol, "bid")
+            ask_price = _round_quote(ask_price, snap.symbol, "ask")
 
         # Inventory limit: do not add exposure on the side that is already at
         # the configured maximum.  In spot long-only mode, never quote an ask

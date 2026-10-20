@@ -151,3 +151,7 @@ python -m pytest -q
 - 模拟撮合没有建模排队位置、撤单延迟和市场冲击；成交判断也没有使用报价时间戳，极端乱序下可能有 look-ahead；
 - `Simulator` 是抽象记账器，允许负仓位/负现金，不代表 Binance 现货账户的可执行性，也没有建模借币、保证金或强平；
 - 没有接私有下单 API 和真实风控前置。
+
+## License
+
+MIT，见 [LICENSE](LICENSE)。

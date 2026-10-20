@@ -90,6 +90,10 @@ class StrategyConfig:
     # balance used to fund buys.
     allow_short: bool = True
     initial_cash_usd: float = 0.0
+    # Quote prices are rounded to the exchange tick size when enabled.  Kept
+    # off by default so historical run configs (which predate the field)
+    # replay byte-for-byte; new configs enable it explicitly.
+    round_to_tick: bool = False
 
 
 @dataclass(slots=True)

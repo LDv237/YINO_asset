@@ -74,6 +74,25 @@ def test_ofi_normalisation_is_clamped() -> None:
     assert sig2.fair_price == pytest.approx(100.0 * (1.0 - 0.8e-4 * 3.0), rel=1e-12)
 
 
+def test_round_to_tick_rounds_bid_down_and_ask_up() -> None:
+    mm = make_mm(round_to_tick=True)
+    snap = make_snap(
+        symbol="ETHUSDT",
+        mid=2393.6395,
+        microprice=2393.6395,
+        best_bid=2393.63,
+        best_ask=2393.65,
+    )
+
+    sig = mm.on_snapshot(snap, position=0.0)
+
+    assert sig is not None
+    assert sig.bid_price is not None and sig.ask_price is not None
+    assert abs(sig.bid_price * 100 - round(sig.bid_price * 100)) < 1e-9
+    assert abs(sig.ask_price * 100 - round(sig.ask_price * 100)) < 1e-9
+    assert sig.bid_price <= 2393.6395 <= sig.ask_price
+
+
 def test_half_spread_formula_and_clamp() -> None:
     # vol = 10 bps -> half = 0.8 + 0.6*10 = 6.8 bps
     mm = make_mm()

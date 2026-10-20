@@ -606,7 +606,14 @@ class LiveEngine:
                 self.metrics.set_gauge(
                     "tickforge_pipeline_processing_lag_ms", self._processing_lag_ms()
                 )
-                next_resource += 1.0
+                # A book can stay unsynced without new depth events (for
+                # example after a failed snapshot on a quiet symbol).  Retry
+                # from the health loop; the in-flight task check prevents
+                # duplicate requests, and force bypasses the 2s throttle.
+                for symbol, book in self.pipeline.books.items():
+                    if not book.synced:
+                        self._schedule_snapshot(symbol, force=True)
+                next_resource += max(0.2, self.cfg.engine.health_interval_s)
 
             if monotonic >= next_stats:
                 window = max(1e-9, monotonic - (next_stats - interval))
