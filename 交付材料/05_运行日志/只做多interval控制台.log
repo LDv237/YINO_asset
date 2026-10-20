@@ -1,119 +1,119 @@
-12:18:23 INFO    tickforge.cli: tickforge live starting  version='0.1.0' run_dir='artifacts\\runs\\20261020T041823Z-df65' log_file='artifacts\\runs\\20261020T041823Z-df65\\logs\\tickforge.log'
-12:18:23 INFO    tickforge.runtime.engine: run starting  run_id='20261020T041823Z-df65' symbols='BTCUSDT,ETHUSDT,SOLUSDT,BNBUSDT,XRPUSDT,DOGEUSDT' ws_url='wss://data-stream.binance.vision/stream' rest_url='https://data-api.binance.vision' duration_s=900.0 fsync_policy='interval' run_dir='artifacts\\runs\\20261020T041823Z-df65'
-12:18:23 INFO    tickforge.runtime.engine: observability server listening on http://127.0.0.1:9100
-12:18:23 INFO    tickforge.runtime.engine: websocket connected (conn_id=1, reconnect=False)
-12:18:23 INFO    tickforge.runtime.engine: websocket connected  conn_id=1
-12:18:23 INFO    tickforge.runtime.engine: first market data received  latency_ms=604.3483
-12:18:24 INFO    tickforge.runtime.engine: book synced symbol=ETHUSDT last_update_id=82265401299 buffered=0
-12:18:24 INFO    tickforge.runtime.engine: book synced symbol=XRPUSDT last_update_id=26777477946 buffered=0
-12:18:24 INFO    tickforge.runtime.engine: book synced symbol=BNBUSDT last_update_id=21011811585 buffered=0
-12:18:24 INFO    tickforge.runtime.engine: book synced symbol=BTCUSDT last_update_id=101665948454 buffered=0
-12:18:25 INFO    tickforge.runtime.engine: book synced symbol=DOGEUSDT last_update_id=25717172193 buffered=0
-12:18:25 INFO    tickforge.runtime.engine: book synced symbol=SOLUSDT last_update_id=30407345195 buffered=0
-12:18:33 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=3630 ws_msg_per_s=356.1 processed=3636 proc_per_s=356.7 queue=0 wal_queue=1 depth=420 trades=151 factors=368 signals=368 fills=2 gaps=0 resyncs=0 errors=0
-12:18:43 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=5081 ws_msg_per_s=143.2 processed=5085 proc_per_s=143.0 queue=2 wal_queue=2 depth=868 trades=201 factors=804 signals=804 fills=2 gaps=0 resyncs=0 errors=0
-12:18:53 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=8626 ws_msg_per_s=352.0 processed=8631 proc_per_s=352.1 queue=1 wal_queue=1 depth=1330 trades=363 factors=1248 signals=1248 fills=30 gaps=0 resyncs=0 errors=0
-12:19:03 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=10668 ws_msg_per_s=204.0 processed=10674 proc_per_s=204.1 queue=0 wal_queue=0 depth=1761 trades=468 factors=1661 signals=1661 fills=49 gaps=0 resyncs=0 errors=0
-12:19:13 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=13477 ws_msg_per_s=275.9 processed=13483 proc_per_s=275.9 queue=0 wal_queue=0 depth=2196 trades=749 factors=2081 signals=2081 fills=84 gaps=0 resyncs=0 errors=0
-12:19:23 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=16798 ws_msg_per_s=327.5 processed=16804 proc_per_s=327.5 queue=0 wal_queue=0 depth=2604 trades=1068 factors=2469 signals=2469 fills=110 gaps=0 resyncs=0 errors=0
-12:19:33 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=19405 ws_msg_per_s=258.2 processed=19411 proc_per_s=258.2 queue=0 wal_queue=0 depth=3030 trades=1188 factors=2883 signals=2883 fills=114 gaps=0 resyncs=0 errors=0
-12:19:43 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=21600 ws_msg_per_s=218.9 processed=21606 proc_per_s=218.9 queue=0 wal_queue=0 depth=3426 trades=1294 factors=3257 signals=3257 fills=125 gaps=0 resyncs=0 errors=0
-12:19:53 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=23949 ws_msg_per_s=234.7 processed=23955 proc_per_s=234.7 queue=0 wal_queue=0 depth=3859 trades=1438 factors=3663 signals=3663 fills=142 gaps=0 resyncs=0 errors=0
-12:20:03 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=25759 ws_msg_per_s=178.3 processed=25765 proc_per_s=178.3 queue=0 wal_queue=0 depth=4262 trades=1544 factors=4052 signals=4052 fills=144 gaps=0 resyncs=0 errors=0
-12:20:13 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=31498 ws_msg_per_s=567.4 processed=31504 proc_per_s=567.4 queue=0 wal_queue=0 depth=4757 trades=2090 factors=4538 signals=4538 fills=281 gaps=0 resyncs=0 errors=0
-12:20:23 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=36505 ws_msg_per_s=498.1 processed=36511 proc_per_s=498.1 queue=0 wal_queue=0 depth=5219 trades=2637 factors=4986 signals=4986 fills=329 gaps=0 resyncs=0 errors=0
-12:20:33 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=44110 ws_msg_per_s=760.5 processed=44115 proc_per_s=760.4 queue=1 wal_queue=1 depth=5735 trades=3632 factors=5496 signals=5496 fills=483 gaps=0 resyncs=0 errors=0
-12:20:43 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=47350 ws_msg_per_s=319.4 processed=47356 proc_per_s=319.5 queue=0 wal_queue=0 depth=6204 trades=3892 factors=5961 signals=5961 fills=516 gaps=0 resyncs=0 errors=0
-12:20:53 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=50279 ws_msg_per_s=289.7 processed=50285 proc_per_s=289.7 queue=0 wal_queue=0 depth=6649 trades=4056 factors=6395 signals=6395 fills=517 gaps=0 resyncs=0 errors=0
-12:21:03 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=52875 ws_msg_per_s=259.1 processed=52881 proc_per_s=259.1 queue=0 wal_queue=0 depth=7088 trades=4232 factors=6821 signals=6821 fills=545 gaps=0 resyncs=0 errors=0
-12:21:13 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=55531 ws_msg_per_s=261.1 processed=55537 proc_per_s=261.1 queue=0 wal_queue=0 depth=7526 trades=4373 factors=7253 signals=7253 fills=549 gaps=0 resyncs=0 errors=0
-12:21:23 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=57032 ws_msg_per_s=147.9 processed=57038 proc_per_s=147.9 queue=0 wal_queue=0 depth=7936 trades=4461 factors=7640 signals=7640 fills=549 gaps=0 resyncs=0 errors=0
-12:21:33 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=60925 ws_msg_per_s=385.5 processed=60930 proc_per_s=385.4 queue=1 wal_queue=1 depth=8399 trades=4771 factors=8084 signals=8084 fills=565 gaps=0 resyncs=0 errors=0
-12:21:43 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=65082 ws_msg_per_s=413.4 processed=65087 proc_per_s=413.4 queue=1 wal_queue=1 depth=8848 trades=5314 factors=8518 signals=8518 fills=606 gaps=0 resyncs=0 errors=0
-12:21:53 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=69019 ws_msg_per_s=392.3 processed=69025 proc_per_s=392.4 queue=0 wal_queue=0 depth=9316 trades=5673 factors=8973 signals=8973 fills=620 gaps=0 resyncs=0 errors=0
-12:22:03 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=71276 ws_msg_per_s=221.4 processed=71282 proc_per_s=221.4 queue=0 wal_queue=0 depth=9737 trades=5870 factors=9381 signals=9381 fills=621 gaps=0 resyncs=0 errors=0
-12:22:13 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=79780 ws_msg_per_s=837.6 processed=79785 proc_per_s=837.5 queue=1 wal_queue=1 depth=10247 trades=6968 factors=9882 signals=9882 fills=724 gaps=0 resyncs=0 errors=0
-12:22:23 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=87100 ws_msg_per_s=724.6 processed=87106 proc_per_s=724.7 queue=0 wal_queue=0 depth=10787 trades=7641 factors=10413 signals=10413 fills=873 gaps=0 resyncs=0 errors=0
-12:22:33 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=94798 ws_msg_per_s=767.3 processed=94804 proc_per_s=767.3 queue=0 wal_queue=0 depth=11292 trades=8211 factors=10914 signals=10914 fills=973 gaps=0 resyncs=0 errors=0
-12:22:43 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=99089 ws_msg_per_s=421.8 processed=99095 proc_per_s=421.8 queue=0 wal_queue=0 depth=11786 trades=8447 factors=11391 signals=11391 fills=984 gaps=0 resyncs=0 errors=0
-12:22:53 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=106053 ws_msg_per_s=689.1 processed=106058 proc_per_s=689.0 queue=1 wal_queue=1 depth=12308 trades=8900 factors=11907 signals=11907 fills=991 gaps=0 resyncs=0 errors=0
-12:23:03 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=109836 ws_msg_per_s=375.9 processed=109842 proc_per_s=376.0 queue=0 wal_queue=0 depth=12811 trades=9174 factors=12398 signals=12398 fills=1003 gaps=0 resyncs=0 errors=0
-12:23:13 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=113807 ws_msg_per_s=396.6 processed=113813 proc_per_s=396.6 queue=0 wal_queue=0 depth=13292 trades=9426 factors=12870 signals=12870 fills=1019 gaps=0 resyncs=0 errors=0
-12:23:23 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=115751 ws_msg_per_s=191.2 processed=115757 proc_per_s=191.2 queue=0 wal_queue=0 depth=13720 trades=9480 factors=13285 signals=13285 fills=1021 gaps=0 resyncs=0 errors=0
-12:23:33 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=120127 ws_msg_per_s=433.7 processed=120133 proc_per_s=433.7 queue=0 wal_queue=0 depth=14227 trades=9785 factors=13777 signals=13777 fills=1035 gaps=0 resyncs=0 errors=0
-12:23:43 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=127039 ws_msg_per_s=689.4 processed=127043 proc_per_s=689.2 queue=2 wal_queue=2 depth=14735 trades=10306 factors=14275 signals=14275 fills=1133 gaps=0 resyncs=0 errors=0
-12:23:53 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=130373 ws_msg_per_s=327.7 processed=130379 proc_per_s=327.9 queue=0 wal_queue=2 depth=15208 trades=10440 factors=14735 signals=14735 fills=1139 gaps=0 resyncs=0 errors=0
-12:24:03 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=133250 ws_msg_per_s=284.2 processed=133255 proc_per_s=284.1 queue=1 wal_queue=1 depth=15669 trades=10583 factors=15177 signals=15177 fills=1148 gaps=0 resyncs=0 errors=0
-12:24:13 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=136230 ws_msg_per_s=296.1 processed=136236 proc_per_s=296.2 queue=0 wal_queue=1 depth=16127 trades=10765 factors=15622 signals=15622 fills=1181 gaps=0 resyncs=0 errors=0
-12:24:23 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=138632 ws_msg_per_s=239.9 processed=138636 proc_per_s=239.7 queue=2 wal_queue=2 depth=16564 trades=10948 factors=16043 signals=16043 fills=1192 gaps=0 resyncs=0 errors=0
-12:24:33 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=140896 ws_msg_per_s=223.2 processed=140902 proc_per_s=223.3 queue=0 wal_queue=0 depth=17006 trades=11045 factors=16471 signals=16471 fills=1193 gaps=0 resyncs=0 errors=0
-12:24:43 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=142842 ws_msg_per_s=192.9 processed=142848 proc_per_s=192.9 queue=0 wal_queue=0 depth=17439 trades=11141 factors=16886 signals=16886 fills=1193 gaps=0 resyncs=0 errors=0
-12:24:53 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=143688 ws_msg_per_s=84.0 processed=143693 proc_per_s=83.9 queue=1 wal_queue=1 depth=17823 trades=11189 factors=17257 signals=17257 fills=1193 gaps=0 resyncs=0 errors=0
-12:25:03 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=146548 ws_msg_per_s=285.3 processed=146554 proc_per_s=285.4 queue=0 wal_queue=1 depth=18246 trades=11369 factors=17662 signals=17662 fills=1195 gaps=0 resyncs=0 errors=0
-12:25:13 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=151202 ws_msg_per_s=458.3 processed=151207 proc_per_s=458.2 queue=1 wal_queue=1 depth=18761 trades=11662 factors=18176 signals=18176 fills=1209 gaps=0 resyncs=0 errors=0
-12:25:23 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=153423 ws_msg_per_s=220.0 processed=153429 proc_per_s=220.1 queue=0 wal_queue=0 depth=19217 trades=11777 factors=18629 signals=18629 fills=1210 gaps=0 resyncs=0 errors=0
-12:25:33 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=156669 ws_msg_per_s=323.1 processed=156675 proc_per_s=323.1 queue=0 wal_queue=1 depth=19694 trades=11919 factors=19087 signals=19087 fills=1227 gaps=0 resyncs=0 errors=0
-12:25:43 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=159769 ws_msg_per_s=303.8 processed=159773 proc_per_s=303.6 queue=2 wal_queue=2 depth=20159 trades=12072 factors=19538 signals=19538 fills=1234 gaps=0 resyncs=0 errors=0
-12:25:53 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=162986 ws_msg_per_s=317.0 processed=162992 proc_per_s=317.2 queue=0 wal_queue=0 depth=20619 trades=12239 factors=19989 signals=19989 fills=1249 gaps=0 resyncs=0 errors=0
-12:26:03 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=165602 ws_msg_per_s=259.3 processed=165608 proc_per_s=259.3 queue=0 wal_queue=0 depth=21081 trades=12342 factors=20432 signals=20432 fills=1262 gaps=0 resyncs=0 errors=0
-12:26:13 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=170132 ws_msg_per_s=450.5 processed=170137 proc_per_s=450.4 queue=1 wal_queue=1 depth=21544 trades=12755 factors=20886 signals=20886 fills=1308 gaps=0 resyncs=0 errors=0
-12:26:23 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=172432 ws_msg_per_s=229.9 processed=172437 proc_per_s=229.9 queue=1 wal_queue=1 depth=21993 trades=12882 factors=21325 signals=21325 fills=1332 gaps=0 resyncs=0 errors=0
-12:26:33 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=173967 ws_msg_per_s=150.9 processed=173972 proc_per_s=150.9 queue=1 wal_queue=1 depth=22425 trades=12933 factors=21739 signals=21739 fills=1337 gaps=0 resyncs=0 errors=0
-12:26:43 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=175103 ws_msg_per_s=112.0 processed=175109 proc_per_s=112.1 queue=0 wal_queue=0 depth=22815 trades=12979 factors=22116 signals=22116 fills=1344 gaps=0 resyncs=0 errors=0
-12:26:53 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=179037 ws_msg_per_s=390.2 processed=179043 proc_per_s=390.2 queue=0 wal_queue=0 depth=23256 trades=13184 factors=22548 signals=22548 fills=1375 gaps=0 resyncs=0 errors=0
-12:27:03 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=181612 ws_msg_per_s=256.0 processed=181618 proc_per_s=256.0 queue=0 wal_queue=0 depth=23692 trades=13370 factors=22963 signals=22963 fills=1388 gaps=0 resyncs=0 errors=0
-12:27:13 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=186149 ws_msg_per_s=453.0 processed=186154 proc_per_s=452.9 queue=1 wal_queue=1 depth=24169 trades=13723 factors=23426 signals=23426 fills=1428 gaps=0 resyncs=0 errors=0
-12:27:23 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=188575 ws_msg_per_s=238.5 processed=188581 proc_per_s=238.6 queue=0 wal_queue=0 depth=24574 trades=13877 factors=23825 signals=23825 fills=1428 gaps=0 resyncs=0 errors=0
-12:27:33 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=190553 ws_msg_per_s=195.7 processed=190559 proc_per_s=195.7 queue=0 wal_queue=0 depth=24997 trades=13961 factors=24232 signals=24232 fills=1430 gaps=0 resyncs=0 errors=0
-12:27:43 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=192975 ws_msg_per_s=240.4 processed=192980 proc_per_s=240.3 queue=1 wal_queue=1 depth=25409 trades=14092 factors=24637 signals=24637 fills=1430 gaps=0 resyncs=0 errors=0
-12:27:53 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=195843 ws_msg_per_s=285.6 processed=195849 proc_per_s=285.7 queue=0 wal_queue=0 depth=25846 trades=14280 factors=25060 signals=25060 fills=1450 gaps=0 resyncs=0 errors=0
-12:28:03 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=198627 ws_msg_per_s=278.2 processed=198633 proc_per_s=278.2 queue=0 wal_queue=0 depth=26305 trades=14368 factors=25511 signals=25511 fills=1461 gaps=0 resyncs=0 errors=0
-12:28:13 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=200509 ws_msg_per_s=184.9 processed=200514 proc_per_s=184.8 queue=1 wal_queue=1 depth=26743 trades=14434 factors=25941 signals=25941 fills=1462 gaps=0 resyncs=0 errors=0
-12:28:23 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=201847 ws_msg_per_s=132.0 processed=201853 proc_per_s=132.1 queue=0 wal_queue=0 depth=27143 trades=14557 factors=26326 signals=26326 fills=1463 gaps=0 resyncs=0 errors=0
-12:28:33 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=203355 ws_msg_per_s=149.4 processed=203361 proc_per_s=149.4 queue=0 wal_queue=0 depth=27553 trades=14604 factors=26725 signals=26725 fills=1463 gaps=0 resyncs=0 errors=0
-12:28:43 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=205580 ws_msg_per_s=221.5 processed=205586 proc_per_s=221.5 queue=0 wal_queue=0 depth=27982 trades=14718 factors=27142 signals=27142 fills=1465 gaps=0 resyncs=0 errors=0
-12:28:53 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=207582 ws_msg_per_s=196.8 processed=207586 proc_per_s=196.6 queue=2 wal_queue=2 depth=28401 trades=14839 factors=27535 signals=27535 fills=1465 gaps=0 resyncs=0 errors=0
-12:29:03 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=209191 ws_msg_per_s=158.9 processed=209197 proc_per_s=159.1 queue=0 wal_queue=0 depth=28839 trades=14919 factors=27959 signals=27959 fills=1466 gaps=0 resyncs=0 errors=0
-12:29:13 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=213991 ws_msg_per_s=476.5 processed=213997 proc_per_s=476.5 queue=0 wal_queue=1 depth=29325 trades=15227 factors=28434 signals=28434 fills=1509 gaps=0 resyncs=0 errors=0
-12:29:23 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=216630 ws_msg_per_s=263.2 processed=216634 proc_per_s=263.0 queue=2 wal_queue=2 depth=29756 trades=15314 factors=28857 signals=28857 fills=1516 gaps=0 resyncs=0 errors=0
-12:29:33 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=217827 ws_msg_per_s=117.8 processed=217833 proc_per_s=118.0 queue=0 wal_queue=0 depth=30157 trades=15352 factors=29246 signals=29246 fills=1517 gaps=0 resyncs=0 errors=0
-12:29:43 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=218783 ws_msg_per_s=94.3 processed=218789 proc_per_s=94.3 queue=0 wal_queue=0 depth=30557 trades=15379 factors=29628 signals=29628 fills=1517 gaps=0 resyncs=0 errors=0
-12:29:53 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=219759 ws_msg_per_s=96.8 processed=219765 proc_per_s=96.8 queue=0 wal_queue=0 depth=30957 trades=15426 factors=29998 signals=29998 fills=1517 gaps=0 resyncs=0 errors=0
-12:30:03 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=222603 ws_msg_per_s=283.3 processed=222609 proc_per_s=283.3 queue=0 wal_queue=0 depth=31377 trades=15606 factors=30408 signals=30408 fills=1541 gaps=0 resyncs=0 errors=0
-12:30:13 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=224809 ws_msg_per_s=216.9 processed=224814 proc_per_s=216.8 queue=1 wal_queue=1 depth=31826 trades=15728 factors=30842 signals=30842 fills=1553 gaps=0 resyncs=0 errors=0
-12:30:23 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=227164 ws_msg_per_s=233.3 processed=227170 proc_per_s=233.4 queue=0 wal_queue=0 depth=32256 trades=15847 factors=31269 signals=31269 fills=1560 gaps=0 resyncs=0 errors=0
-12:30:33 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=229800 ws_msg_per_s=262.1 processed=229806 proc_per_s=262.1 queue=0 wal_queue=1 depth=32649 trades=16125 factors=31653 signals=31653 fills=1585 gaps=0 resyncs=0 errors=0
-12:30:43 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=232190 ws_msg_per_s=234.4 processed=232196 proc_per_s=234.4 queue=0 wal_queue=0 depth=33084 trades=16276 factors=32075 signals=32075 fills=1597 gaps=0 resyncs=0 errors=0
-12:30:53 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=233711 ws_msg_per_s=150.0 processed=233716 proc_per_s=150.0 queue=1 wal_queue=1 depth=33486 trades=16338 factors=32462 signals=32462 fills=1597 gaps=0 resyncs=0 errors=0
-12:31:03 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=237008 ws_msg_per_s=327.2 processed=237006 proc_per_s=326.5 queue=8 wal_queue=8 depth=33899 trades=16532 factors=32861 signals=32861 fills=1597 gaps=0 resyncs=0 errors=0
-12:31:13 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=239547 ws_msg_per_s=253.0 processed=239553 proc_per_s=253.8 queue=0 wal_queue=0 depth=34372 trades=16616 factors=33326 signals=33326 fills=1605 gaps=0 resyncs=0 errors=0
-12:31:23 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=241798 ws_msg_per_s=221.2 processed=241804 proc_per_s=221.2 queue=0 wal_queue=1 depth=34818 trades=16734 factors=33752 signals=33752 fills=1618 gaps=0 resyncs=0 errors=0
-12:31:33 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=243302 ws_msg_per_s=148.0 processed=243307 proc_per_s=147.9 queue=1 wal_queue=1 depth=35227 trades=16813 factors=34149 signals=34149 fills=1624 gaps=0 resyncs=0 errors=0
-12:31:43 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=244670 ws_msg_per_s=134.5 processed=244675 proc_per_s=134.5 queue=1 wal_queue=1 depth=35621 trades=16882 factors=34526 signals=34526 fills=1624 gaps=0 resyncs=0 errors=0
-12:31:53 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=246345 ws_msg_per_s=165.7 processed=246350 proc_per_s=165.7 queue=1 wal_queue=1 depth=36032 trades=16949 factors=34926 signals=34926 fills=1629 gaps=0 resyncs=0 errors=0
-12:32:03 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=247957 ws_msg_per_s=160.0 processed=247962 proc_per_s=160.0 queue=1 wal_queue=1 depth=36439 trades=17037 factors=35319 signals=35319 fills=1632 gaps=0 resyncs=0 errors=0
-12:32:13 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=250304 ws_msg_per_s=234.5 processed=250310 proc_per_s=234.6 queue=0 wal_queue=0 depth=36819 trades=17199 factors=35687 signals=35687 fills=1659 gaps=0 resyncs=0 errors=0
-12:32:23 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=256465 ws_msg_per_s=606.3 processed=256471 proc_per_s=606.3 queue=0 wal_queue=0 depth=37315 trades=17657 factors=36177 signals=36177 fills=1752 gaps=0 resyncs=0 errors=0
-12:32:33 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=258645 ws_msg_per_s=216.3 processed=258650 proc_per_s=216.2 queue=1 wal_queue=1 depth=37711 trades=17786 factors=36555 signals=36555 fills=1763 gaps=0 resyncs=0 errors=0
-12:32:43 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=260558 ws_msg_per_s=190.7 processed=260563 proc_per_s=190.7 queue=1 wal_queue=1 depth=38128 trades=17867 factors=36959 signals=36959 fills=1769 gaps=0 resyncs=0 errors=0
-12:32:53 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=262540 ws_msg_per_s=194.5 processed=262546 proc_per_s=194.6 queue=0 wal_queue=0 depth=38545 trades=17982 factors=37360 signals=37360 fills=1782 gaps=0 resyncs=0 errors=0
-12:33:03 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=268118 ws_msg_per_s=549.9 processed=268124 proc_per_s=549.9 queue=0 wal_queue=0 depth=39063 trades=18523 factors=37868 signals=37868 fills=1880 gaps=0 resyncs=0 errors=0
-12:33:13 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=270378 ws_msg_per_s=223.7 processed=270383 proc_per_s=223.6 queue=1 wal_queue=1 depth=39490 trades=18782 factors=38284 signals=38284 fills=1895 gaps=0 resyncs=0 errors=0
-12:33:23 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=276033 ws_msg_per_s=560.6 processed=276039 proc_per_s=560.7 queue=0 wal_queue=0 depth=39987 trades=19403 factors=38770 signals=38770 fills=1987 gaps=0 resyncs=0 errors=0
-12:33:23 INFO    tickforge.runtime.engine: stop requested  reason='duration_elapsed'
-12:33:23 INFO    tickforge.runtime.engine: shutdown begin  reason='duration_elapsed'
-12:33:25 WARNING tickforge.runtime.engine: timed out closing websocket during stop()
-12:33:25 WARNING tickforge.runtime.engine: websocket disconnected  conn_id=1 reason='stopped'
-12:33:26 INFO    tickforge.runtime.engine: observability server stopped
-12:33:26 INFO    tickforge.runtime.engine: run complete  run_dir='artifacts\\runs\\20261020T041823Z-df65' ws_msgs=276118 processed=276124 wal_records=276124 signals=38799 fills=1987 clean=True
+15:44:16 INFO    tickforge.cli: tickforge live starting  version='0.1.0' run_dir='artifacts\\runs\\20261020T074416Z-91ac' log_file='artifacts\\runs\\20261020T074416Z-91ac\\logs\\tickforge.log'
+15:44:16 INFO    tickforge.runtime.engine: run starting  run_id='20261020T074416Z-91ac' symbols='BTCUSDT,ETHUSDT,SOLUSDT,BNBUSDT,XRPUSDT,DOGEUSDT' ws_url='wss://data-stream.binance.vision/stream' rest_url='https://data-api.binance.vision' duration_s=900.0 fsync_policy='interval' run_dir='artifacts\\runs\\20261020T074416Z-91ac'
+15:44:16 INFO    tickforge.runtime.engine: observability server listening on http://127.0.0.1:9100
+15:44:17 INFO    tickforge.runtime.engine: websocket connected (conn_id=1, reconnect=False)
+15:44:17 INFO    tickforge.runtime.engine: websocket connected  conn_id=1
+15:44:17 INFO    tickforge.runtime.engine: first market data received  latency_ms=731.7697
+15:44:17 INFO    tickforge.runtime.engine: book synced symbol=DOGEUSDT last_update_id=25717993008 buffered=0
+15:44:17 INFO    tickforge.runtime.engine: book synced symbol=ETHUSDT last_update_id=82270200946 buffered=0
+15:44:17 INFO    tickforge.runtime.engine: book synced symbol=XRPUSDT last_update_id=26778303073 buffered=0
+15:44:18 INFO    tickforge.runtime.engine: book synced symbol=BNBUSDT last_update_id=21012657490 buffered=0
+15:44:18 INFO    tickforge.runtime.engine: book synced symbol=SOLUSDT last_update_id=30408420312 buffered=0
+15:44:18 INFO    tickforge.runtime.engine: book synced symbol=BTCUSDT last_update_id=101671603879 buffered=0
+15:44:26 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=3552 ws_msg_per_s=353.3 processed=3550 proc_per_s=353.1 queue=8 wal_queue=8 depth=426 trades=251 factors=385 signals=385 fills=0 gaps=0 resyncs=0 errors=0
+15:44:36 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=6874 ws_msg_per_s=330.0 processed=6879 proc_per_s=330.7 queue=1 wal_queue=1 depth=901 trades=444 factors=846 signals=846 fills=8 gaps=0 resyncs=0 errors=0
+15:44:46 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=8783 ws_msg_per_s=188.6 processed=8788 proc_per_s=188.6 queue=1 wal_queue=1 depth=1318 trades=532 factors=1248 signals=1248 fills=9 gaps=0 resyncs=0 errors=0
+15:44:56 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=13201 ws_msg_per_s=435.6 processed=13206 proc_per_s=435.6 queue=1 wal_queue=1 depth=1821 trades=824 factors=1743 signals=1743 fills=32 gaps=0 resyncs=0 errors=0
+15:45:06 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=19234 ws_msg_per_s=593.1 processed=19240 proc_per_s=593.2 queue=0 wal_queue=0 depth=2324 trades=1234 factors=2237 signals=2237 fills=52 gaps=0 resyncs=0 errors=0
+15:45:16 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=22906 ws_msg_per_s=361.1 processed=22912 proc_per_s=361.1 queue=0 wal_queue=0 depth=2788 trades=1477 factors=2691 signals=2691 fills=78 gaps=0 resyncs=0 errors=0
+15:45:26 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=27056 ws_msg_per_s=407.3 processed=27057 proc_per_s=406.8 queue=5 wal_queue=5 depth=3310 trades=1702 factors=3204 signals=3204 fills=114 gaps=0 resyncs=0 errors=0
+15:45:36 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=29920 ws_msg_per_s=280.8 processed=29919 proc_per_s=280.6 queue=7 wal_queue=7 depth=3771 trades=1851 factors=3650 signals=3650 fills=129 gaps=0 resyncs=0 errors=0
+15:45:46 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=31882 ws_msg_per_s=195.8 processed=31887 proc_per_s=196.4 queue=1 wal_queue=1 depth=4198 trades=1948 factors=4058 signals=4058 fills=138 gaps=0 resyncs=0 errors=0
+15:45:56 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=34923 ws_msg_per_s=302.5 processed=34929 proc_per_s=302.6 queue=0 wal_queue=0 depth=4697 trades=2098 factors=4537 signals=4537 fills=164 gaps=0 resyncs=0 errors=0
+15:46:06 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=39109 ws_msg_per_s=414.4 processed=39115 proc_per_s=414.4 queue=0 wal_queue=1 depth=5174 trades=2394 factors=5002 signals=5002 fills=186 gaps=0 resyncs=0 errors=0
+15:46:16 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=42337 ws_msg_per_s=319.1 processed=42343 proc_per_s=319.1 queue=0 wal_queue=0 depth=5633 trades=2600 factors=5452 signals=5452 fills=228 gaps=0 resyncs=0 errors=0
+15:46:26 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=47662 ws_msg_per_s=525.4 processed=47668 proc_per_s=525.4 queue=0 wal_queue=1 depth=6135 trades=3062 factors=5942 signals=5942 fills=257 gaps=0 resyncs=0 errors=0
+15:46:36 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=50368 ws_msg_per_s=266.3 processed=50374 proc_per_s=266.3 queue=0 wal_queue=0 depth=6597 trades=3204 factors=6387 signals=6387 fills=267 gaps=0 resyncs=0 errors=0
+15:46:46 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=53184 ws_msg_per_s=276.1 processed=53182 proc_per_s=275.3 queue=8 wal_queue=8 depth=7049 trades=3378 factors=6826 signals=6826 fills=295 gaps=0 resyncs=0 errors=0
+15:46:56 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=56612 ws_msg_per_s=342.5 processed=56618 proc_per_s=343.3 queue=0 wal_queue=0 depth=7535 trades=3624 factors=7301 signals=7301 fills=301 gaps=0 resyncs=0 errors=0
+15:47:06 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=59194 ws_msg_per_s=257.3 processed=59200 proc_per_s=257.3 queue=0 wal_queue=0 depth=8031 trades=3716 factors=7782 signals=7782 fills=308 gaps=0 resyncs=0 errors=0
+15:47:16 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=63165 ws_msg_per_s=395.8 processed=63171 proc_per_s=395.8 queue=0 wal_queue=1 depth=8507 trades=3877 factors=8248 signals=8248 fills=342 gaps=0 resyncs=0 errors=0
+15:47:26 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=65641 ws_msg_per_s=246.7 processed=65647 proc_per_s=246.7 queue=0 wal_queue=0 depth=8970 trades=4010 factors=8700 signals=8700 fills=373 gaps=0 resyncs=0 errors=0
+15:47:36 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=69023 ws_msg_per_s=335.6 processed=69028 proc_per_s=335.5 queue=1 wal_queue=1 depth=9453 trades=4205 factors=9170 signals=9170 fills=392 gaps=0 resyncs=0 errors=0
+15:47:46 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=72149 ws_msg_per_s=308.8 processed=72155 proc_per_s=308.9 queue=0 wal_queue=0 depth=9929 trades=4435 factors=9636 signals=9636 fills=395 gaps=0 resyncs=0 errors=0
+15:47:56 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=74837 ws_msg_per_s=264.3 processed=74843 proc_per_s=264.3 queue=0 wal_queue=2 depth=10382 trades=4589 factors=10073 signals=10073 fills=414 gaps=0 resyncs=0 errors=0
+15:48:06 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=78644 ws_msg_per_s=373.2 processed=78650 proc_per_s=373.2 queue=0 wal_queue=0 depth=10895 trades=4858 factors=10575 signals=10575 fills=456 gaps=0 resyncs=0 errors=0
+15:48:16 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=80499 ws_msg_per_s=184.3 processed=80505 proc_per_s=184.3 queue=0 wal_queue=0 depth=11334 trades=4934 factors=11000 signals=11000 fills=462 gaps=0 resyncs=0 errors=0
+15:48:26 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=84640 ws_msg_per_s=409.3 processed=84645 proc_per_s=409.2 queue=1 wal_queue=1 depth=11855 trades=5204 factors=11514 signals=11514 fills=542 gaps=0 resyncs=0 errors=0
+15:48:36 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=88886 ws_msg_per_s=419.6 processed=88891 proc_per_s=419.6 queue=1 wal_queue=1 depth=12334 trades=5478 factors=11985 signals=11985 fills=562 gaps=0 resyncs=0 errors=0
+15:48:46 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=92391 ws_msg_per_s=346.6 processed=92393 proc_per_s=346.3 queue=4 wal_queue=4 depth=12798 trades=5696 factors=12439 signals=12439 fills=631 gaps=0 resyncs=0 errors=0
+15:48:56 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=95751 ws_msg_per_s=331.9 processed=95756 proc_per_s=332.2 queue=1 wal_queue=1 depth=13274 trades=5951 factors=12905 signals=12905 fills=684 gaps=0 resyncs=0 errors=0
+15:49:06 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=99388 ws_msg_per_s=358.3 processed=99393 proc_per_s=358.3 queue=1 wal_queue=1 depth=13803 trades=6195 factors=13425 signals=13425 fills=689 gaps=0 resyncs=0 errors=0
+15:49:16 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=103864 ws_msg_per_s=441.6 processed=103866 proc_per_s=441.3 queue=4 wal_queue=4 depth=14293 trades=6466 factors=13907 signals=13907 fills=717 gaps=0 resyncs=0 errors=0
+15:49:26 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=108134 ws_msg_per_s=421.3 processed=108140 proc_per_s=421.7 queue=0 wal_queue=0 depth=14761 trades=6857 factors=14360 signals=14360 fills=739 gaps=0 resyncs=0 errors=0
+15:49:36 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=109481 ws_msg_per_s=132.5 processed=109487 proc_per_s=132.5 queue=0 wal_queue=0 depth=15184 trades=6932 factors=14771 signals=14771 fills=741 gaps=0 resyncs=0 errors=0
+15:49:46 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=111240 ws_msg_per_s=172.7 processed=111246 proc_per_s=172.7 queue=0 wal_queue=0 depth=15628 trades=7006 factors=15201 signals=15201 fills=744 gaps=0 resyncs=0 errors=0
+15:49:56 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=115818 ws_msg_per_s=448.8 processed=115822 proc_per_s=448.6 queue=2 wal_queue=2 depth=16098 trades=7469 factors=15653 signals=15653 fills=761 gaps=0 resyncs=0 errors=0
+15:50:06 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=118334 ws_msg_per_s=250.1 processed=118340 proc_per_s=250.3 queue=0 wal_queue=0 depth=16564 trades=7608 factors=16102 signals=16102 fills=777 gaps=0 resyncs=0 errors=0
+15:50:16 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=121945 ws_msg_per_s=357.9 processed=121951 proc_per_s=357.9 queue=0 wal_queue=0 depth=17038 trades=7826 factors=16566 signals=16566 fills=846 gaps=0 resyncs=0 errors=0
+15:50:26 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=125456 ws_msg_per_s=347.5 processed=125460 proc_per_s=347.3 queue=2 wal_queue=2 depth=17461 trades=7933 factors=16970 signals=16970 fills=857 gaps=0 resyncs=0 errors=0
+15:50:36 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=129802 ws_msg_per_s=428.6 processed=129808 proc_per_s=428.8 queue=0 wal_queue=0 depth=17927 trades=8187 factors=17424 signals=17424 fills=870 gaps=0 resyncs=0 errors=0
+15:50:46 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=132663 ws_msg_per_s=281.6 processed=132669 proc_per_s=281.6 queue=0 wal_queue=0 depth=18398 trades=8333 factors=17875 signals=17875 fills=881 gaps=0 resyncs=0 errors=0
+15:50:56 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=135889 ws_msg_per_s=316.3 processed=135895 proc_per_s=316.3 queue=0 wal_queue=0 depth=18870 trades=8611 factors=18333 signals=18333 fills=940 gaps=0 resyncs=0 errors=0
+15:51:06 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=141152 ws_msg_per_s=515.9 processed=141157 proc_per_s=515.8 queue=1 wal_queue=1 depth=19379 trades=9045 factors=18818 signals=18818 fills=985 gaps=0 resyncs=0 errors=0
+15:51:16 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=143317 ws_msg_per_s=216.1 processed=143322 proc_per_s=216.1 queue=1 wal_queue=1 depth=19802 trades=9156 factors=19233 signals=19233 fills=985 gaps=0 resyncs=0 errors=0
+15:51:26 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=146218 ws_msg_per_s=289.6 processed=146223 proc_per_s=289.6 queue=1 wal_queue=1 depth=20236 trades=9256 factors=19657 signals=19657 fills=989 gaps=0 resyncs=0 errors=0
+15:51:36 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=152451 ws_msg_per_s=613.1 processed=152456 proc_per_s=613.1 queue=1 wal_queue=1 depth=20670 trades=9388 factors=20078 signals=20078 fills=999 gaps=0 resyncs=0 errors=0
+15:51:46 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=160710 ws_msg_per_s=819.3 processed=160716 proc_per_s=819.4 queue=0 wal_queue=0 depth=21114 trades=9551 factors=20509 signals=20509 fills=1036 gaps=0 resyncs=0 errors=0
+15:51:56 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=163571 ws_msg_per_s=284.1 processed=163576 proc_per_s=284.0 queue=1 wal_queue=1 depth=21575 trades=9705 factors=20958 signals=20958 fills=1073 gaps=0 resyncs=0 errors=0
+15:52:06 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=168110 ws_msg_per_s=449.0 processed=168116 proc_per_s=449.1 queue=0 wal_queue=0 depth=22060 trades=10029 factors=21429 signals=21429 fills=1083 gaps=0 resyncs=0 errors=0
+15:52:16 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=171764 ws_msg_per_s=360.5 processed=171769 proc_per_s=360.4 queue=1 wal_queue=1 depth=22557 trades=10255 factors=21924 signals=21924 fills=1169 gaps=0 resyncs=0 errors=0
+15:52:26 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=175748 ws_msg_per_s=393.9 processed=175753 proc_per_s=393.9 queue=1 wal_queue=1 depth=22978 trades=10399 factors=22330 signals=22330 fills=1189 gaps=0 resyncs=0 errors=0
+15:52:36 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=179693 ws_msg_per_s=389.6 processed=179699 proc_per_s=389.7 queue=0 wal_queue=1 depth=23453 trades=10686 factors=22782 signals=22782 fills=1232 gaps=0 resyncs=0 errors=0
+15:52:46 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=184729 ws_msg_per_s=495.6 processed=184735 proc_per_s=495.6 queue=0 wal_queue=1 depth=23908 trades=10802 factors=23220 signals=23220 fills=1247 gaps=0 resyncs=0 errors=0
+15:52:56 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=196070 ws_msg_per_s=1122.5 processed=196075 proc_per_s=1122.4 queue=1 wal_queue=1 depth=24356 trades=11194 factors=23665 signals=23665 fills=1292 gaps=0 resyncs=0 errors=0
+15:53:06 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=198516 ws_msg_per_s=241.8 processed=198522 proc_per_s=241.9 queue=0 wal_queue=0 depth=24836 trades=11315 factors=24131 signals=24131 fills=1298 gaps=0 resyncs=0 errors=0
+15:53:16 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=202736 ws_msg_per_s=417.7 processed=202742 proc_per_s=417.7 queue=0 wal_queue=0 depth=25287 trades=11493 factors=24568 signals=24568 fills=1310 gaps=0 resyncs=0 errors=0
+15:53:26 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=206082 ws_msg_per_s=329.9 processed=206088 proc_per_s=329.9 queue=0 wal_queue=0 depth=25726 trades=11753 factors=24987 signals=24987 fills=1324 gaps=0 resyncs=0 errors=0
+15:53:36 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=209072 ws_msg_per_s=294.6 processed=209078 proc_per_s=294.6 queue=0 wal_queue=0 depth=26192 trades=11870 factors=25435 signals=25435 fills=1325 gaps=0 resyncs=0 errors=0
+15:53:46 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=211319 ws_msg_per_s=220.7 processed=211324 proc_per_s=220.6 queue=1 wal_queue=1 depth=26637 trades=11998 factors=25858 signals=25858 fills=1330 gaps=0 resyncs=0 errors=0
+15:53:56 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=216570 ws_msg_per_s=517.1 processed=216575 proc_per_s=517.1 queue=1 wal_queue=1 depth=27115 trades=12376 factors=26322 signals=26322 fills=1337 gaps=0 resyncs=0 errors=0
+15:54:06 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=220674 ws_msg_per_s=405.2 processed=220679 proc_per_s=405.2 queue=1 wal_queue=1 depth=27613 trades=12530 factors=26811 signals=26811 fills=1360 gaps=0 resyncs=0 errors=0
+15:54:16 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=224833 ws_msg_per_s=409.9 processed=224839 proc_per_s=410.0 queue=0 wal_queue=0 depth=28140 trades=12743 factors=27324 signals=27324 fills=1409 gaps=0 resyncs=0 errors=0
+15:54:26 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=229470 ws_msg_per_s=456.6 processed=229476 proc_per_s=456.6 queue=0 wal_queue=0 depth=28658 trades=12932 factors=27827 signals=27827 fills=1466 gaps=0 resyncs=0 errors=0
+15:54:36 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=234272 ws_msg_per_s=471.4 processed=234277 proc_per_s=471.3 queue=1 wal_queue=1 depth=29154 trades=13197 factors=28308 signals=28308 fills=1546 gaps=0 resyncs=0 errors=0
+15:54:46 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=236873 ws_msg_per_s=258.9 processed=236879 proc_per_s=259.0 queue=0 wal_queue=0 depth=29622 trades=13300 factors=28758 signals=28758 fills=1568 gaps=0 resyncs=0 errors=0
+15:54:56 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=241193 ws_msg_per_s=429.0 processed=241199 proc_per_s=429.0 queue=0 wal_queue=0 depth=30071 trades=13584 factors=29191 signals=29191 fills=1581 gaps=0 resyncs=0 errors=0
+15:55:06 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=243439 ws_msg_per_s=222.4 processed=243445 proc_per_s=222.4 queue=0 wal_queue=0 depth=30557 trades=13715 factors=29668 signals=29668 fills=1582 gaps=0 resyncs=0 errors=0
+15:55:16 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=246546 ws_msg_per_s=307.2 processed=246552 proc_per_s=307.2 queue=0 wal_queue=0 depth=31015 trades=13941 factors=30121 signals=30121 fills=1583 gaps=0 resyncs=0 errors=0
+15:55:26 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=248432 ws_msg_per_s=186.4 processed=248438 proc_per_s=186.4 queue=0 wal_queue=0 depth=31433 trades=14028 factors=30524 signals=30524 fills=1593 gaps=0 resyncs=0 errors=0
+15:55:36 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=250330 ws_msg_per_s=186.9 processed=250336 proc_per_s=186.9 queue=0 wal_queue=0 depth=31850 trades=14112 factors=30925 signals=30925 fills=1600 gaps=0 resyncs=0 errors=0
+15:55:46 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=253212 ws_msg_per_s=284.0 processed=253217 proc_per_s=283.9 queue=1 wal_queue=1 depth=32329 trades=14274 factors=31385 signals=31385 fills=1619 gaps=0 resyncs=0 errors=0
+15:55:56 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=257380 ws_msg_per_s=409.7 processed=257386 proc_per_s=409.8 queue=0 wal_queue=1 depth=32817 trades=14636 factors=31863 signals=31863 fills=1620 gaps=0 resyncs=0 errors=0
+15:56:06 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=260030 ws_msg_per_s=260.3 processed=260034 proc_per_s=260.1 queue=2 wal_queue=2 depth=33302 trades=14776 factors=32342 signals=32342 fills=1638 gaps=0 resyncs=0 errors=0
+15:56:16 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=262178 ws_msg_per_s=210.8 processed=262183 proc_per_s=210.9 queue=1 wal_queue=1 depth=33747 trades=14943 factors=32775 signals=32775 fills=1681 gaps=0 resyncs=0 errors=0
+15:56:26 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=264130 ws_msg_per_s=194.8 processed=264135 proc_per_s=194.8 queue=1 wal_queue=1 depth=34157 trades=15077 factors=33177 signals=33177 fills=1693 gaps=0 resyncs=0 errors=0
+15:56:36 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=269466 ws_msg_per_s=532.3 processed=269471 proc_per_s=532.3 queue=1 wal_queue=1 depth=34652 trades=15681 factors=33657 signals=33657 fills=1703 gaps=0 resyncs=0 errors=0
+15:56:46 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=276205 ws_msg_per_s=672.9 processed=276210 proc_per_s=672.9 queue=1 wal_queue=1 depth=35210 trades=16284 factors=34211 signals=34211 fills=1746 gaps=0 resyncs=0 errors=0
+15:56:56 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=279309 ws_msg_per_s=308.9 processed=279315 proc_per_s=309.0 queue=0 wal_queue=12 depth=35700 trades=16503 factors=34690 signals=34690 fills=1767 gaps=0 resyncs=0 errors=0
+15:57:06 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=286982 ws_msg_per_s=765.5 processed=286987 proc_per_s=765.4 queue=1 wal_queue=1 depth=36232 trades=17312 factors=35211 signals=35211 fills=1790 gaps=0 resyncs=0 errors=0
+15:57:16 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=290036 ws_msg_per_s=304.7 processed=290042 proc_per_s=304.8 queue=0 wal_queue=1 depth=36750 trades=17410 factors=35720 signals=35720 fills=1804 gaps=0 resyncs=0 errors=0
+15:57:26 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=293695 ws_msg_per_s=362.7 processed=293701 proc_per_s=362.7 queue=0 wal_queue=0 depth=37259 trades=17681 factors=36222 signals=36222 fills=1859 gaps=0 resyncs=0 errors=0
+15:57:36 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=297486 ws_msg_per_s=375.4 processed=297492 proc_per_s=375.4 queue=0 wal_queue=0 depth=37719 trades=17946 factors=36663 signals=36663 fills=1867 gaps=0 resyncs=0 errors=0
+15:57:46 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=299449 ws_msg_per_s=194.5 processed=299454 proc_per_s=194.4 queue=1 wal_queue=1 depth=38167 trades=18017 factors=37099 signals=37099 fills=1870 gaps=0 resyncs=0 errors=0
+15:57:56 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=303785 ws_msg_per_s=428.5 processed=303790 proc_per_s=428.5 queue=1 wal_queue=1 depth=38648 trades=18320 factors=37568 signals=37568 fills=1943 gaps=0 resyncs=0 errors=0
+15:58:06 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=307480 ws_msg_per_s=364.5 processed=307484 proc_per_s=364.4 queue=2 wal_queue=2 depth=39143 trades=18590 factors=38053 signals=38053 fills=1968 gaps=0 resyncs=0 errors=0
+15:58:16 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=309487 ws_msg_per_s=196.9 processed=309493 proc_per_s=197.1 queue=0 wal_queue=0 depth=39585 trades=18678 factors=38484 signals=38484 fills=1977 gaps=0 resyncs=0 errors=0
+15:58:26 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=313042 ws_msg_per_s=348.7 processed=313048 proc_per_s=348.7 queue=0 wal_queue=0 depth=40080 trades=18874 factors=38968 signals=38968 fills=2030 gaps=0 resyncs=0 errors=0
+15:58:36 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=315279 ws_msg_per_s=223.2 processed=315284 proc_per_s=223.1 queue=1 wal_queue=1 depth=40542 trades=19068 factors=39409 signals=39409 fills=2060 gaps=0 resyncs=0 errors=0
+15:58:46 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=318566 ws_msg_per_s=327.1 processed=318572 proc_per_s=327.2 queue=0 wal_queue=0 depth=41021 trades=19290 factors=39865 signals=39865 fills=2094 gaps=0 resyncs=0 errors=0
+15:58:56 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=321002 ws_msg_per_s=241.8 processed=321007 proc_per_s=241.7 queue=1 wal_queue=1 depth=41494 trades=19459 factors=40323 signals=40323 fills=2112 gaps=0 resyncs=0 errors=0
+15:59:06 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=322674 ws_msg_per_s=165.5 processed=322680 proc_per_s=165.6 queue=0 wal_queue=1 depth=41965 trades=19546 factors=40774 signals=40774 fills=2116 gaps=0 resyncs=0 errors=0
+15:59:16 INFO    tickforge.runtime.engine: runtime stats  ws_msgs=325147 ws_msg_per_s=245.5 processed=325152 proc_per_s=245.4 queue=1 wal_queue=1 depth=42444 trades=19696 factors=41239 signals=41239 fills=2127 gaps=0 resyncs=0 errors=0
+15:59:17 INFO    tickforge.runtime.engine: stop requested  reason='duration_elapsed'
+15:59:17 INFO    tickforge.runtime.engine: shutdown begin  reason='duration_elapsed'
+15:59:19 WARNING tickforge.runtime.engine: timed out closing websocket during stop()
+15:59:19 WARNING tickforge.runtime.engine: websocket disconnected  conn_id=1 reason='stopped'
+15:59:20 INFO    tickforge.runtime.engine: observability server stopped
+15:59:20 INFO    tickforge.runtime.engine: run complete  run_dir='artifacts\\runs\\20261020T074416Z-91ac' ws_msgs=325280 processed=325286 wal_records=325286 signals=41265 fills=2131 clean=True
 
-run_dir     : artifacts\runs\20261020T041823Z-df65
-summary     : artifacts\runs\20261020T041823Z-df65\summary.json
-manifest    : artifacts\runs\20261020T041823Z-df65\manifest.json
+run_dir     : artifacts\runs\20261020T074416Z-91ac
+summary     : artifacts\runs\20261020T074416Z-91ac\summary.json
+manifest    : artifacts\runs\20261020T074416Z-91ac\manifest.json
 clean       : True
-window_s    : 900.169
-ws_frames   : 276118
-processed   : 276124
-signals     : 38799
-fills       : 1987
-replay      : python -m tickforge replay --run artifacts\runs\20261020T041823Z-df65 --verify
+window_s    : 900.044
+ws_frames   : 325280
+processed   : 325286
+signals     : 41265
+fills       : 2131
+replay      : python -m tickforge replay --run artifacts\runs\20261020T074416Z-91ac --verify

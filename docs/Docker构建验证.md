@@ -33,16 +33,18 @@ bash scripts/docker_verify.sh
 
 不想用脚本，或者某一步要单独重跑，就按下面的命令来：
 
+镜像已设置 `ENTRYPOINT ["python", "-m", "tickforge"]`，因此 `docker compose run --rm tickforge` 后面直接接 `--version`、`live`、`verify` 或 `replay`，无需再次填写 `python -m tickforge`。
+
 ```bash
 # 构建
 docker compose build 2>&1 | tee artifacts/experiments/docker_build.log
 
 # 容器内版本
-docker compose run --rm tickforge python -m tickforge --version
+docker compose run --rm tickforge --version
 
-# 镜像自带样本的离线 replay
+# 镜像自带样本的离线 replay（不要用 --no-derived，否则 digest 对比会失败）
 docker compose run --rm tickforge \
-  replay --run /app/samples/demo_run --no-derived
+  replay --run /app/samples/demo_run --out /tmp/sample-replay --verify
 
 # 60 秒真实行情（挂载 artifacts -> /data）
 docker compose run --rm tickforge \
@@ -65,7 +67,7 @@ docker compose run --rm tickforge \
 提交材料里至少要有这些：
 
 - `artifacts/experiments/docker_build.log`：构建成功日志；
-- `docker compose run ... python -m tickforge --version` 输出；
+- `docker compose run --rm tickforge --version` 输出；
 - 容器内 live 运行生成的 `artifacts/runs/<run_id>/summary.json`（`clean_shutdown=true`、`lost_raw_frames=0`）；
 - 容器内 `verify` 输出（`ok=true`）；
 - 容器内 `replay --verify` 输出（`verified=true`、三个摘要一致）；
@@ -77,7 +79,7 @@ docker compose run --rm tickforge \
 
 - [ ] `docker compose build` 退出码 0；
 - [ ] 容器内 `python -m tickforge --version` 正常；
-- [ ] 容器内离线样本 replay 正常退出；
+- [ ] 容器内离线样本 replay 返回 `verified=true`；
 - [ ] 容器内 live 运行生成 `summary.json` 且 `clean_shutdown=true`；
 - [ ] 容器内 `verify` 返回 `ok=true`；
 - [ ] 容器内 `replay --verify` 返回 `verified=true`，三个 SHA-256 与 live 一致。

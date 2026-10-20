@@ -1,0 +1,114 @@
+name: docker-verify
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "Dockerfile"
+      - "docker-compose.yml"
+      - ".dockerignore"
+      - "requirements*.txt"
+      - "tickforge/**"
+      - "config/**"
+      - "scripts/**"
+      - "tools/**"
+      - "samples/**"
+      - ".github/workflows/docker-verify.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  docker-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare evidence directory
+        run: mkdir -p ci_artifacts
+
+      - name: Docker versions
+        run: |
+          set -euo pipefail
+          {
+            echo "=== docker version ==="
+            docker version
+            echo "=== docker compose version ==="
+            docker compose version
+            echo "=== runner ==="
+            uname -a
+          } 2>&1 | tee ci_artifacts/docker_versions.log
+
+      - name: Build image
+        run: |
+          set -euo pipefail
+          docker build -t tickforge:ci . 2>&1 | tee ci_artifacts/docker_build.log
+          docker image inspect tickforge:ci > ci_artifacts/image_inspect.json
+          docker image inspect --format '{{.Id}}' tickforge:ci | tee ci_artifacts/image_id.txt
+
+      - name: Container version
+        run: |
+          set -euo pipefail
+          docker run --rm tickforge:ci --version 2>&1 | tee ci_artifacts/container_version.log
+
+      - name: Offline sample replay (verified)
+        run: |
+          set -euo pipefail
+          docker run --rm tickforge:ci \
+            replay --run /app/samples/demo_run \
+            --out /tmp/sample-replay --verify 2>&1 \
+            | tee ci_artifacts/sample_replay.log
+
+      - name: 60s live run (network dependent)
+        id: live
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          mkdir -p ci_artifacts/data
+          docker run --rm --name tickforge-ci-live \
+            -v "$PWD/ci_artifacts/data:/data" \
+            tickforge:ci \
+            live --config config/default.toml --duration 60 --out /data --http-port 0 2>&1 \
+            | tee ci_artifacts/live_60s.log
+
+      - name: Verify and replay container run
+        if: steps.live.outcome == 'success'
+        run: |
+          set -euo pipefail
+          RUN_DIR=$(ls -td ci_artifacts/data/runs/* | head -1)
+          RUN_ID=$(basename "$RUN_DIR")
+          echo "RUN_ID=$RUN_ID" | tee ci_artifacts/run_id.txt
+          docker run --rm -v "$PWD/ci_artifacts/data:/data" tickforge:ci \
+            verify --run "/data/runs/$RUN_ID" 2>&1 | tee ci_artifacts/verify.log
+          mkdir -p ci_artifacts/replay_out
+          docker run --rm \
+            -v "$PWD/ci_artifacts/data:/data" \
+            -v "$PWD/ci_artifacts/replay_out:/replay-out" \
+            tickforge:ci \
+            replay --run "/data/runs/$RUN_ID" --out /replay-out --verify 2>&1 \
+            | tee ci_artifacts/replay_verify.log
+          cp "$RUN_DIR/summary.json" ci_artifacts/container_summary.json
+          cp ci_artifacts/replay_out/replay_summary.json ci_artifacts/container_replay_summary.json
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "run_url=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+            echo "commit=$GITHUB_SHA"
+            echo "live_outcome=${{ steps.live.outcome }}"
+            echo "build_log=ci_artifacts/docker_build.log"
+            echo "sample_replay_log=ci_artifacts/sample_replay.log"
+            echo "image_id=ci_artifacts/image_id.txt"
+          } | tee ci_artifacts/run_info.txt
+
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-verify-evidence
+          path: ci_artifacts
+          if-no-files-found: warn

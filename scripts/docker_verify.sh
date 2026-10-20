@@ -37,12 +37,12 @@ echo "=== build ===" | tee artifacts/experiments/docker/build.log
 "$DOCKER" compose build 2>&1 | tee -a artifacts/experiments/docker/build.log
 
 echo "=== container version ===" | tee artifacts/experiments/docker/container_version.log
-"$DOCKER" compose run --rm tickforge python -m tickforge --version 2>&1 \
+"$DOCKER" compose run --rm tickforge --version 2>&1 \
   | tee -a artifacts/experiments/docker/container_version.log
 
 echo "=== offline sample replay ===" | tee artifacts/experiments/docker/sample_replay.log
 "$DOCKER" compose run --rm tickforge \
-  replay --run /app/samples/demo_run --no-derived 2>&1 \
+  replay --run /app/samples/demo_run --out /tmp/sample-replay --verify 2>&1 \
   | tee -a artifacts/experiments/docker/sample_replay.log
 
 echo "=== 60s live run ===" | tee artifacts/experiments/docker/live_60s.log
