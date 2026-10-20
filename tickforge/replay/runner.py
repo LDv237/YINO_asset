@@ -310,13 +310,14 @@ class ReplayRunner:
             missing_derived = ["factors", "signals", "fills"]
         if missing_derived:
             reasons.append("live_derived_missing")
-        live_derived_match = {
-            key: (live_file_digests.get(key) == digests.get(key))
-            for key in ("factors_sha256", "signals_sha256", "fills_sha256")
-            if key in live_file_digests or key in digests
-        }
-        if live_file_digests and not all(live_derived_match.values()):
-            reasons.append("live_derived_digest_mismatch")
+        live_derived_match: dict[str, bool] = {}
+        if live_file_digests:
+            live_derived_match = {
+                key: (live_file_digests.get(key) == digests.get(key))
+                for key in ("factors_sha256", "signals_sha256", "fills_sha256")
+            }
+            if not all(live_derived_match.values()):
+                reasons.append("live_derived_digest_mismatch")
 
         live_wal = live.get("wal") or {}
         wal_match = {
