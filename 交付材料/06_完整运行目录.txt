@@ -12,4 +12,7 @@
 同一 WAL 只做多对照:
   artifacts/experiments/variants/spot_long_only_same_wal_final
 
-前三个运行目录包含 raw/、derived/、logs/、summary.json、manifest.json 和 replay/；同一 WAL 对照目录只包含 derived/ 和 replay_summary.json，源 WAL 在 53b5 的 raw/ 下。
+最终代码单源复跑:
+  artifacts/runs/20261021T033309Z-4ac9
+
+前三个运行目录和最终代码单源复跑目录包含 raw/、derived/、logs/、summary.json、manifest.json 和 replay/；同一 WAL 对照目录只包含 derived/ 和 replay_summary.json，源 WAL 在 53b5 的 raw/ 下。

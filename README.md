@@ -5,7 +5,7 @@ TickForge 是我这次笔试交的实时高频数据流水线 demo，行情接�
 > 笔试题目：YINO ASSET 量化开发工程师（实时高频行情交易系统 demo）。
 > GitHub: https://github.com/LDv237/YINO_asset
 > 文件名说明：GitHub 首页固定读取 `README.md`；其余设计、报告、验证文档均使用中文文件名。
-> 提交材料清单与复现入口见 [交付说明.md](交付说明.md)。
+> 提交材料清单与复现入口见 [交付说明.md](交付说明.md)；完整交付包内的 `交付材料/复现入口.md` 给出三条逐条命令（完整 Release / 分类附件 / 离线样本）。
 > 完整运行材料（原始 WAL、JSONL、CSV、验证证据、日志）见仓库根目录的 [`交付材料/`](交付材料/)；邮件发送版把全部内容打成一个完整压缩包。
 > 完整运行产物的打包下载（`artifacts/` 压缩包与邮件完整包）见 [GitHub Release delivery-20261020](https://github.com/LDv237/YINO_asset/releases/tag/delivery-20261020)。
 > 设计与取舍见 [docs/系统架构.md](docs/系统架构.md)，模块接口与 WAL 格式见 [docs/接口设计.md](docs/接口设计.md)，实测与复现见 [docs/性能实测.md](docs/性能实测.md)，完整报告见 [笔试报告.md](笔试报告.md)。
@@ -154,6 +154,7 @@ python -m pytest -q
 | 端到端延迟 p50 / p99 / p999 | 0.512 ms / 2.435 ms / 27.554 ms |
 | 原始帧丢失 / 未处理（正常关闭） | 0 / 0 |
 | 回放摘要一致性 | 回放与 run 目录 derived 的因子/信号/成交 SHA-256 全部一致 |
+| 最终代码单源复跑 | 178,954 帧，35,128 信号，4,908 fills，0 原始帧丢失；queue/durable 字段完整（`20261021T033309Z-4ac9`，第 3.6 节） |
 | 交易活跃度 | 抽象/interval 与只做多/interval 在 07:00–08:00 UTC 桶排名 3/47；严格版在 08:00–09:00 UTC 桶排名 4/47（47 个完整小时） |
 
 ## 已知的局限
