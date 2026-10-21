@@ -120,9 +120,9 @@ docker compose run --rm tickforge replay --run /data/runs/<run_id> --out /data/r
 ## 目录结构
 
 ```text
-tickforge/           核心包（feed/store/book/factor/strategy/exec/runtime/replay/metrics/server）
+tickforge/           核心包（feed/store/book/factor/strategy/exec/runtime/replay/metrics/server；模块地图见 tickforge/README.md）
 tests/               单元、集成、混沌与端到端回放测试
-tools/               运行分析、样本裁剪
+tools/               运行分析、导出、追溯和样本裁剪（工具说明见 tools/README.md）
 scripts/             15 分钟运行、回放校验、Docker 运行
 config/default.toml  默认配置
 docs/                架构、接口、性能、验证、开发过程、人工智能协作、依赖说明、运行手册
