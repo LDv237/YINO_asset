@@ -50,7 +50,8 @@ echo "=== 60s live run ===" | tee artifacts/experiments/docker/live_60s.log
   live --config config/default.toml --duration 60 --out /data --http-port 0 2>&1 \
   | tee -a artifacts/experiments/docker/live_60s.log
 
-RUN_DIR=$(ls -td artifacts/runs/* | head -1)
+RUN_DIR=$(ls -td artifacts/runs/*/ | grep -v -- '-replay/' | head -1)
+RUN_DIR=${RUN_DIR%/}
 RUN_ID=$(basename "$RUN_DIR")
 echo "container run: $RUN_ID" | tee -a artifacts/experiments/docker/live_60s.log
 

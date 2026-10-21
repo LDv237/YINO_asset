@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Reconstruct a complete run directory from the classified delivery folder.
 
-`运行材料/02_正式运行/` intentionally keeps the large files as archives.  This
-script rebuilds the exact layout expected by ``tickforge verify``/``replay``:
+The classified delivery folders (`07_最终代码单源复跑/` and `02_正式运行/`)
+intentionally keep the large files as archives.  This script rebuilds the
+exact layout expected by ``tickforge verify``/``replay``:
 
     <workdir>/raw/raw-*.wal
     <workdir>/derived/factors|signals|fills.jsonl
@@ -13,9 +14,11 @@ script rebuilds the exact layout expected by ``tickforge verify``/``replay``:
 Then it runs ``verify`` and ``replay --verify``.  Use the full Release
 artifacts zip instead if you want the pre-built run directory.
 
-By default the workdir is derived from ``run_id`` in 正式运行摘要.json, so
-02_正式运行 (53b5) and 07_最终代码单源复跑 (af19) do not collide.  Existing
-non-empty workdirs and replay outputs are refused unless ``--force``.
+By default the script rebuilds the main result in ``07_最终代码单源复跑``.
+Pass ``--delivery 运行材料/02_正式运行`` to rebuild the historical 53b5
+baseline instead.  The workdir is derived from ``run_id`` in 正式运行摘要.json,
+so the two runs do not collide.  Existing non-empty workdirs and replay
+outputs are refused unless ``--force``.
 
 Usage::
 
@@ -36,7 +39,7 @@ import tarfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_DELIVERY = ROOT / "运行材料" / "02_正式运行"
+DEFAULT_DELIVERY = ROOT / "运行材料" / "07_最终代码单源复跑"
 
 
 def extract(tar_path: Path, dest: Path) -> None:

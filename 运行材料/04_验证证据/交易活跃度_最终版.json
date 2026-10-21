@@ -1,0 +1,75 @@
+{
+  "symbol": "BTCUSDT",
+  "generated_at_utc": "2026-10-21T08:17:35+00:00",
+  "complete_hours": 47,
+  "target_run_utc": "2026-10-21T07:59:25Z",
+  "target_bucket": {
+    "open_utc": "2026-10-21T07:00:00+00:00",
+    "open_cst": "2026-10-21T15:00:00+08:00",
+    "quote_volume": 67534514.2975784,
+    "base_volume": 812.99334,
+    "trades": 97351
+  },
+  "target_rank_by_quote_volume": "6/47",
+  "target_percentile": 89.36,
+  "top_hours": [
+    {
+      "open_utc": "2026-10-20T14:00:00+00:00",
+      "open_cst": "2026-10-20T22:00:00+08:00",
+      "quote_volume": 191658456.852822,
+      "base_volume": 2309.64642,
+      "trades": 430970
+    },
+    {
+      "open_utc": "2026-10-20T15:00:00+00:00",
+      "open_cst": "2026-10-20T23:00:00+08:00",
+      "quote_volume": 97201106.2380228,
+      "base_volume": 1176.50709,
+      "trades": 317081
+    },
+    {
+      "open_utc": "2026-10-19T14:00:00+00:00",
+      "open_cst": "2026-10-19T22:00:00+08:00",
+      "quote_volume": 80069580.5550234,
+      "base_volume": 975.41598,
+      "trades": 283709
+    },
+    {
+      "open_utc": "2026-10-20T07:00:00+00:00",
+      "open_cst": "2026-10-20T15:00:00+08:00",
+      "quote_volume": 73962599.9331691,
+      "base_volume": 906.02611,
+      "trades": 125770
+    },
+    {
+      "open_utc": "2026-10-20T08:00:00+00:00",
+      "open_cst": "2026-10-20T16:00:00+08:00",
+      "quote_volume": 73080561.5388412,
+      "base_volume": 897.05221,
+      "trades": 115018
+    },
+    {
+      "open_utc": "2026-10-21T07:00:00+00:00",
+      "open_cst": "2026-10-21T15:00:00+08:00",
+      "quote_volume": 67534514.2975784,
+      "base_volume": 812.99334,
+      "trades": 97351
+    },
+    {
+      "open_utc": "2026-10-19T15:00:00+00:00",
+      "open_cst": "2026-10-19T23:00:00+08:00",
+      "quote_volume": 65499726.3925938,
+      "base_volume": 796.71202,
+      "trades": 182975
+    },
+    {
+      "open_utc": "2026-10-20T13:00:00+00:00",
+      "open_cst": "2026-10-20T21:00:00+08:00",
+      "quote_volume": 65463350.3722179,
+      "base_volume": 801.82291,
+      "trades": 218841
+    }
+  ],
+  "method": "Binance public 1h klines, quote volume and trade count; the current incomplete hour is excluded; rank 1 = highest volume.",
+  "caveat": "This is a liquidity/activity proxy for the chosen symbol, not a guarantee that every future 15-minute window is equally active."
+}

@@ -1,6 +1,6 @@
 # TickForge
 
-TickForge 是我这次笔试交的实时高频数据流水线 demo，行情接的是 Binance 现货公开接口。WebSocket 原始帧先原样落盘，然后做 L2 订单簿重建、因子计算、做市信号和模拟成交；一次跑完可以从 WAL 按字节做确定性回放，把回放结果和运行目录里的派生文件逐项对上。历史 15 分钟 run（53b5 等）的执行结果按统一口径从同一份 WAL 重算；本次交付的主结果——最终代码单源 run af19——日志、信号、成交、性能和回放全部同源，未经过重算。
+TickForge 是我这次笔试交的实时高频数据流水线 demo，行情接的是 Binance 现货公开接口。WebSocket 原始帧先原样落盘，然后做 L2 订单簿重建、因子计算、做市信号和模拟成交；一次跑完可以从 WAL 按字节做确定性回放，把回放结果和运行目录里的派生文件逐项对上。历史 15 分钟 run（53b5 等）的执行结果按统一口径从同一份 WAL 重算；本次交付的主结果——最终代码单源 run——日志、信号、成交、性能和回放全部同源，未经过重算。
 
 > 笔试题目：YINO ASSET 量化开发工程师（实时高频行情交易系统 demo）。
 > GitHub: https://github.com/LDv237/YINO_asset
@@ -18,7 +18,7 @@ TickForge 是我这次笔试交的实时高频数据流水线 demo，行情接�
 
 订单簿按 Binance 的 `U/u` 规则维护完整档位。检测到丢包或者交叉时，程序会自动进入缓冲，再用 REST 快照加增量重放把簿恢复回来。
 
-回放能不能对上，是这条流水线的底线。REST 快照会作为 `kind=2` 事件写进 WAL，回放走同一套流水线，所以因子、信号、成交三个 JSONL 的 SHA-256 必须和运行目录里的 derived 一致；对不上就说明中间有环节不可复现。历史 15 分钟 run（53b5 等）的 derived 已按基于实际成交时间 `T` 的 quote-time guard + tick 取整从同一份 WAL 重算；最终单源 af19 的 derived 为 live 采集产物，回放直接对比该 derived。
+回放能不能对上，是这条流水线的底线。REST 快照会作为 `kind=2` 事件写进 WAL，回放走同一套流水线，所以因子、信号、成交三个 JSONL 的 SHA-256 必须和运行目录里的 derived 一致；对不上就说明中间有环节不可复现。历史 15 分钟 run（53b5 等）的 derived 已按基于实际成交时间 `T` 的 quote-time guard + tick 取整从同一份 WAL 重算；最终单源 run 的 derived 为 live 采集产物，回放直接对比该 derived。
 
 运行状态可以从 `/healthz`、`/readyz`、`/status`、`/metrics` 查，WAL 队列、处理滞后、逐阶段延迟、订单簿状态、反压次数都在里面。校验手段包括 WAL 的 CRC/seq/分段哈希、计数对账、单元/集成/混沌测试，以及回放摘要对比。跑法上，本地直接 `python -m tickforge`，也可以用 Docker 或 docker compose。
 
@@ -51,7 +51,8 @@ curl http://127.0.0.1:9100/metrics
 运行结束后：
 
 ```bash
-RUN_DIR=$(ls -td artifacts/runs/* | head -1)
+RUN_DIR=$(ls -td artifacts/runs/*/ | grep -v -- '-replay/' | head -1)
+RUN_DIR=${RUN_DIR%/}
 python -m tickforge show --run "$RUN_DIR"
 python -m tickforge verify --run "$RUN_DIR"
 python -m tickforge replay --run "$RUN_DIR" --out "$RUN_DIR-replay" --verify
@@ -145,25 +146,26 @@ python -m pytest -q
 
 ### 最终代码单源 run（主结果）
 
-`20261021T055305Z-af19`，900.19 s，日志/信号/成交/性能/回放全部来自同一次 live：
+`20261021T075925Z-3049`，900.129 s，日志/信号/成交/性能/回放全部来自同一次 live：
 
 | 指标 | 结果 |
 |---|---|
-| 原始帧 / WAL 记录 | 244,570 / 244,582 |
-| 信号 / fills | 39,716 / 6,370 |
-| depth / aggTrade / bookTicker | 41,434 / 12,734 / 190,402 |
-| depth e2e p50 / p95 / p99 / p999 | 0.431 / 1.218 / 2.048 / 4.871 ms |
-| 聚合 e2e p50 / p99 / p999 | 0.431 / 2.435 / 5.793 ms（bookTicker 占 77.9%，只做轻处理，不代表完整链路） |
+| 原始帧 / WAL 记录 | 303,784 / 303,793 |
+| 信号 / fills | 41,470 / 8,828 |
+| depth / aggTrade / bookTicker | 42,620 / 17,381 / 243,783 |
+| depth e2e p50 / p95 / p99 / p999 | 0.512 / 1.448 / 2.435 / 4.871 ms |
+| 聚合 e2e p50 / p99 / p999 | 0.512 / 2.435 / 5.793 ms（bookTicker 占 80.2%，只做轻处理，不代表完整链路） |
 | 原始帧丢失 / `clean_shutdown` | 0 / true |
 | data gap / 订单簿 resync | 0 / 0 |
-| 队列峰值 / durable p50 / p95 | WAL 303 / pipeline 18；262 / 312 ms（`interval` 批次口径） |
+| 队列峰值 / durable p50 / p95 | WAL 413 / pipeline 16；262 / 312 ms（`interval` 批次口径） |
+| 窗口活跃度 | 起始桶 07:00–08:00 UTC 当日 67.53M USDT / 97,351 笔，排 6/47（89.4 分位）；前一交易日 08:00–09:00 桶排 4/47 |
 | 回放摘要一致性 | 回放与 run 目录 derived 的因子/信号/成交 SHA-256 全部一致 |
 
-延迟从 `ws.recv()` 返回后开始计时，不含 WebSocket 库、内核缓冲和网络 RTT；它只证明接收后的处理延迟，不能证明行情从交易所产生到策略完成同样只用几毫秒。离线回放吞吐约为实时平均帧率的 42 倍，这是两种运行方式的速率比，不是实时容量证明。
+延迟从 `ws.recv()` 返回后开始计时，不含 WebSocket 库、内核缓冲和网络 RTT；它只证明接收后的处理延迟，不能证明行情从交易所产生到策略完成同样只用几毫秒。离线回放吞吐约为实时平均帧率的 54 倍，这是两种运行方式的速率比，不是实时容量证明。
 
 ### 历史性能基准（53b5）
 
-历史基准的 signals/fills/PnL/digests 是从同一份 WAL 按统一口径重算的（混合口径），只作为较活跃窗口的负载/性能对照；最终交付结论以最终代码单源 run af19 为准。
+历史基准的 signals/fills/PnL/digests 是从同一份 WAL 按统一口径重算的（混合口径），只作为较活跃窗口的负载/性能对照；最终交付结论以最终代码单源 run 为准。
 
 | 指标 | 结果 |
 |---|---|

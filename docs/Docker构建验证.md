@@ -16,7 +16,7 @@
 有 Docker 的机器上，我一般直接跑这个脚本：
 
 ```bash
-cd 一诺资产
+cd YINO_asset   # git clone 得到的目录；如果是解压邮件包，cd 到包根目录
 bash scripts/docker_verify.sh
 ```
 
@@ -37,7 +37,8 @@ bash scripts/docker_verify.sh
 
 ```bash
 # 构建
-docker compose build 2>&1 | tee artifacts/experiments/docker_build.log
+mkdir -p artifacts/experiments/docker
+docker compose build 2>&1 | tee artifacts/experiments/docker/build.log
 
 # 容器内版本
 docker compose run --rm tickforge --version
@@ -51,7 +52,8 @@ docker compose run --rm tickforge \
   live --config config/default.toml --duration 60 --out /data --http-port 0
 
 # 找到容器写入的 run
-RUN_ID=$(ls -td artifacts/runs/* | head -1 | xargs basename)
+RUN_DIR=$(ls -td artifacts/runs/*/ | grep -v -- '-replay/' | head -1)
+RUN_ID=$(basename "${RUN_DIR%/}")
 
 # WAL 校验
 docker compose run --rm tickforge \
@@ -66,7 +68,7 @@ docker compose run --rm tickforge \
 
 提交材料里至少要有这些：
 
-- `artifacts/experiments/docker_build.log`：构建成功日志；
+- `artifacts/experiments/docker/build.log`：本机构建日志；CI 证据在 `artifacts/experiments/docker/ci/docker_build.log`；
 - `docker compose run --rm tickforge --version` 输出；
 - 容器内 live 运行生成的 `artifacts/runs/<run_id>/summary.json`（`clean_shutdown=true`、`lost_raw_frames=0`）；
 - 容器内 `verify` 输出（`ok=true`）；
