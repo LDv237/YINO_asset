@@ -121,7 +121,7 @@ docker compose run --rm tickforge replay --run /data/runs/<run_id> --out /data/r
 
 ```text
 tickforge/           核心包（feed/store/book/factor/strategy/exec/runtime/replay/metrics/server；模块地图见 tickforge/README.md）
-tests/               单元、集成、混沌与端到端回放测试
+tests/               单元、集成、混沌与端到端回放测试（测试矩阵见 tests/README.md）
 tools/               运行分析、导出、追溯和样本裁剪（工具说明见 tools/README.md）
 scripts/             15 分钟运行、回放校验、Docker 运行
 config/default.toml  默认配置
