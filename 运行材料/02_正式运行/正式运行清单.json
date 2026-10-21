@@ -97,7 +97,7 @@
   "logs": [
     {
       "path": "logs/tickforge.log",
-      "bytes": 30832
+      "bytes": 31213
     }
   ],
   "digests": {

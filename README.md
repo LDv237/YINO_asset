@@ -94,7 +94,7 @@ python -m tickforge live --config config/spot_long_only_durable.toml   --duratio
 
 ## Docker 的现状
 
-Docker 这块本机没跑起来：Docker Desktop 装了，但 WSL2 虚拟化组件不完整，引擎起不来。不过镜像已经在 GitHub Actions 的干净环境里用当前 main 完成 build、容器版本、离线 sample replay、60 秒 live、verify 和 replay，全部通过；run 是 https://github.com/LDv237/YINO_asset/actions/runs/39552903429，commit `83d4c1a`，image ID 是 `sha256:a960d6c2…`。CI 证据在 `artifacts/experiments/docker/ci/`，本机或其他 Docker 主机可以按 [docs/Docker构建验证.md](docs/Docker构建验证.md) 和 [scripts/docker_verify.sh](scripts/docker_verify.sh) 复跑。
+Docker 这块本机没跑起来：Docker Desktop 装了，但 WSL2 虚拟化组件不完整，引擎起不来。不过镜像已经在 GitHub Actions 的干净环境里用当时的 main 完成 build、容器版本、离线 sample replay、60 秒 live、verify 和 replay，全部通过；run 是 https://github.com/LDv237/YINO_asset/actions/runs/39552903429，commit `83d4c1a`，image ID 是 `sha256:a960d6c2…`。CI 证据在 `运行材料/04_验证证据/docker_ci/`（完整 artifacts 在 Release）；本机或其他 Docker 主机可以按 [docs/Docker构建验证.md](docs/Docker构建验证.md) 和 [scripts/docker_verify.sh](scripts/docker_verify.sh) 复跑。
 
 不想本机构建，可以直接加载 Release 里的镜像包（linux/amd64，48.55 MiB，`docker load` 后约 141.6 MiB）：
 
