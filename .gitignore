@@ -11,9 +11,7 @@ tickforge_delivery.zip
 
 # generated delivery archive
 代码包.zip
-!交付材料/01_代码与文档/代码包.zip
-
-!交付材料/05_运行日志/*.log
+!运行材料/05_运行日志/*.log
 
 # complete email attachment archive
 一诺笔试完整交付包.zip

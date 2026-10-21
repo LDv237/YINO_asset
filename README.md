@@ -5,8 +5,8 @@ TickForge 是我这次笔试交的实时高频数据流水线 demo，行情接�
 > 笔试题目：YINO ASSET 量化开发工程师（实时高频行情交易系统 demo）。
 > GitHub: https://github.com/LDv237/YINO_asset
 > 文件名说明：GitHub 首页固定读取 `README.md`；其余设计、报告、验证文档均使用中文文件名。
-> 提交材料清单与复现入口见 [交付说明.md](交付说明.md)；完整交付包内的 `交付材料/复现入口.md` 给出三条逐条命令（完整 Release / 分类附件 / 离线样本）。
-> 完整运行材料（原始 WAL、JSONL、CSV、验证证据、日志）见仓库根目录的 [`交付材料/`](交付材料/)；邮件发送版把全部内容打成一个完整压缩包。
+> 提交材料清单与复现入口见 [交付说明.md](交付说明.md)；完整交付包内的 `运行材料/复现入口.md` 给出三条逐条命令（完整 Release / 分类附件 / 离线样本）。
+> 完整运行材料（原始 WAL、JSONL、CSV、验证证据、日志）见仓库根目录的 [`运行材料/`](运行材料/)；邮件发送版把全部内容打成一个完整压缩包。
 > 完整运行产物的打包下载（`artifacts/` 压缩包与邮件完整包）见 [GitHub Release delivery-20261020](https://github.com/LDv237/YINO_asset/releases/tag/delivery-20261020)。
 > 设计与取舍见 [docs/系统架构.md](docs/系统架构.md)，模块接口与 WAL 格式见 [docs/接口设计.md](docs/接口设计.md)，实测与复现见 [docs/性能实测.md](docs/性能实测.md)，完整报告见 [笔试报告.md](笔试报告.md)。
 
@@ -29,13 +29,13 @@ TickForge 是我这次笔试交的实时高频数据流水线 demo，行情接�
 - WebSocket：`wss://data-stream.binance.vision/stream`
 - REST 快照：`https://data-api.binance.vision`
 
-默认订阅 6 个交易对（`BTCUSDT`、`ETHUSDT`、`SOLUSDT`、`BNBUSDT`、`XRPUSDT`、`DOGEUSDT`）的 `depth@100ms`、`aggTrade`、`bookTicker` 三条流。要改的话，[config/default.toml](config/default.toml) 或命令行都可以覆盖。
+默认订阅 6 个交易对（`BTCUSDT`、`ETHUSDT`、`SOLUSDT`、`BNBUSDT`、`XRPUSDT`、`DOGEUSDT`）的 `depth@100ms`、`aggTrade`、`bookTicker` 三条流。要改的话，[config/default.toml](config/default.toml) 或命令行都可以覆盖；字段含义和三个配置的差异见 [config/README.md](config/README.md)。
 
 题目允许自己选公开、免费的实时高频数据源，`BTCUSDT` 是题目给的示例，不是唯一选项。我在同一个币安现货公开接口上加了 5 个 USDT 交易对，把 15 分钟窗口里的消息量撑起来，BTCUSDT 始终在主列表里。说白了，这不是换数据源，是同一接口的多 symbol 订阅。
 
 ## 怎么跑
 
-环境要 Python 3.11+，我本机验证用的是 3.14.7。`requirements-lock.txt` 把运行时的全部直接和传递依赖都固定住了（aiohttp 3.14.5、orjson 3.13.0、websockets 17.3、psutil 7.2.2 等），重建环境请直接用锁文件。
+环境要 Python 3.11+，我本机验证用的是 3.14.7。`requirements-lock.txt` 把运行时的全部直接和传递依赖都固定住了（aiohttp 3.14.5、orjson 3.13.0、websockets 17.3、psutil 7.2.2 等），重建环境请直接用锁文件。仓库里有四个 `requirements*.txt`，各自用途和安装选择见 [docs/依赖说明.md](docs/依赖说明.md)。
 
 ```bash
 python -m pip install -r requirements-lock.txt
@@ -125,7 +125,7 @@ tests/               单元、集成、混沌与端到端回放测试
 tools/               运行分析、样本裁剪
 scripts/             15 分钟运行、回放校验、Docker 运行
 config/default.toml  默认配置
-docs/                架构、接口、性能、验证、开发过程、人工智能协作、运行手册
+docs/                架构、接口、性能、验证、开发过程、人工智能协作、依赖说明、运行手册
 笔试报告.md            笔试交付报告
 artifacts/           运行产物（WAL、可读 JSONL/CSV、派生 JSONL、日志、摘要、清单）
 ```

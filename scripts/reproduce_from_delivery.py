@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Reconstruct a complete run directory from the classified delivery folder.
 
-`交付材料/02_正式运行/` intentionally keeps the large files as archives.  This
+`运行材料/02_正式运行/` intentionally keeps the large files as archives.  This
 script rebuilds the exact layout expected by ``tickforge verify``/``replay``:
 
     <workdir>/raw/raw-*.wal
@@ -21,7 +21,7 @@ Usage::
 
     python scripts/reproduce_from_delivery.py
     python scripts/reproduce_from_delivery.py \
-        --delivery 交付材料/02_正式运行 \
+        --delivery 运行材料/02_正式运行 \
         --workdir artifacts/reproduced/20261020T072820Z-53b5
 """
 
@@ -36,7 +36,7 @@ import tarfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_DELIVERY = ROOT / "交付材料" / "02_正式运行"
+DEFAULT_DELIVERY = ROOT / "运行材料" / "02_正式运行"
 
 
 def extract(tar_path: Path, dest: Path) -> None:

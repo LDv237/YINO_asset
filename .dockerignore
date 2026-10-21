@@ -12,7 +12,7 @@ logs/
 *.log
 release_assets/
 邮件附件/
-交付材料/
+运行材料/
 一诺笔试交付包.zip
 一诺笔试完整交付包.zip
 ci_artifacts/
