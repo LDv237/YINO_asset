@@ -1,5 +1,5 @@
 {
-  "run_id": "20261021T143009Z-5788",
+  "run_id": "20261021T150432Z-6058",
   "ok": true,
   "errors": [],
   "checks": {
@@ -46,38 +46,38 @@
       {
         "path": "derived/factors.jsonl",
         "ok": true,
-        "sha256": "32924ed9dba851d9b7359f53576ebe50f045e306441df81a4bf7bceb1888155a"
+        "sha256": "d8b6ebfe12e9221038c19a71354ef5456e0c16ba1be6dbf7ea0ecc6471b883cd"
       },
       {
         "path": "derived/signals.jsonl",
         "ok": true,
-        "sha256": "d33f4fed6e7fd519ebf04a65c187655bc748d413e258baf5cc25bb7d523ec264"
+        "sha256": "13499de1e74342a0e7921468c6ce76bf83719f1bb3e3bcbf26fa48cd3d1090a2"
       },
       {
         "path": "derived/fills.jsonl",
         "ok": true,
-        "sha256": "107abff43392a118ecd8b344a3a540d432d5a11d2ec0eb645e0266918f28ac74"
+        "sha256": "8212defd65a688c07bf28104973cc37cb5480122f686559cc889535fcc895f05"
       }
     ]
   },
   "scan": {
-    "records": 62629,
+    "records": 78826,
     "records_by_kind": {
-      "2": 12,
-      "1": 62617
+      "1": 78815,
+      "2": 11
     },
-    "bytes": 18499665,
+    "bytes": 22247202,
     "segments": [
       "raw-000001.wal"
     ],
     "first_seq": 1,
-    "last_seq": 62629,
+    "last_seq": 78826,
     "truncated_tail_bytes": 0
   },
   "summary_clean_shutdown": true,
   "summary_digests": {
-    "factors_sha256": "32924ed9dba851d9b7359f53576ebe50f045e306441df81a4bf7bceb1888155a",
-    "signals_sha256": "d33f4fed6e7fd519ebf04a65c187655bc748d413e258baf5cc25bb7d523ec264",
-    "fills_sha256": "107abff43392a118ecd8b344a3a540d432d5a11d2ec0eb645e0266918f28ac74"
+    "factors_sha256": "d8b6ebfe12e9221038c19a71354ef5456e0c16ba1be6dbf7ea0ecc6471b883cd",
+    "signals_sha256": "13499de1e74342a0e7921468c6ce76bf83719f1bb3e3bcbf26fa48cd3d1090a2",
+    "fills_sha256": "8212defd65a688c07bf28104973cc37cb5480122f686559cc889535fcc895f05"
   }
 }
