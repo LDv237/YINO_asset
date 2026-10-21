@@ -1,5 +1,5 @@
 {
-  "run_id": "20261021T121613Z-deb2",
+  "run_id": "20261021T143009Z-5788",
   "ok": true,
   "errors": [],
   "checks": {
@@ -7,6 +7,9 @@
     "records_match_summary": true,
     "no_lost_raw_frames": true,
     "clean_shutdown": true,
+    "derived_complete": true,
+    "derived_errors": true,
+    "derived_digests_complete": true,
     "segment_hashes": [
       {
         "name": "raw-000001.wal",
@@ -38,26 +41,43 @@
         "path": "summary.json",
         "ok": true
       }
+    ],
+    "derived_files": [
+      {
+        "path": "derived/factors.jsonl",
+        "ok": true,
+        "sha256": "32924ed9dba851d9b7359f53576ebe50f045e306441df81a4bf7bceb1888155a"
+      },
+      {
+        "path": "derived/signals.jsonl",
+        "ok": true,
+        "sha256": "d33f4fed6e7fd519ebf04a65c187655bc748d413e258baf5cc25bb7d523ec264"
+      },
+      {
+        "path": "derived/fills.jsonl",
+        "ok": true,
+        "sha256": "107abff43392a118ecd8b344a3a540d432d5a11d2ec0eb645e0266918f28ac74"
+      }
     ]
   },
   "scan": {
-    "records": 17179,
+    "records": 62629,
     "records_by_kind": {
-      "1": 17171,
-      "2": 8
+      "2": 12,
+      "1": 62617
     },
-    "bytes": 6518886,
+    "bytes": 18499665,
     "segments": [
       "raw-000001.wal"
     ],
     "first_seq": 1,
-    "last_seq": 17179,
+    "last_seq": 62629,
     "truncated_tail_bytes": 0
   },
   "summary_clean_shutdown": true,
   "summary_digests": {
-    "factors_sha256": "404eb9fffb39a4d98b7a7c1319c8c787a146c413d8e358c3d9033518d3541b23",
-    "signals_sha256": "b6731a5c5a2f08d0d8de3cddb948baf5927381a59f5854340d798b7733bdef87",
-    "fills_sha256": "8a7b965c6ce2c12f55cbcdd5544c4330a16ed9c974f3b691e8e67887da0930e1"
+    "factors_sha256": "32924ed9dba851d9b7359f53576ebe50f045e306441df81a4bf7bceb1888155a",
+    "signals_sha256": "d33f4fed6e7fd519ebf04a65c187655bc748d413e258baf5cc25bb7d523ec264",
+    "fills_sha256": "107abff43392a118ecd8b344a3a540d432d5a11d2ec0eb645e0266918f28ac74"
   }
 }

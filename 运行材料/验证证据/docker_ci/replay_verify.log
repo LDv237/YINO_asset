@@ -1,13 +1,25 @@
-12:17:18 INFO    tickforge.replay.runner: book synced symbol=DOGEUSDT last_update_id=25726047014 buffered=0
-12:17:18 INFO    tickforge.replay.runner: book synced symbol=SOLUSDT last_update_id=30419900898 buffered=0
-12:17:18 INFO    tickforge.replay.runner: book synced symbol=XRPUSDT last_update_id=26787893942 buffered=0
-12:17:18 INFO    tickforge.replay.runner: book synced symbol=BNBUSDT last_update_id=21022276138 buffered=0
-12:17:18 INFO    tickforge.replay.runner: book synced symbol=ETHUSDT last_update_id=82318803281 buffered=0
-12:17:18 INFO    tickforge.replay.runner: book synced symbol=BTCUSDT last_update_id=101727090339 buffered=0
-12:17:19 INFO    tickforge.replay.runner: replay complete  records=17179 elapsed_s=0.715 deterministic=True verified=True
+14:31:14 INFO    tickforge.replay.runner: book synced symbol=ETHUSDT last_update_id=82326267758 buffered=0
+14:31:14 INFO    tickforge.replay.runner: book synced symbol=SOLUSDT last_update_id=30421333913 buffered=0
+14:31:14 INFO    tickforge.replay.runner: book synced symbol=BTCUSDT last_update_id=101734814089 buffered=0
+14:31:14 INFO    tickforge.replay.runner: book synced symbol=DOGEUSDT last_update_id=25727031557 buffered=0
+14:31:14 INFO    tickforge.replay.runner: book synced symbol=BNBUSDT last_update_id=21023409631 buffered=0
+14:31:14 INFO    tickforge.replay.runner: book synced symbol=XRPUSDT last_update_id=26789200418 buffered=0
+14:31:14 WARNING tickforge.replay.runner: book out of sync symbol=DOGEUSDT status=gap last_update_id=25727031557
+14:31:14 WARNING tickforge.replay.runner: book out of sync symbol=SOLUSDT status=gap last_update_id=30421333913
+14:31:14 WARNING tickforge.replay.runner: book out of sync symbol=BNBUSDT status=gap last_update_id=21023409631
+14:31:14 WARNING tickforge.replay.runner: book out of sync symbol=BTCUSDT status=gap last_update_id=101734814089
+14:31:14 WARNING tickforge.replay.runner: book out of sync symbol=ETHUSDT status=gap last_update_id=82326267758
+14:31:14 WARNING tickforge.replay.runner: book out of sync symbol=XRPUSDT status=gap last_update_id=26789200418
+14:31:14 INFO    tickforge.replay.runner: book synced symbol=XRPUSDT last_update_id=26789200917 buffered=0
+14:31:14 INFO    tickforge.replay.runner: book synced symbol=BTCUSDT last_update_id=101734815299 buffered=0
+14:31:14 INFO    tickforge.replay.runner: book synced symbol=DOGEUSDT last_update_id=25727031775 buffered=0
+14:31:14 INFO    tickforge.replay.runner: book synced symbol=SOLUSDT last_update_id=30421334100 buffered=0
+14:31:14 INFO    tickforge.replay.runner: book synced symbol=ETHUSDT last_update_id=82326268706 buffered=0
+14:31:14 INFO    tickforge.replay.runner: book synced symbol=BNBUSDT last_update_id=21023409775 buffered=0
+14:31:16 INFO    tickforge.replay.runner: replay complete  records=62629 elapsed_s=1.709 deterministic=True verified=True
 {
-  "records": 17179,
-  "throughput_events_per_s": 24023.5,
+  "records": 62629,
+  "throughput_events_per_s": 36648.7,
   "deterministic": true,
   "verified": true,
   "reasons": [],
