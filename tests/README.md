@@ -1,6 +1,6 @@
 # tests 目录说明
 
-这里是 TickForge 的测试集，当前 **274 passed**。测试不连接真实 Binance：单元测试用纯函数/本地数据结构，集成测试用本地 WebSocket + REST 交易所替身；真实公网行情由 `live` 运行单独验证。
+这里是 TickForge 的测试集，当前 **275 passed**。测试不连接真实 Binance：单元测试用纯函数/本地数据结构，集成测试用本地 WebSocket + REST 交易所替身；真实公网行情由 `live` 运行单独验证。
 
 ## 1. 怎么跑
 
@@ -9,7 +9,7 @@ python -m pip install -r requirements-dev-lock.txt
 python -m pytest -q
 ```
 
-预期输出：`274 passed`。测试通常 8–10 秒跑完，不需要 API Key，也不访问外网。
+预期输出：`275 passed`。测试通常 8–10 秒跑完，不需要 API Key，也不访问外网。
 
 ## 2. 测试分层
 

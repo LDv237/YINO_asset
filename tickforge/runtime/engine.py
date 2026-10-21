@@ -841,6 +841,7 @@ class LiveEngine:
 
         digests: dict[str, str] = {}
         sink_info: dict[str, Any] = {}
+        sink_errors: dict[str, str] = {}
         for name, sink in (
             ("factors", self.factor_sink),
             ("signals", self.signal_sink),
@@ -851,7 +852,12 @@ class LiveEngine:
                 digests[f"{name}_sha256"] = result.sha256
                 sink_info[name] = asdict(result)
             except Exception as exc:
-                self.log.error("failed closing %s sink: %s", name, exc)
+                # A derived file that could not be flushed, closed and hashed
+                # is incomplete output, not a cosmetic warning: fail the run.
+                sink_errors[name] = f"{type(exc).__name__}: {exc}"
+                self.log.error(
+                    "failed closing %s sink: %s", name, exc, exc_info=exc
+                )
 
         wal_manifest: WalManifest | None = None
         wal_error: str | None = None
@@ -871,6 +877,7 @@ class LiveEngine:
             wal_manifest=wal_manifest,
             digests=digests,
             sink_info=sink_info,
+            sink_errors=sink_errors,
             drained=drained,
             wal_error=wal_error,
             end_reason=end_reason,
@@ -933,6 +940,7 @@ class LiveEngine:
         wal_manifest: WalManifest | None,
         digests: dict[str, str],
         sink_info: dict[str, Any],
+        sink_errors: dict[str, str],
         drained: bool,
         wal_error: str | None,
         end_reason: str,
@@ -981,8 +989,12 @@ class LiveEngine:
             0,
             (wal_records_ws + wal_records_snapshot) - self.live.processed_envelopes,
         )
+        derived_complete = not sink_errors and all(
+            f"{name}_sha256" in digests for name in ("factors", "signals", "fills")
+        )
         clean = bool(
             drained
+            and derived_complete
             and wal_error is None
             and wal_stats.get("error") is None
             and wal_manifest is not None
@@ -1058,6 +1070,8 @@ class LiveEngine:
             "simulator": self.pipeline.simulator.summary(),
             "digests": digests,
             "derived": sink_info,
+            "derived_complete": derived_complete,
+            "derived_errors": sink_errors,
             "reconciliation": {
                 "ws_frames_received": self.live.ws_frames,
                 "wal_records_ws": wal_records_ws,

@@ -2,7 +2,7 @@
 
 TickForge 是我这次笔试交的实时高频数据流水线 demo，行情接 Binance 现货公开接口。WebSocket 原始帧先原样落盘，再做 L2 订单簿重建、因子计算、做市信号和模拟成交；一次跑完可以从 WAL 做确定性回放，并把回放结果和运行目录里的派生文件逐项对上。
 
-本次提交的**主结果**是最终代码的 15 分钟 live 单源 run `20261021T075925Z-3049`：303,784 条原始帧、41,470 个信号、8,828 笔模拟成交，原始帧 0 丢失、0 data gap、0 订单簿 resync，回放三项 SHA-256 一致。53b5、6db8、同一 WAL 只做多只在报告里作为对照表，完整数据在 GitHub Release。
+本次提交的**主结果**是 15 分钟 live 单源 run `20261021T075925Z-3049`：303,784 条原始帧、41,470 个信号、8,828 笔模拟成交，原始帧 0 丢失、0 data gap、0 订单簿 resync，回放三项 SHA-256 一致。53b5、6db8、同一 WAL 只做多只在报告里作为对照表，完整数据在 GitHub Release。
 
 > 笔试题目：YINO ASSET 量化开发工程师（实时高频行情交易系统 demo）。
 > GitHub：https://github.com/LDv237/YINO_asset
@@ -75,7 +75,7 @@ python -m tickforge replay --run samples/demo_run --out samples/demo_run-replay 
 
 ```text
 tickforge/         核心包（feed/store/book/factor/strategy/exec/runtime/replay/metrics/server）
-tests/             单元、集成、混沌与端到端回放测试（274 passed）
+tests/             单元、集成、混沌与端到端回放测试（275 passed）
 tools/ scripts/    运行分析、导出、追溯、样本裁剪、15 分钟运行和 Docker 校验
 config/            默认、只做多、严格落盘三套配置
 docs/              架构、接口、性能、验证、开发过程、AI 协作、依赖、运行手册
@@ -90,7 +90,7 @@ python -m pip install -r requirements-dev-lock.txt
 python -m pytest -q
 ```
 
-测试覆盖订单簿序列/随机对拍、WAL 轮转/CRC/截断/fsync、因子手算、策略与模拟执行、断线重连和 REST 重试、指标/HTTP，以及“本地模拟交易所 → 实时引擎 → WAL → 回放摘要一致”的端到端链路。完整结果 **274 passed**。
+测试覆盖订单簿序列/随机对拍、WAL 轮转/CRC/截断/fsync、因子手算、策略与模拟执行、断线重连和 REST 重试、指标/HTTP，以及“本地模拟交易所 → 实时引擎 → WAL → 回放摘要一致”的端到端链路。完整结果 **275 passed**。
 
 ## 15 分钟主结果
 

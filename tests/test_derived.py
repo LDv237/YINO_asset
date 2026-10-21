@@ -246,6 +246,21 @@ def test_fsync_flag_controls_os_fsync(tmp_path, monkeypatch) -> None:
     unsynced.close()
     assert len(calls) == 4  # unchanged
 
+    # A failing flush/fsync inside close() must propagate, not return a
+    # SinkResult for a file whose durability is unknown.
+    failing = JsonlSink(
+        tmp_path / "failing.jsonl", flush_interval_s=3600.0, fsync=True
+    )
+    failing.write({"i": 0})
+
+    def broken_fsync(fd: int) -> None:
+        raise OSError("simulated fsync failure")
+
+    monkeypatch.setattr(derived_module.os, "fsync", broken_fsync)
+    with pytest.raises(OSError, match="simulated fsync failure"):
+        failing.close()
+    assert failing._result is None
+
 
 def test_serialization_error_does_not_corrupt_stream(tmp_path) -> None:
     path = tmp_path / "partial.jsonl"

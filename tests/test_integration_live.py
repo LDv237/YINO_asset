@@ -11,6 +11,7 @@ import asyncio
 import hashlib
 import json
 import logging
+import shutil
 from pathlib import Path
 
 import orjson
@@ -233,6 +234,178 @@ async def test_live_pipeline_verifies_and_replays(tmp_path: Path) -> None:
     tampered = verify_run(run_dir)
     assert tampered["ok"] is False
     assert any("manifest file hash mismatch" in error for error in tampered["errors"])
+
+
+async def test_sink_close_failure_marks_run_unclean(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A derived sink that cannot be flushed/closed must fail the run.
+
+    Regression test: ``sink.close()`` errors used to be logged only, leaving
+    ``clean_shutdown=true`` with a missing digest in ``summary.json``.
+    """
+
+    rest_app = web.Application()
+    rest_app.router.add_get("/api/v3/depth", _rest_depth)
+    rest_runner = web.AppRunner(rest_app)
+    await rest_runner.setup()
+    rest_site = web.TCPSite(rest_runner, "127.0.0.1", 0)
+    await rest_site.start()
+    rest_port = rest_site._server.sockets[0].getsockname()[1]
+
+    ws_server = await serve(_ws_handler, "127.0.0.1", 0)
+    ws_port = ws_server.sockets[0].getsockname()[1]
+
+    cfg = _config(ws_port, rest_port, tmp_path)
+    cfg.run.duration_s = 1.5
+    run_dir, run_id = prepare_run_dir(tmp_path, "sink-close-failure")
+    configure_logging(run_dir / "logs", level="WARNING")
+    try:
+        engine = LiveEngine(cfg, run_dir, run_id=run_id)
+        original_close = engine.factor_sink.close
+
+        def failing_close():
+            original_close()
+            raise OSError("simulated fsync failure")
+
+        monkeypatch.setattr(engine.factor_sink, "close", failing_close)
+        summary = await asyncio.wait_for(engine.run(), timeout=30)
+    finally:
+        ws_server.close()
+        await ws_server.wait_closed()
+        await rest_runner.cleanup()
+
+    # The only fault is the factors sink close; everything else is clean.
+    assert summary["clean_shutdown"] is False
+    assert summary["derived_complete"] is False
+    assert summary["derived_errors"]["factors"].startswith("OSError")
+    assert "factors" not in summary["derived"]
+    assert "factors_sha256" not in summary["digests"]
+    assert set(summary["digests"]) == {"signals_sha256", "fills_sha256"}
+    assert summary["counts"]["ws_frames_received"] > 0
+    assert summary["counts"]["processing_errors"] == 0
+    assert summary["counts"]["fatal_errors"] == 0
+    assert summary["reconciliation"]["drained"] is True
+    assert summary["reconciliation"]["lost_raw_frames"] == 0
+    assert summary["reconciliation"]["unprocessed_persisted"] == 0
+    assert summary["reconciliation"]["not_enqueued_at_shutdown"] == 0
+    assert summary["wal"]["error"] is None
+    wal_manifest = summary["wal"]["manifest"]
+    assert wal_manifest["durable_seq"] == wal_manifest["last_seq"]
+
+    verified = verify_run(run_dir)
+    assert verified["ok"] is False
+    assert verified["checks"]["clean_shutdown"] is False
+    assert verified["checks"]["derived_digests_complete"] is False
+    assert any("clean_shutdown" in error for error in verified["errors"])
+    assert any(
+        "missing derived digests: factors_sha256" in error
+        for error in verified["errors"]
+    )
+
+    def copy_run(name: str) -> Path:
+        target = tmp_path / name
+        shutil.copytree(run_dir, target)
+        return target
+
+    def rewrite_summary_as_clean(
+        target: Path, summary_doc: dict, **overrides
+    ) -> None:
+        summary_doc["clean_shutdown"] = True
+        summary_doc["derived_complete"] = True
+        summary_doc["derived_errors"] = {}
+        summary_doc.update(overrides)
+        summary_path = target / "summary.json"
+        summary_path.write_text(
+            json.dumps(summary_doc, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        manifest_path = target / "manifest.json"
+        manifest_doc = json.loads(manifest_path.read_text(encoding="utf-8"))
+        for entry in manifest_doc.get("files", []):
+            if entry.get("path") == "summary.json":
+                entry["bytes"] = summary_path.stat().st_size
+                entry["sha256"] = hashlib.sha256(summary_path.read_bytes()).hexdigest()
+        manifest_path.write_text(
+            json.dumps(manifest_doc, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
+
+    # A summary that claims clean but omits a derived digest must still fail.
+    fake_clean = copy_run("fake-clean")
+    fake_summary = json.loads(
+        (fake_clean / "summary.json").read_text(encoding="utf-8")
+    )
+    rewrite_summary_as_clean(fake_clean, fake_summary)
+    fake_verified = verify_run(fake_clean)
+    assert fake_verified["ok"] is False
+    assert fake_verified["checks"]["clean_shutdown"] is True
+    assert any(
+        "missing derived digests: factors_sha256" in error
+        for error in fake_verified["errors"]
+    )
+
+    # A truthy non-string digest is not a valid digest.
+    numeric_digest = copy_run("numeric-digest")
+    numeric_summary = json.loads(
+        (numeric_digest / "summary.json").read_text(encoding="utf-8")
+    )
+    numeric_summary["digests"]["factors_sha256"] = 123
+    rewrite_summary_as_clean(numeric_digest, numeric_summary)
+    numeric_verified = verify_run(numeric_digest)
+    assert numeric_verified["ok"] is False
+    assert numeric_verified["checks"]["derived_digests_complete"] is False
+
+    # An explicit derived failure must fail even if the files/digests are
+    # otherwise intact.
+    inconsistent = copy_run("inconsistent-derived")
+    inconsistent_summary = json.loads(
+        (inconsistent / "summary.json").read_text(encoding="utf-8")
+    )
+    factors_sha = hashlib.sha256(
+        (inconsistent / "derived" / "factors.jsonl").read_bytes()
+    ).hexdigest()
+    inconsistent_summary["digests"]["factors_sha256"] = factors_sha
+    rewrite_summary_as_clean(
+        inconsistent,
+        inconsistent_summary,
+        derived_complete=False,
+        derived_errors={"factors": "OSError: injected"},
+    )
+    inconsistent_verified = verify_run(inconsistent)
+    assert inconsistent_verified["ok"] is False
+    assert inconsistent_verified["checks"]["derived_complete"] is False
+    assert inconsistent_verified["checks"]["derived_errors"] is False
+    assert any(
+        "derived_complete is not true" in error
+        for error in inconsistent_verified["errors"]
+    )
+
+    # A derived file that vanished after the manifest was written must fail
+    # even when the summary looks clean and its digests are intact.
+    missing_derived = copy_run("missing-derived")
+    missing_summary = json.loads(
+        (missing_derived / "summary.json").read_text(encoding="utf-8")
+    )
+    rewrite_summary_as_clean(missing_derived, missing_summary)
+    (missing_derived / "derived" / "signals.jsonl").unlink()
+    missing_manifest_path = missing_derived / "manifest.json"
+    missing_manifest = json.loads(missing_manifest_path.read_text(encoding="utf-8"))
+    missing_manifest["files"] = [
+        entry
+        for entry in missing_manifest.get("files", [])
+        if entry.get("path") != "derived/signals.jsonl"
+    ]
+    missing_manifest_path.write_text(
+        json.dumps(missing_manifest, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    missing_verified = verify_run(missing_derived)
+    assert missing_verified["ok"] is False
+    assert any(
+        "derived file missing: derived/signals.jsonl" in error
+        for error in missing_verified["errors"]
+    )
 
 
 def count_synced(summary: dict) -> bool:

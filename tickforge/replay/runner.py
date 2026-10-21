@@ -451,6 +451,39 @@ def verify_run(run_dir: str | Path) -> dict:
     if not checks["clean_shutdown"]:
         errors.append("summary.clean_shutdown is not true")
 
+    # Older summaries predate these fields; an explicit failure is conclusive.
+    if "derived_complete" in summary and summary["derived_complete"] is not True:
+        checks["derived_complete"] = False
+        errors.append("summary.derived_complete is not true")
+    else:
+        checks["derived_complete"] = True
+    derived_errors = summary.get("derived_errors")
+    if derived_errors:
+        checks["derived_errors"] = False
+        errors.append(f"summary reports derived close errors: {derived_errors}")
+    else:
+        checks["derived_errors"] = True
+
+    # Fail-closed on incomplete derived output: all three files must have been
+    # flushed, closed and hashed.  Older summaries predate derived_errors but
+    # still carry the three digests, so this check stays backward compatible.
+    digests = summary.get("digests")
+    if not isinstance(digests, dict):
+        checks["derived_digests_complete"] = False
+        errors.append("summary.json is missing digests")
+    else:
+        missing = []
+        for name in ("factors", "signals", "fills"):
+            key = f"{name}_sha256"
+            value = digests.get(key)
+            if not isinstance(value, str) or not value:
+                missing.append(key)
+        checks["derived_digests_complete"] = not missing
+        if missing:
+            errors.append(
+                "summary.json is missing derived digests: " + ", ".join(missing)
+            )
+
     manifest_segments = (manifest.get("wal") or {}).get("segments") or []
     if not manifest_segments:
         errors.append("manifest.json is missing wal.segments")
@@ -490,6 +523,39 @@ def verify_run(run_dir: str | Path) -> dict:
         if not ok:
             errors.append(f"manifest file hash mismatch: {rel}")
     checks["manifest_files"] = file_results
+
+    # The digest-completeness check above only proves the keys exist.  Re-hash
+    # the three derived files so a summary with fabricated digests or a run
+    # directory whose derived output vanished cannot verify ok.
+    manifest_hashes = {
+        item.get("path"): item.get("sha256")
+        for item in manifest_files
+        if isinstance(item, dict) and item.get("path")
+    }
+    derived_results = []
+    for name in ("factors", "signals", "fills"):
+        rel = f"derived/{name}.jsonl"
+        path = run_dir / rel
+        expected = digests.get(f"{name}_sha256") if isinstance(digests, dict) else None
+        entry: dict[str, Any] = {"path": rel, "ok": False}
+        if not path.is_file():
+            entry["reason"] = "missing"
+            errors.append(f"derived file missing: {rel}")
+        else:
+            actual = _sha256_file(path)
+            entry["sha256"] = actual
+            if not isinstance(expected, str) or not expected:
+                entry["reason"] = "missing digest"
+            elif actual != expected:
+                entry["reason"] = "digest mismatch"
+                errors.append(f"derived file hash mismatch: {rel}")
+            elif manifest_hashes.get(rel) != actual:
+                entry["reason"] = "manifest mismatch"
+                errors.append(f"manifest.json has no matching hash for: {rel}")
+            else:
+                entry["ok"] = True
+        derived_results.append(entry)
+    checks["derived_files"] = derived_results
 
     return {
         "run_id": run_dir.name,
