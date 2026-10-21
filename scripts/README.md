@@ -11,6 +11,7 @@
 | `run_live_15m_docker.sh` | 有 Docker 的主机 | `docker compose build` + `up --abort-on-container-exit`，在容器里跑 15 分钟 |
 | `docker_verify.sh` | 有 Docker 的主机 | 构建镜像并产出 Docker 证据：版本、离线 sample replay、60 秒 live、容器内 verify/replay |
 | `replay_verify.sh` | Git Bash / Linux | 对一个 run 目录执行 `verify` + `replay --verify` |
+| `extract_main_run.py` | 跨平台 Python | 解压主结果的 `run_data.tar.xz`（raw/ + derived/） |
 | `run_fsync_experiments.sh` | Git Bash / Linux | 30 秒 BTCUSDT 的 `interval` / `always` / `never` 对照，输出到 `artifacts/experiments/fsync/` |
 
 ## 2. 常用命令
@@ -23,7 +24,7 @@ bash scripts/run_live_15m.sh
 powershell -ExecutionPolicy Bypass -File scripts/run_live_15m.ps1
 
 # 对主结果做校验和确定性回放
-bash scripts/replay_verify.sh 运行材料/20261021T075925Z-3049
+bash scripts/replay_verify.sh 运行材料/20261021T162501Z-9821
 
 # fsync 对照（30 秒实验，需要交易所网络）
 bash scripts/run_fsync_experiments.sh

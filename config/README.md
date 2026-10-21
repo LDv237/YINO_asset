@@ -6,8 +6,8 @@
 
 | 文件 | 用途 | 关键差异 | 对应 run |
 |---|---|---|---|
-| `default.toml` | 默认抽象做市，性能/链路基准 | `allow_short = true`、`initial_cash_usd = 0`、`fsync_policy = "interval"` | **3049 主结果** / 53b5 历史基准 |
-| `spot_long_only.toml` | 现货只做多执行语义 | `allow_short = false`、`initial_cash_usd = 10000.0`；feed/因子/策略其余相同 | 同一 WAL 对照 |
+| `default.toml` | 抽象做市，执行语义/性能对照 | `allow_short = true`、`initial_cash_usd = 0`、`fsync_policy = "interval"` | 3049 抽象对照 / 53b5 历史基准 |
+| `spot_long_only.toml` | 现货只做多执行语义 | `allow_short = false`、`initial_cash_usd = 10000.0`；feed/因子/策略其余相同 | **9821 主结果** / 同一 WAL 对照 |
 | `spot_long_only_durable.toml` | 现货只做多 + 严格落盘 | 在 `spot_long_only` 基础上把 `fsync_policy` 改成 `"always"` | 6db8 严格落盘（Release） |
 
 运行命令见 [`README.md`](../README.md) 的“怎么跑”；把 `--config` 换成对应文件即可。

@@ -1,0 +1,34 @@
+{
+  "run_id": "20261021T075925Z-3049",
+  "window_s": 900.129,
+  "first_event_at": "2026-10-21T07:59:29.048964400Z",
+  "measure_end_at": "2026-10-21T08:14:29.177829500Z",
+  "ws_frames": 303784,
+  "wal_records": 303793,
+  "signals": 41470,
+  "fills": 8828,
+  "clean_shutdown": true,
+  "lost_raw_frames": 0,
+  "data_gaps": [],
+  "cash": -11841.670972688837,
+  "position": -778.38552802,
+  "max_abs_position": 6429.198918939999,
+  "negative_position_symbols": 6,
+  "negative_cash_symbols": 6,
+  "latency_ns": {
+    "tickforge_latency_e2e_ns": {
+      "p50_ns": 512000,
+      "p95_ns": 1448155,
+      "p99_ns": 2435496,
+      "p999_ns": 5792619
+    },
+    "tickforge_latency_e2e_depth_ns": {
+      "p50_ns": 512000,
+      "p95_ns": 1448155,
+      "p99_ns": 2435496,
+      "p999_ns": 4870992
+    }
+  },
+  "execution_replay": null,
+  "note": "摘要；完整 run 在 GitHub Release 的 YINO_artifacts_complete_20261020.zip 内 artifacts/runs/20261021T075925Z-3049/"
+}

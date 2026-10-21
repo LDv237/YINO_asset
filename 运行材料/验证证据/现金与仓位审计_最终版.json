@@ -1,0 +1,60 @@
+{
+  "run_id": "20261021T162501Z-9821",
+  "initial_cash_per_symbol": 10000.0,
+  "total_initial_cash": 60000.0,
+  "fills_total": 6437,
+  "per_symbol": {
+    "BTCUSDT": {
+      "fills": 931,
+      "running_min_cash": 7963.247835237484,
+      "min_position": 0.0,
+      "max_position": 0.00590885,
+      "ending_cash": 8450.542939669602,
+      "ending_position": 0.0
+    },
+    "BNBUSDT": {
+      "fills": 653,
+      "running_min_cash": 9126.53858134828,
+      "min_position": 0.0,
+      "max_position": 0.6670267,
+      "ending_cash": 9614.472504298552,
+      "ending_position": 0.0
+    },
+    "XRPUSDT": {
+      "fills": 510,
+      "running_min_cash": 8919.067884136597,
+      "min_position": 0.0,
+      "max_position": 365.6522049,
+      "ending_cash": 9412.919058188809,
+      "ending_position": 0.0
+    },
+    "ETHUSDT": {
+      "fills": 1525,
+      "running_min_cash": 7338.429646079793,
+      "min_position": 0.0,
+      "max_position": 0.19964365,
+      "ending_cash": 7823.874222864619,
+      "ending_position": 0.0
+    },
+    "DOGEUSDT": {
+      "fills": 2250,
+      "running_min_cash": 6298.469165488493,
+      "min_position": 0.0,
+      "max_position": 6020.03661183,
+      "ending_cash": 6785.750976607241,
+      "ending_position": 0.0
+    },
+    "SOLUSDT": {
+      "fills": 568,
+      "running_min_cash": 8650.740382460208,
+      "min_position": 0.0,
+      "max_position": 4.6421402,
+      "ending_cash": 9140.10442792853,
+      "ending_position": 0.0
+    }
+  },
+  "global_running_min_cash": 6298.469165488493,
+  "global_min_position": 0.0,
+  "ending_min_cash": 6785.750976607241,
+  "ending_max_abs_position": 0
+}

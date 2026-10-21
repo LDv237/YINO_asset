@@ -1,50 +1,50 @@
 {
-  "run_id": "20261021T075925Z-3049",
+  "run_id": "20261021T162501Z-9821",
   "source": "summary.pipeline.trade_quality (live run counters)",
   "trade_quality": {
     "BNBUSDT": {
-      "last_agg_trade_id": 867154749,
-      "accepted": 2774,
+      "last_agg_trade_id": 867275524,
+      "accepted": 3159,
       "duplicates": 0,
       "backwards": 0,
       "gaps": 0,
       "missing_ids": 0
     },
     "BTCUSDT": {
-      "last_agg_trade_id": 4094417072,
-      "accepted": 5636,
+      "last_agg_trade_id": 4094849608,
+      "accepted": 12456,
       "duplicates": 0,
       "backwards": 0,
       "gaps": 0,
       "missing_ids": 0
     },
     "DOGEUSDT": {
-      "last_agg_trade_id": 721105984,
-      "accepted": 465,
+      "last_agg_trade_id": 721161374,
+      "accepted": 10661,
       "duplicates": 0,
       "backwards": 0,
       "gaps": 0,
       "missing_ids": 0
     },
     "ETHUSDT": {
-      "last_agg_trade_id": 2104961250,
-      "accepted": 6418,
+      "last_agg_trade_id": 2105394011,
+      "accepted": 13204,
       "duplicates": 0,
       "backwards": 0,
       "gaps": 0,
       "missing_ids": 0
     },
     "SOLUSDT": {
-      "last_agg_trade_id": 679310530,
-      "accepted": 939,
+      "last_agg_trade_id": 679369744,
+      "accepted": 1900,
       "duplicates": 0,
       "backwards": 0,
       "gaps": 0,
       "missing_ids": 0
     },
     "XRPUSDT": {
-      "last_agg_trade_id": 730572982,
-      "accepted": 1149,
+      "last_agg_trade_id": 730650703,
+      "accepted": 2213,
       "duplicates": 0,
       "backwards": 0,
       "gaps": 0,

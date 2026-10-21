@@ -1,24 +1,45 @@
 {
   "symbol": "BTCUSDT",
-  "generated_at_utc": "2026-10-21T08:17:35+00:00",
+  "generated_at_utc": "2026-10-21T17:00:13+00:00",
   "complete_hours": 47,
-  "target_run_utc": "2026-10-21T07:59:25Z",
+  "target_run_utc": "2026-10-21T16:25:05Z",
   "target_bucket": {
-    "open_utc": "2026-10-21T07:00:00+00:00",
-    "open_cst": "2026-10-21T15:00:00+08:00",
-    "quote_volume": 67534514.2975784,
-    "base_volume": 812.99334,
-    "trades": 97351
+    "open_utc": "2026-10-21T16:00:00+00:00",
+    "open_cst": "2026-10-22T00:00:00+08:00",
+    "quote_volume": 69417173.524277,
+    "base_volume": 819.92315,
+    "trades": 194279
   },
-  "target_rank_by_quote_volume": "6/47",
-  "target_percentile": 89.36,
+  "target_rank_by_quote_volume": "9/47",
+  "target_percentile": 82.98,
   "top_hours": [
+    {
+      "open_utc": "2026-10-21T14:00:00+00:00",
+      "open_cst": "2026-10-21T22:00:00+08:00",
+      "quote_volume": 200687702.0813571,
+      "base_volume": 2382.95418,
+      "trades": 385379
+    },
     {
       "open_utc": "2026-10-20T14:00:00+00:00",
       "open_cst": "2026-10-20T22:00:00+08:00",
       "quote_volume": 191658456.852822,
       "base_volume": 2309.64642,
       "trades": 430970
+    },
+    {
+      "open_utc": "2026-10-21T15:00:00+00:00",
+      "open_cst": "2026-10-21T23:00:00+08:00",
+      "quote_volume": 124415397.8379838,
+      "base_volume": 1470.72187,
+      "trades": 283144
+    },
+    {
+      "open_utc": "2026-10-21T13:00:00+00:00",
+      "open_cst": "2026-10-21T21:00:00+08:00",
+      "quote_volume": 98780732.8087859,
+      "base_volume": 1179.87635,
+      "trades": 311444
     },
     {
       "open_utc": "2026-10-20T15:00:00+00:00",
@@ -28,11 +49,11 @@
       "trades": 317081
     },
     {
-      "open_utc": "2026-10-19T14:00:00+00:00",
-      "open_cst": "2026-10-19T22:00:00+08:00",
-      "quote_volume": 80069580.5550234,
-      "base_volume": 975.41598,
-      "trades": 283709
+      "open_utc": "2026-10-21T08:00:00+00:00",
+      "open_cst": "2026-10-21T16:00:00+08:00",
+      "quote_volume": 77285380.8975406,
+      "base_volume": 927.2992,
+      "trades": 137737
     },
     {
       "open_utc": "2026-10-20T07:00:00+00:00",
@@ -47,27 +68,6 @@
       "quote_volume": 73080561.5388412,
       "base_volume": 897.05221,
       "trades": 115018
-    },
-    {
-      "open_utc": "2026-10-21T07:00:00+00:00",
-      "open_cst": "2026-10-21T15:00:00+08:00",
-      "quote_volume": 67534514.2975784,
-      "base_volume": 812.99334,
-      "trades": 97351
-    },
-    {
-      "open_utc": "2026-10-19T15:00:00+00:00",
-      "open_cst": "2026-10-19T23:00:00+08:00",
-      "quote_volume": 65499726.3925938,
-      "base_volume": 796.71202,
-      "trades": 182975
-    },
-    {
-      "open_utc": "2026-10-20T13:00:00+00:00",
-      "open_cst": "2026-10-20T21:00:00+08:00",
-      "quote_volume": 65463350.3722179,
-      "base_volume": 801.82291,
-      "trades": 218841
     }
   ],
   "method": "Binance public 1h klines, quote volume and trade count; the current incomplete hour is excluded; rank 1 = highest volume.",
