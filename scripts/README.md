@@ -24,7 +24,7 @@ bash scripts/run_live_15m.sh
 powershell -ExecutionPolicy Bypass -File scripts/run_live_15m.ps1
 
 # 对主结果做校验和确定性回放
-bash scripts/replay_verify.sh 运行材料/20261021T162501Z-9821
+bash scripts/replay_verify.sh 运行材料/01_主结果_现货_9821
 
 # fsync 对照（30 秒实验，需要交易所网络）
 bash scripts/run_fsync_experiments.sh

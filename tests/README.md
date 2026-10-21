@@ -17,7 +17,7 @@ python -m pytest -q
 |---|---|---|
 | 单元 | `test_book.py`、`test_wal.py`、`test_normalize.py`、`test_factors.py`、`test_strategy.py`、`test_simulator.py`、`test_config.py`、`test_derived.py`、`test_metrics.py`、`test_health.py`、`test_trade_quality.py` | 每个模块的边界、公式、序列规则、确定性和健康滞后口径 |
 | 集成 | `test_integration_live.py`、`test_feed.py`、`test_rest.py`、`test_http.py` | 本地交易所替身 → live 引擎 → WAL → replay；WebSocket 重连、REST 重试、HTTP 健康接口 |
-| 变体/执行语义 | `test_spot_long_only.py`、`test_simulator.py` | 现货只做多、现金/持仓约束、基于 T 的 quote-time guard |
+| 变体/执行语义 | `test_spot_long_only.py`、`test_simulator.py` | 现货、现金/持仓约束、基于 T 的 quote-time guard |
 | 交付安全 | `test_verify_fail_closed.py`、`test_replay_config.py` | 缺 summary/manifest、坏 derived、缺失 config 时必须失败，不能静默回退 |
 
 ## 3. 各文件覆盖什么

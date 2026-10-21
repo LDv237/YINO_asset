@@ -11,7 +11,7 @@
 | `wal_export_csv.py` | 按事件类型导出 CSV：`agg_trades.csv`、`book_ticker.csv`、`depth_updates.csv`、`snapshots.csv` | `python tools/wal_export_csv.py --run artifacts/runs/<run_id> --out-dir artifacts/exports/csv` |
 | `trim_run.py` | 从一次 live run 的 WAL 裁出小样本，保持 `raw/` + `config.json` 的 run 布局，便于离线 replay | `python tools/trim_run.py --run artifacts/runs/<run_id> --out samples/demo_run --records 20000` |
 | `make_sample_reference.py` | 给离线样本生成参考 `summary.json`，让样本也能走 `replay --verify` 的比较路径 | `python tools/make_sample_reference.py --sample samples/demo_run` |
-| `replay_spot_long_only.py` | 用同一份 WAL 做受控对照：只切换现货只做多执行语义，比较 fills/仓位/现金 | `python tools/replay_spot_long_only.py --run artifacts/runs/<run_id> --out artifacts/experiments/variants/spot_long_only_same_wal_final` |
+| `replay_spot_long_only.py` | 用同一份 WAL 做受控对照：只切换现货执行语义，比较 fills/仓位/现金 | `python tools/replay_spot_long_only.py --run artifacts/runs/<run_id> --out artifacts/experiments/variants/spot_long_only_same_wal_final` |
 | `trace_signal.py` | 按 `(symbol, seq)` 追溯一条信号到因子快照和 WAL 原始帧，并说明 fills 的 `trade_id` 链接 | `python tools/trace_signal.py --run artifacts/runs/<run_id> --index 0` |
 | `market_activity.py` | 拉 Binance 小时 K 线，给运行窗口所在小时桶做成交额/笔数排名 | `python tools/market_activity.py --target 2026-10-21T16:25:05Z --out artifacts/evidence/market_activity.json` |
 | `crash_recovery_check.py` | 起一个短时 live、强制杀进程，再恢复读取 WAL 前缀，检查记录数、CRC/seq 和残缺尾部；该检查不证明哪些记录已完成 fsync | `python tools/crash_recovery_check.py --help` |
@@ -21,7 +21,7 @@
 常见的一条链：
 
 ```bash
-RUN=运行材料/20261021T162501Z-9821
+RUN=运行材料/01_主结果_现货_9821
 
 # 1) 看运行摘要
 python tools/analyze_run.py "$RUN"
@@ -33,7 +33,7 @@ python tools/wal_export_csv.py --run "$RUN" --out-dir artifacts/exports/csv
 # 3) 追溯一条信号
 python tools/trace_signal.py --run "$RUN" --index 0
 
-# 4) 同一 WAL 的只做多对照
+# 4) 同一 WAL 的现货对照
 python tools/replay_spot_long_only.py --run "$RUN" \
   --out artifacts/experiments/variants/spot_long_only_same_wal_final
 ```

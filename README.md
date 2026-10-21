@@ -2,7 +2,7 @@
 
 TickForge 是我这次笔试交的实时高频数据流水线 demo，行情接 Binance 现货公开接口。WebSocket 原始帧先进入 WAL 队列，再进入处理队列；独立写线程负责异步写入分段 WAL。默认 `interval` 按目标间隔组提交，处理不等待写入或 fsync 完成，正常关闭时 flush+fsync；`always` 则等待 fsync 完成后才进入处理队列。处理队列再做 L2 订单簿重建、因子计算、做市信号和模拟成交；一次跑完可以从 WAL 做确定性回放，并把回放结果和运行目录里的派生文件逐项对上。
 
-本次提交的**主结果**是最终代码的 15 分钟**现货只做多 live 单源 run** `20261021T162501Z-9821`：650,532 条原始帧、47,127 个信号、6,437 笔模拟成交，原始帧 0 丢失、0 data gap、0 订单簿 resync、0 负仓位/0 负现金，回放三项 SHA-256 一致。3049 抽象做市、53b5 历史基准、6db8 严格落盘只作为报告里的对照，完整数据在 GitHub Release。
+本次提交的**主结果**是最终代码的 15 分钟**现货 live 单源 run** `20261021T162501Z-9821`：650,532 条原始帧、47,127 个信号、6,437 笔模拟成交，原始帧 0 丢失、0 data gap、0 订单簿 resync、0 负仓位/0 负现金，回放三项 SHA-256 一致。3049 抽象做市、53b5 历史基准、6db8 严格落盘只作为报告里的对照，完整数据在 GitHub Release。
 
 > 笔试题目：YINO ASSET 量化开发工程师（实时高频行情交易系统 demo）。
 > GitHub：https://github.com/LDv237/YINO_asset
@@ -41,15 +41,15 @@ curl http://127.0.0.1:9100/healthz
 curl http://127.0.0.1:9100/metrics
 ```
 
-> 路径约定：**本邮件包不含完整 `artifacts/`**（约 1,011 MiB，7 个历史 run 在 Release 的 `YINO_artifacts_complete_20261020.zip`）。文档里的 `artifacts/runs/<run_id>` 指新跑 live 或 Release/仓库；包内主结果在 `运行材料/20261021T162501Z-9821/`，完整数据在 `run_data.tar.xz`。详见 [`artifacts/README.md`](artifacts/README.md)。
+> 路径约定：**本邮件包不含完整 `artifacts/`**（约 1,011 MiB，7 个历史 run 在 Release 的 `YINO_artifacts_complete_20261020.zip`）。文档里的 `artifacts/runs/<run_id>` 指新跑 live 或 Release/仓库；包内主结果在 `运行材料/01_主结果_现货_9821/`，完整数据在 `run_data.tar.xz`。详见 [`artifacts/README.md`](artifacts/README.md)。
 
 包内主结果先解压再验证：
 
 ```bash
-python scripts/extract_main_run.py 运行材料/20261021T162501Z-9821
-python -m tickforge verify --run 运行材料/20261021T162501Z-9821
-python -m tickforge replay --run 运行材料/20261021T162501Z-9821 \
-  --out 运行材料/20261021T162501Z-9821-replay --verify
+python scripts/extract_main_run.py 运行材料/01_主结果_现货_9821
+python -m tickforge verify --run 运行材料/01_主结果_现货_9821
+python -m tickforge replay --run 运行材料/01_主结果_现货_9821 \
+  --out 运行材料/01_主结果_现货_9821-replay --verify
 ```
 
 `replay --verify` 比对 WAL 记录数、订单簿同步/因子/信号/成交计数和三个 JSONL 的 SHA-256；不一致退出码非零。
@@ -62,9 +62,9 @@ python -m tickforge replay --run samples/demo_run --out samples/demo_run-replay 
 
 ## 两套执行语义
 
-**主结果用 `config/spot_long_only.toml`**：禁止裸卖、卖出不超过持仓、买入受每 symbol 10,000 USDT 现金限制；本次 650,532 帧里所有 symbol position/cash ≥ 0。完整设计和对照见 [`docs/现货只做多设计.md`](docs/现货只做多设计.md)。
+**主结果用 `config/spot_long_only.toml`**：禁止裸卖、卖出不超过持仓、买入受每 symbol 10,000 USDT 现金限制；本次 650,532 帧里所有 symbol position/cash ≥ 0。完整设计和对照见 [`docs/现货语义设计.md`](docs/现货语义设计.md)。
 
-默认抽象做市（`config/default.toml`）允许负仓位/负现金，是执行语义对照；最终代码的 3049 抽象 run 摘要放在 `运行材料/对照_抽象做市_3049/`，完整 run 在 Release。
+默认抽象做市（`config/default.toml`）允许负仓位/负现金，是执行语义对照；最终代码的 3049 抽象 run 摘要放在 `运行材料/02_对照_抽象做市_3049/`，完整 run 在 Release。
 
 `config/spot_long_only_durable.toml` 增加 `fsync=always`；严格落盘的完整数字和边界见 [`docs/性能实测.md`](docs/性能实测.md)。
 
@@ -78,7 +78,7 @@ python -m tickforge replay --run samples/demo_run --out samples/demo_run-replay 
 tickforge/         核心包（feed/store/book/factor/strategy/exec/runtime/replay/metrics/server）
 tests/             单元、集成、混沌与端到端回放测试（276 passed）
 tools/ scripts/    运行分析、导出、追溯、样本裁剪、15 分钟运行和 Docker 校验
-config/            默认、只做多、严格落盘三套配置
+config/            默认、现货、严格落盘三套配置
 docs/              架构、接口、性能、验证、开发过程、AI 协作、依赖、运行手册
 samples/demo_run/  20,000 条 WAL 的离线样本（来自 53b5，仅验证 replay 机制）
 运行材料/          主结果 20261021T162501Z-9821/、对照_抽象做市_3049/、验证证据/
@@ -112,6 +112,6 @@ python -m pytest -q
 
 ## 已知的局限
 
-公开 WS 不自动补发，本 demo 尚未实现 REST 补采；Python 单进程不是生产级 HFT；`Simulator` 是抽象记账器，主结果用现货只做多配置、所有 position/cash ≥ 0，但仍不是真实交易所账户；3049 抽象对照允许负仓位/负现金。成交用 `@aggTrade` 而非逐笔 `@trade`。完整边界见 [`交付说明.md`](交付说明.md) §6 和 [`docs/正确性与可靠性验证.md`](docs/正确性与可靠性验证.md)。
+公开 WS 不自动补发，本 demo 尚未实现 REST 补采；Python 单进程不是生产级 HFT；`Simulator` 是抽象记账器，主结果用现货配置、所有 position/cash ≥ 0，但仍不是真实交易所账户；3049 抽象对照允许负仓位/负现金。成交用 `@aggTrade` 而非逐笔 `@trade`。完整边界见 [`交付说明.md`](交付说明.md) §6 和 [`docs/正确性与可靠性验证.md`](docs/正确性与可靠性验证.md)。
 
 MIT，见 [LICENSE](LICENSE)。

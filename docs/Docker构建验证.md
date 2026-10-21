@@ -1,6 +1,6 @@
 # Docker 构建与运行验证（P0）
 
-题目要求打包 Docker image，保证代码能正常运行。本机的情况是：开发机装了 Docker Desktop，但 WSL2 虚拟化组件不完整，Docker 引擎无法启动，所以本机没有构建和运行。为了不把这个缺口留到交付，我在 GitHub Actions 的干净 Docker 环境里用**最终 main** 跑了一遍：build、容器版本、离线 sample replay、60 秒 live、verify 和 replay 全部通过（run 39622339780，commit `e9886ea`，image `sha256:1df56a07…`，60 秒运行 78,815 帧、1,899 fills、0 丢失、`clean_shutdown=true`），并生成了可直接 `docker load` 的镜像包。邮件包内的证据在 `运行材料/验证证据/docker_ci/`；完整 Actions 日志在 run 39622339780 的 `docker-verify-evidence` artifact，2026-10-20 的历史 artifacts 仍在 Release 的 `YINO_artifacts_complete_20261020.zip` 内。下面的命令是给本机或其他 Docker 主机复跑用的。
+题目要求打包 Docker image，保证代码能正常运行。本机的情况是：开发机装了 Docker Desktop，但 WSL2 虚拟化组件不完整，Docker 引擎无法启动，所以本机没有构建和运行。为了不把这个缺口留到交付，我在 GitHub Actions 的干净 Docker 环境里用**最终 main** 跑了一遍：build、容器版本、离线 sample replay、60 秒 live、verify 和 replay 全部通过（run 39622339780，commit `e9886ea`，image `sha256:1df56a07…`，60 秒运行 78,815 帧、1,899 fills、0 丢失、`clean_shutdown=true`），并生成了可直接 `docker load` 的镜像包。邮件包内的证据在 `运行材料/03_验证证据/docker_ci/`；完整 Actions 日志在 run 39622339780 的 `docker-verify-evidence` artifact，2026-10-20 的历史 artifacts 仍在 Release 的 `YINO_artifacts_complete_20261020.zip` 内。下面的命令是给本机或其他 Docker 主机复跑用的。
 
 ## 1. 环境要求
 
@@ -50,7 +50,7 @@ bash scripts/docker_verify.sh
 - `verify`: `ok=true`，`summary_clean_shutdown=true`、`derived_complete=true`、`derived_digests_complete=true`，`truncated_tail_bytes=0`
 - `replay --verify`: `verified=true`、`deterministic=true`，三个 SHA-256 与 live 一致
 - 健康快照: `health_before_shutdown.ok=true` / `health_final.ok=true`，`oldest_pending_ms=0.0`
-- 证据: 邮件包内 `运行材料/验证证据/docker_ci/`；完整 Actions artifact 为 `docker-verify-evidence`（run 39622339780）；2026-10-20 的历史 artifacts 在 Release 的 `YINO_artifacts_complete_20261020.zip` 内
+- 证据: 邮件包内 `运行材料/03_验证证据/docker_ci/`；完整 Actions artifact 为 `docker-verify-evidence`（run 39622339780）；2026-10-20 的历史 artifacts 在 Release 的 `YINO_artifacts_complete_20261020.zip` 内
 
 ## 5.2 镜像包交付
 

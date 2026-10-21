@@ -7,8 +7,8 @@
 | 文件 | 用途 | 关键差异 | 对应 run |
 |---|---|---|---|
 | `default.toml` | 抽象做市，执行语义/性能对照 | `allow_short = true`、`initial_cash_usd = 0`、`fsync_policy = "interval"` | 3049 抽象对照 / 53b5 历史基准 |
-| `spot_long_only.toml` | 现货只做多执行语义 | `allow_short = false`、`initial_cash_usd = 10000.0`；feed/因子/策略其余相同 | **9821 主结果** / 同一 WAL 对照 |
-| `spot_long_only_durable.toml` | 现货只做多 + 严格落盘 | 在 `spot_long_only` 基础上把 `fsync_policy` 改成 `"always"` | 6db8 严格落盘（Release） |
+| `spot_long_only.toml` | 现货执行语义 | `allow_short = false`、`initial_cash_usd = 10000.0`；feed/因子/策略其余相同 | **9821 主结果** / 同一 WAL 对照 |
+| `spot_long_only_durable.toml` | 现货 + 严格落盘 | 在 `spot_long_only` 基础上把 `fsync_policy` 改成 `"always"` | 6db8 严格落盘（Release） |
 
 运行命令见 [`README.md`](../README.md) 的“怎么跑”；把 `--config` 换成对应文件即可。
 
@@ -61,8 +61,8 @@
 | `fee_bps` | 模拟手续费 |
 | `quote_cooldown_ms` | 同 symbol 两次报价的最小间隔 |
 | `enabled` | 是否启用策略 |
-| `allow_short` | `true` 允许抽象负仓位；`false` 为现货只做多语义 |
-| `initial_cash_usd` | 每个 symbol 的初始现金；现货只做多版为 10000 |
+| `allow_short` | `true` 允许抽象负仓位；`false` 为现货语义 |
+| `initial_cash_usd` | 每个 symbol 的初始现金；现货版为 10000 |
 | `round_to_tick` | bid 向下、ask 向上取到交易所 tick |
 
 ### `[http]`：观测接口

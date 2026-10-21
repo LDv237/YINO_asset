@@ -1,6 +1,8 @@
 # 主结果：20261021T162501Z-9821
 
-这个目录是最终代码的 15 分钟**现货只做多 live** run。窗口为 2026-10-21 16:25:05–16:40:05 UTC；日志、signals、fills、性能和回放都来自同一次运行，没有 live/重算混合口径。
+这个目录是最终代码的 15 分钟**现货 live** run。窗口为 2026-10-21 16:25:05–16:40:05 UTC；日志、signals、fills、性能和回放都来自同一次运行，没有 live/重算混合口径。
+
+> 目录名 `01_主结果_现货_9821` 里的 `9821` 是 run_id 简写；完整 run_id 是 `20261021T162501Z-9821`。`tickforge verify` 输出的 `run_id` 字段取目录名，内部 `summary.json` / `manifest.json` 的 run_id 是完整值。
 
 ## 关键结果
 
@@ -33,10 +35,10 @@ console.log          控制台日志
 ## 复现
 
 ```bash
-python scripts/extract_main_run.py 运行材料/20261021T162501Z-9821
-python -m tickforge verify --run 运行材料/20261021T162501Z-9821
-python -m tickforge replay --run 运行材料/20261021T162501Z-9821 \
-  --out 运行材料/20261021T162501Z-9821-replay --verify
+python scripts/extract_main_run.py 运行材料/01_主结果_现货_9821
+python -m tickforge verify --run 运行材料/01_主结果_现货_9821
+python -m tickforge replay --run 运行材料/01_主结果_现货_9821 \
+  --out 运行材料/01_主结果_现货_9821-replay --verify
 ```
 
 预期 `verify` 返回 `ok=true`，`replay --verify` 返回 `verified=true`、`deterministic=true`，三个 SHA-256 一致。

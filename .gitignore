@@ -14,9 +14,9 @@ tickforge_delivery.zip
 代码包.zip
 
 # keep delivery logs
-!运行材料/20261021T162501Z-9821/logs/*.log
-!运行材料/20261021T162501Z-9821/console.log
-!运行材料/验证证据/docker_ci/*.log
+!运行材料/01_主结果_现货_9821/logs/*.log
+!运行材料/01_主结果_现货_9821/console.log
+!运行材料/03_验证证据/docker_ci/*.log
 
 # complete email attachment archive
 一诺笔试完整交付包.zip

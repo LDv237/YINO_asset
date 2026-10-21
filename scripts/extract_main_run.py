@@ -9,7 +9,7 @@ from pathlib import Path
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("run_dir", help="e.g. 运行材料/20261021T162501Z-9821")
+    parser.add_argument("run_dir", help="e.g. 运行材料/01_主结果_现货_9821")
     args = parser.parse_args()
     run_dir = Path(args.run_dir)
     archive = run_dir / "run_data.tar.xz"
