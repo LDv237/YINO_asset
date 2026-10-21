@@ -1,6 +1,6 @@
 # Docker 构建与运行验证（P0）
 
-题目要求打包 Docker image，保证代码能正常运行。本机的情况是：开发机装了 Docker Desktop，但 WSL2 虚拟化组件不完整，Docker 引擎无法启动，所以本机没有构建和运行。为了不把这个缺口留到交付，我在 GitHub Actions 的干净 Docker 环境里用当时的 main 跑了一遍：build、容器版本、离线 sample replay、60 秒 live、verify 和 replay 全部通过（run 39552903429，commit 83d4c1a，image sha256:a960d6c2…，60 秒运行 11,931 帧、204 fills、0 丢失、`clean_shutdown=true`），并生成了可直接 `docker load` 的镜像包。邮件包内的证据在 `运行材料/04_验证证据/docker_ci/`；完整 artifacts 在 Release 的 `YINO_artifacts_complete_20261020.zip` 内 `artifacts/experiments/docker/ci/`。下面的命令是给本机或其他 Docker 主机复跑用的。
+题目要求打包 Docker image，保证代码能正常运行。本机的情况是：开发机装了 Docker Desktop，但 WSL2 虚拟化组件不完整，Docker 引擎无法启动，所以本机没有构建和运行。为了不把这个缺口留到交付，我在 GitHub Actions 的干净 Docker 环境里用当时的 main 跑了一遍：build、容器版本、离线 sample replay、60 秒 live、verify 和 replay 全部通过（run 39552903429，commit 83d4c1a，image sha256:a960d6c2…，60 秒运行 11,931 帧、204 fills、0 丢失、`clean_shutdown=true`），并生成了可直接 `docker load` 的镜像包。邮件包内的证据在 `运行材料/验证证据/docker_ci/`；完整 artifacts 在 Release 的 `YINO_artifacts_complete_20261020.zip` 内 `artifacts/experiments/docker/ci/`。下面的命令是给本机或其他 Docker 主机复跑用的。
 
 ## 1. 环境要求
 
@@ -93,14 +93,14 @@ docker compose run --rm tickforge \
 - Run: https://github.com/LDv237/YINO_asset/actions/runs/39552903429
 - Commit: `83d4c1a`
 - Image: `sha256:a960d6c24a7a155ce07945c8966c65fb37825e19988939970cde7162732c25d3`
-- Build: 成功，日志 `运行材料/04_验证证据/docker_ci/docker_build.log`（完整路径 `artifacts/experiments/docker/ci/docker_build.log`）
+- Build: 成功，完整日志在 Release 的 `artifacts/experiments/docker/ci/docker_build.log`；邮件包 `docker_ci/` 保留 container/verify/replay 证据
 - 容器版本: `tickforge 0.1.0`
 - 离线 sample replay: `verified=true`，counts/digests 全部一致
 - 60 秒 live: `run_id=20261021T060228Z-161a`，11,931 帧，11,938 条 WAL，2,486 信号，204 fills，`clean_shutdown=true`，`lost_raw_frames=0`
 - 队列峰值（CI 60 秒进程内计数器值）/ durable lag: `wal_queue_max=109`、`pipeline_queue_max=16`；durable p50/p95 约 262/441 ms（`interval` 批次口径，不是逐条）
 - `verify`: `ok=true`，`summary_clean_shutdown=true`，`truncated_tail_bytes=0`
 - `replay --verify`: `verified=true`、`deterministic=true`，三个 SHA-256 与 live 一致
-- 证据: 邮件包内 `运行材料/04_验证证据/docker_ci/`；完整 artifacts 在 Release 的 `YINO_artifacts_complete_20261020.zip` 内 `artifacts/experiments/docker/ci/`；GitHub Actions artifact `docker-verify-evidence`
+- 证据: 邮件包内 `运行材料/验证证据/docker_ci/`；完整 artifacts 在 Release 的 `YINO_artifacts_complete_20261020.zip` 内 `artifacts/experiments/docker/ci/`；GitHub Actions artifact `docker-verify-evidence`
 
 ## 5.2 镜像包交付
 

@@ -1,0 +1,34 @@
+06:03:33 INFO    tickforge.replay.runner: book synced symbol=DOGEUSDT last_update_id=25724704831 buffered=0
+06:03:33 INFO    tickforge.replay.runner: book synced symbol=BNBUSDT last_update_id=21020516400 buffered=0
+06:03:33 INFO    tickforge.replay.runner: book synced symbol=BTCUSDT last_update_id=101716650398 buffered=0
+06:03:33 INFO    tickforge.replay.runner: book synced symbol=XRPUSDT last_update_id=26785829754 buffered=0
+06:03:33 INFO    tickforge.replay.runner: book synced symbol=ETHUSDT last_update_id=82310145734 buffered=0
+06:03:33 INFO    tickforge.replay.runner: book synced symbol=SOLUSDT last_update_id=30418036763 buffered=0
+06:03:33 WARNING tickforge.replay.runner: book out of sync symbol=DOGEUSDT status=gap last_update_id=25724704831
+06:03:33 INFO    tickforge.replay.runner: book synced symbol=DOGEUSDT last_update_id=25724704877 buffered=0
+06:03:34 INFO    tickforge.replay.runner: replay complete  records=11938 elapsed_s=0.38 deterministic=True verified=True
+{
+  "records": 11938,
+  "throughput_events_per_s": 31437.2,
+  "deterministic": true,
+  "verified": true,
+  "reasons": [],
+  "count_match": {
+    "ws_frames": true,
+    "snapshots": true,
+    "factor_snapshots": true,
+    "signals": true,
+    "fills": true
+  },
+  "digest_match": {
+    "factors_sha256": true,
+    "signals_sha256": true,
+    "fills_sha256": true
+  },
+  "live_derived_digest_match": {
+    "factors_sha256": true,
+    "signals_sha256": true,
+    "fills_sha256": true
+  },
+  "out": "/replay-out"
+}

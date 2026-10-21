@@ -28,9 +28,9 @@ symbols = ["BTCUSDT", "ETHUSDT"]
 
 | 文件 | 用途 | 关键差异 | 对应 run |
 |---|---|---|---|
-| `default.toml` | 默认抽象做市，性能/链路基准 | `allow_short = true`、`initial_cash_usd = 0`、`fsync_policy = "interval"` | 53b5 历史基准 |
-| `spot_long_only.toml` | 现货只做多执行语义 | `allow_short = false`、`initial_cash_usd = 10000.0`；feed/因子/策略其余相同 | 91ac、同一 WAL 对照 |
-| `spot_long_only_durable.toml` | 现货只做多 + 严格落盘 | 在 `spot_long_only` 基础上把 `fsync_policy` 改成 `"always"` | 6db8 严格版 |
+| `default.toml` | 默认抽象做市，性能/链路基准 | `allow_short = true`、`initial_cash_usd = 0`、`fsync_policy = "interval"` | **3049 主结果** / 53b5 历史基准 |
+| `spot_long_only.toml` | 现货只做多执行语义 | `allow_short = false`、`initial_cash_usd = 10000.0`；feed/因子/策略其余相同 | 同一 WAL 对照 |
+| `spot_long_only_durable.toml` | 现货只做多 + 严格落盘 | 在 `spot_long_only` 基础上把 `fsync_policy` 改成 `"always"` | 6db8 严格落盘（Release） |
 
 ```bash
 # 默认抽象做市
