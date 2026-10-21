@@ -5,7 +5,7 @@ plus the current base-asset position into a two-sided :class:`Signal`.  It is
 stateless apart from a per-symbol cooldown timestamp, so replaying the same
 snapshots reproduces byte-identical signals.
 
-Formulas (see ``docs/INTERFACES.md`` section 5)::
+Formulas (see ``docs/接口设计.md`` section 5)::
 
     ofi_norm    = clamp(ofi_1s / max(bid_qty + ask_qty, 1e-9), -3, 3)
     fair        = microprice * (1 + momentum_coeff * momentum_5s
