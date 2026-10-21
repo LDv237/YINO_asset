@@ -1,6 +1,6 @@
 # Docker 构建与运行验证（P0）
 
-题目要求打包 Docker image，保证代码能正常运行。本机的情况是：开发机装了 Docker Desktop，但 WSL2 虚拟化组件不完整，Docker 引擎无法启动，所以本机没有构建和运行。为了不把这个缺口留到交付，我在 GitHub Actions 的干净 Docker 环境里用当时的 main 跑了一遍：build、容器版本、离线 sample replay、60 秒 live、verify 和 replay 全部通过（run 39552903429，commit 83d4c1a，image sha256:a960d6c2…，60 秒运行 11,931 帧、204 fills、0 丢失、`clean_shutdown=true`），并生成了可直接 `docker load` 的镜像包。邮件包内的证据在 `运行材料/验证证据/docker_ci/`；完整 artifacts 在 Release 的 `YINO_artifacts_complete_20261020.zip` 内 `artifacts/experiments/docker/ci/`。下面的命令是给本机或其他 Docker 主机复跑用的。
+题目要求打包 Docker image，保证代码能正常运行。本机的情况是：开发机装了 Docker Desktop，但 WSL2 虚拟化组件不完整，Docker 引擎无法启动，所以本机没有构建和运行。为了不把这个缺口留到交付，我在 GitHub Actions 的干净 Docker 环境里用**最终 main** 跑了一遍：build、容器版本、离线 sample replay、60 秒 live、verify 和 replay 全部通过（run 39598128432，commit `4d634cd`，image `sha256:d6697fe5…`，60 秒运行 17,171 帧、486 fills、0 丢失、`clean_shutdown=true`），并生成了可直接 `docker load` 的镜像包。邮件包内的证据在 `运行材料/验证证据/docker_ci/`；完整 artifacts 在 Release 的 `YINO_artifacts_complete_20261020.zip` 内 `artifacts/experiments/docker/ci/`。下面的命令是给本机或其他 Docker 主机复跑用的。
 
 ## 1. 环境要求
 
@@ -35,25 +35,25 @@ bash scripts/docker_verify.sh
 
 ## 4. 验收判定
 
-六项验收（build、容器版本、sample replay、60 秒 live、verify、replay）在 2026-10-21 的 GitHub Actions run 39552903429 上全部通过；结果和证据见 §5.1。本机仍受 WSL2 限制，其他 Docker 主机可按 `scripts/docker_verify.sh` 复跑。
+六项验收（build、容器版本、sample replay、60 秒 live、verify、replay）在 2026-10-21 的 GitHub Actions run 39598128432 上全部通过；结果和证据见 §5.1。本机仍受 WSL2 限制，其他 Docker 主机可按 `scripts/docker_verify.sh` 复跑。
 
 ## 5.1 CI 证据
 
-- Run: https://github.com/LDv237/YINO_asset/actions/runs/39552903429
-- Commit: `83d4c1a`
-- Image: `sha256:a960d6c24a7a155ce07945c8966c65fb37825e19988939970cde7162732c25d3`
+- Run: https://github.com/LDv237/YINO_asset/actions/runs/39598128432
+- Commit: `4d634cd`
+- Image: `sha256:d6697fe5a70f965d2932d57eca534127861b7c801e8d79d2ea2e4d9517b069d1`
 - Build: 成功，完整日志在 Release 的 `artifacts/experiments/docker/ci/docker_build.log`；邮件包 `docker_ci/` 保留 container/verify/replay 证据
 - 容器版本: `tickforge 0.1.0`
 - 离线 sample replay: `verified=true`，counts/digests 全部一致
-- 60 秒 live: `run_id=20261021T060228Z-161a`，11,931 帧，11,938 条 WAL，2,486 信号，204 fills，`clean_shutdown=true`，`lost_raw_frames=0`
-- 队列峰值（CI 60 秒进程内计数器值）/ durable lag: `wal_queue_max=109`、`pipeline_queue_max=16`；durable p50/p95 约 262/441 ms（`interval` 批次口径，不是逐条）
+- 60 秒 live: `run_id=20261021T121613Z-deb2`，17,171 帧，17,179 条 WAL，2,574 信号，486 fills，`clean_shutdown=true`，`lost_raw_frames=0`
+- 队列峰值（CI 60 秒进程内计数器值）/ durable lag: `wal_queue_max=80`、`pipeline_queue_max=16`；durable p50/p95 262/262 ms（`interval` 批次口径，不是逐条）
 - `verify`: `ok=true`，`summary_clean_shutdown=true`，`truncated_tail_bytes=0`
 - `replay --verify`: `verified=true`、`deterministic=true`，三个 SHA-256 与 live 一致
 - 证据: 邮件包内 `运行材料/验证证据/docker_ci/`；完整 artifacts 在 Release 的 `YINO_artifacts_complete_20261020.zip` 内 `artifacts/experiments/docker/ci/`；GitHub Actions artifact `docker-verify-evidence`
 
 ## 5.2 镜像包交付
 
-Release 里附了 `tickforge-0.1.0.tar.gz`（`docker save` 生成，linux/amd64，50,906,849 字节 / 48.55 MiB；`docker load` 后镜像约 141.6 MiB），SHA-256 为 `147821262e09c09094d6ee4eb1175f355f97a6d0c528b5185a335c3162601a61`，同名 `.sha256` 文件也在 Release 里。评审不需要本机构建，直接：
+Release 里附了 `tickforge-0.1.0.tar.gz`（`docker save` 生成，linux/amd64，49,317,333 字节 / 47.03 MiB；`docker load` 后镜像约 136.4 MiB），SHA-256 为 `ca3891c2e15c68f638fc5d4b375e78da7f0c851e79745f81e5057aeca41ab4be`，同名 `.sha256` 文件也在 Release 里。评审不需要本机构建，直接：
 
 ```bash
 curl -L -O https://github.com/LDv237/YINO_asset/releases/download/delivery-20261020/tickforge-0.1.0.tar.gz
@@ -65,7 +65,7 @@ docker run --rm -p 9100:9100 -v "$PWD/artifacts:/data" tickforge:0.1.0 \
   live --config config/default.toml --duration 60 --out /data
 ```
 
-镜像构建于 `83d4c1a`，已包含成交时间 `T` 修正；之后的提交只改文档、数据和宿主机工具，`tickforge/`、`config/`、`Dockerfile` 和依赖等核心运行代码与配置没有变化。镜像标签和 `docker-compose.yml` 里的 `tickforge:0.1.0` 一致；入口是 `python -m tickforge`，离线样本在 `/app/samples/demo_run`，没有交易所网络也能验证：
+镜像由最终 main `4d634cd` 构建，已包含成交时间 `T` 修正。镜像标签和 `docker-compose.yml` 里的 `tickforge:0.1.0` 一致；入口是 `python -m tickforge`，离线样本在 `/app/samples/demo_run`，没有交易所网络也能验证：
 
 ```bash
 docker run --rm tickforge:0.1.0 \
