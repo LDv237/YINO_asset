@@ -166,6 +166,8 @@ async def test_live_pipeline_verifies_and_replays(tmp_path: Path) -> None:
     assert summary["health_before_shutdown"]["ok"] is True
     assert summary["health_final"]["ok"] is True
     assert summary["health_final_context"] == "after_intentional_shutdown"
+    assert "oldest_pending_ms" in summary["health_before_shutdown"]["pipeline"]
+    assert "oldest_pending_ms" in summary["health_final"]["pipeline"]
 
     assert "wal_queue_max" in summary["counts"]
     assert "pipeline_queue_max" in summary["counts"]

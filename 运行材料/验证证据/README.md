@@ -4,7 +4,7 @@
 
 | 文件 | 内容 |
 |---|---|
-| `pytest_275_passed.txt` | 完整测试套件：275 passed |
+| `pytest_276_passed.txt` | 完整测试套件：276 passed |
 | `成交编号完整性_最终版.json` | 3049 的 `pipeline.trade_quality`：6 个 symbol 均 0 duplicates / 0 backwards / 0 gaps / 0 missing_ids |
 | `交易活跃度_最终版.json` | 3049 起始小时桶（07:00–08:00 UTC）的市场活跃度排名 |
 | `异常终止恢复.json` | 应用层强制终止后的 WAL 可读前缀（229 条记录）；完整 crash WAL 在 Release |

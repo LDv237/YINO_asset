@@ -23,6 +23,7 @@ import secrets
 import socket
 import sys
 import time
+from collections import deque
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
@@ -151,6 +152,10 @@ class LiveEngine:
         self._last_ingress_mono_ns = 0
         self._last_processed_recv_mono_ns = 0
         self._last_processed_mono_ns = 0
+        # Receive timestamps of events that have not finished processing.
+        # FIFO order mirrors ``self.queue``; the head is the oldest backlog
+        # item (including the event currently in flight).
+        self._pending_recv_mono_ns: deque[int] = deque()
         self._disconnect_started_wall_ns = 0
         self._data_gaps: list[dict[str, Any]] = []
         self._seq = 0
@@ -404,6 +409,7 @@ class LiveEngine:
             while True:
                 try:
                     self.queue.put_nowait(env)
+                    self._pending_recv_mono_ns.append(env.recv_mono_ns)
                     self.metrics.set_gauge(
                         "tickforge_pipeline_queue_depth", self.queue.qsize()
                     )
@@ -563,6 +569,8 @@ class LiveEngine:
                 self.request_stop("too_many_pipeline_errors")
         finally:
             self.queue.task_done()
+            if self._pending_recv_mono_ns:
+                self._pending_recv_mono_ns.popleft()
             self.live.processed_envelopes += 1
             self._last_processed_mono_ns = time.perf_counter_ns()
             self._last_processed_recv_mono_ns = env.recv_mono_ns
@@ -605,6 +613,9 @@ class LiveEngine:
                 self.metrics.set_gauge("tickforge_wal_queue_depth", self.wal.queue_depth)
                 self.metrics.set_gauge(
                     "tickforge_pipeline_processing_lag_ms", self._processing_lag_ms()
+                )
+                self.metrics.set_gauge(
+                    "tickforge_pipeline_oldest_pending_ms", self._oldest_pending_ms()
                 )
                 # A book can stay unsynced without new depth events (for
                 # example after a failed snapshot on a quiet symbol).  Retry
@@ -657,10 +668,30 @@ class LiveEngine:
             pass
 
     def _processing_lag_ms(self) -> float:
+        """Arrival delta between the newest ingress frame and the last processed one."""
+
         if self.queue.empty() or self._last_ingress_mono_ns <= 0:
             return 0.0
         lag = self._last_ingress_mono_ns - self._last_processed_recv_mono_ns
         return round(max(0, lag) / 1e6, 3)
+
+    def _oldest_pending_ms(self, now_ns: int | None = None) -> float:
+        """How long the oldest unfinished event has been waiting.
+
+        This is measured from the event's receive timestamp, not from the last
+        ingress frame, so it keeps growing during a processor stall even when
+        the market goes quiet and no newer frames arrive.
+        """
+
+        if not self._pending_recv_mono_ns:
+            return 0.0
+        now_ns = time.perf_counter_ns() if now_ns is None else now_ns
+        return round(max(0, now_ns - self._pending_recv_mono_ns[0]) / 1e6, 3)
+
+    def _backlog_lag_ms(self) -> float:
+        """Head-of-line backlog: max(arrival delta, oldest pending wait)."""
+
+        return max(self._processing_lag_ms(), self._oldest_pending_ms())
 
     def _log_stats(self, ws_rate: float, proc_rate: float) -> None:
         pipe = self.pipeline.counts
@@ -672,6 +703,7 @@ class LiveEngine:
                 "processed": self.live.processed_envelopes,
                 "proc_per_s": round(proc_rate, 1),
                 "queue": self.queue.qsize(),
+                "oldest_pending_ms": self._oldest_pending_ms(),
                 "wal_queue": self.wal.queue_depth,
                 "depth": pipe["depth_events"],
                 "trades": pipe["trade_events"],
@@ -716,7 +748,8 @@ class LiveEngine:
         if wal_stats.get("error"):
             reasons.append("wal_error")
         lag = self._processing_lag_ms()
-        if lag > self.cfg.engine.max_processing_lag_ms:
+        oldest_pending = self._oldest_pending_ms()
+        if self._backlog_lag_ms() > self.cfg.engine.max_processing_lag_ms:
             reasons.append("processing_lag")
         if self.queue.maxsize and self.queue.qsize() >= self.queue.maxsize * 0.9:
             reasons.append("pipeline_queue_near_full")
@@ -754,6 +787,7 @@ class LiveEngine:
             "pipeline": {
                 "queue_depth": self.queue.qsize(),
                 "processing_lag_ms": lag,
+                "oldest_pending_ms": oldest_pending,
                 "processed": self.live.processed_envelopes,
             },
         }
