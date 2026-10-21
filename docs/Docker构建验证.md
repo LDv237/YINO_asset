@@ -1,6 +1,6 @@
 # Docker 构建与运行验证（P0）
 
-题目要求打包 Docker image，保证代码能正常运行。本机的情况是：开发机装了 Docker Desktop，但 WSL2 虚拟化组件不完整，Docker 引擎无法启动，所以本机没有构建和运行。为了不把这个缺口留到交付，我在 GitHub Actions 的干净 Docker 环境里用当前 main 跑了一遍：build、容器版本、离线 sample replay、60 秒 live、verify 和 replay 全部通过（run 39533252435，commit beae9ee，image sha256:75014967…，60 秒运行 19,538 帧、627 fills、0 丢失、`clean_shutdown=true`），并生成了可直接 `docker load` 的镜像包。证据在 `artifacts/experiments/docker/ci/`。下面的命令是给本机或其他 Docker 主机复跑用的。
+题目要求打包 Docker image，保证代码能正常运行。本机的情况是：开发机装了 Docker Desktop，但 WSL2 虚拟化组件不完整，Docker 引擎无法启动，所以本机没有构建和运行。为了不把这个缺口留到交付，我在 GitHub Actions 的干净 Docker 环境里用当前 main 跑了一遍：build、容器版本、离线 sample replay、60 秒 live、verify 和 replay 全部通过（run 39552903429，commit 83d4c1a，image sha256:a960d6c2…，60 秒运行 11,931 帧、204 fills、0 丢失、`clean_shutdown=true`），并生成了可直接 `docker load` 的镜像包。证据在 `artifacts/experiments/docker/ci/`。下面的命令是给本机或其他 Docker 主机复跑用的。
 
 ## 1. 环境要求
 
@@ -84,25 +84,25 @@ docker compose run --rm tickforge \
 - [x] 容器内 `verify` 返回 `ok=true`；
 - [x] 容器内 `replay --verify` 返回 `verified=true`，三个 SHA-256 与 live 一致。
 
-2026-10-21 的 GitHub Actions run 39533252435 已满足以上六条；本机仍受 WSL2 限制，下面保留本机/其他 Docker 主机的复跑步骤。
+2026-10-21 的 GitHub Actions run 39552903429 已满足以上六条；本机仍受 WSL2 限制，下面保留本机/其他 Docker 主机的复跑步骤。
 
 ## 5.1 CI 证据
 
-- Run: https://github.com/LDv237/YINO_asset/actions/runs/39533252435
-- Commit: `beae9ee`
-- Image: `sha256:7501496739bf6f46c436810c402c3851600bab4d254a37d56505d23152689b7b`
+- Run: https://github.com/LDv237/YINO_asset/actions/runs/39552903429
+- Commit: `83d4c1a`
+- Image: `sha256:a960d6c24a7a155ce07945c8966c65fb37825e19988939970cde7162732c25d3`
 - Build: 成功，日志 `artifacts/experiments/docker/ci/docker_build.log`
 - 容器版本: `tickforge 0.1.0`
 - 离线 sample replay: `verified=true`，counts/digests 全部一致
-- 60 秒 live: `run_id=20261021T022948Z-1b8c`，19,538 帧，19,548 条 WAL，2,752 信号，627 fills，`clean_shutdown=true`，`lost_raw_frames=0`
-- 队列峰值（CI 60 秒进程内计数器值）/ durable lag: `wal_queue_max=62`、`pipeline_queue_max=16`；durable p50/p95 约 262 ms（`interval` 批次口径，不是逐条）
+- 60 秒 live: `run_id=20261021T060228Z-161a`，11,931 帧，11,938 条 WAL，2,486 信号，204 fills，`clean_shutdown=true`，`lost_raw_frames=0`
+- 队列峰值（CI 60 秒进程内计数器值）/ durable lag: `wal_queue_max=109`、`pipeline_queue_max=16`；durable p50/p95 约 262/441 ms（`interval` 批次口径，不是逐条）
 - `verify`: `ok=true`，`summary_clean_shutdown=true`，`truncated_tail_bytes=0`
 - `replay --verify`: `verified=true`、`deterministic=true`，三个 SHA-256 与 live 一致
 - 证据: `artifacts/experiments/docker/ci/`，GitHub Actions artifact `docker-verify-evidence`
 
 ## 5.2 镜像包交付
 
-Release 里附了 `tickforge-0.1.0.tar.gz`（`docker save` 生成，linux/amd64，50,901,849 字节 / 48.54 MiB；`docker load` 后镜像约 141.5 MiB），SHA-256 为 `6f188ec6e427f9ab1987ab853563ffd4f644fb9e99080f806a3e222776b09b90`，同名 `.sha256` 文件也在 Release 里。评审不需要本机构建，直接：
+Release 里附了 `tickforge-0.1.0.tar.gz`（`docker save` 生成，linux/amd64，50,906,849 字节 / 48.55 MiB；`docker load` 后镜像约 141.6 MiB），SHA-256 为 `147821262e09c09094d6ee4eb1175f355f97a6d0c528b5185a335c3162601a61`，同名 `.sha256` 文件也在 Release 里。评审不需要本机构建，直接：
 
 ```bash
 curl -L -O https://github.com/LDv237/YINO_asset/releases/download/delivery-20261020/tickforge-0.1.0.tar.gz
@@ -114,7 +114,7 @@ docker run --rm -p 9100:9100 -v "$PWD/artifacts:/data" tickforge:0.1.0 \
   live --config config/default.toml --duration 60 --out /data
 ```
 
-镜像构建于 `beae9ee`；之后的提交只改文档和宿主机工具（`tools/trace_signal.py`、`scripts/reproduce_from_delivery.py`），`tickforge/`、`config/`、`Dockerfile` 和依赖等核心运行代码与配置没有变化，运行时代码与当前 main 一致。镜像标签和 `docker-compose.yml` 里的 `tickforge:0.1.0` 一致；入口是 `python -m tickforge`，离线样本在 `/app/samples/demo_run`，没有交易所网络也能验证：
+镜像构建于 `83d4c1a`，已包含成交时间 `T` 修正；之后的提交只改文档、数据和宿主机工具，`tickforge/`、`config/`、`Dockerfile` 和依赖等核心运行代码与配置没有变化。镜像标签和 `docker-compose.yml` 里的 `tickforge:0.1.0` 一致；入口是 `python -m tickforge`，离线样本在 `/app/samples/demo_run`，没有交易所网络也能验证：
 
 ```bash
 docker run --rm tickforge:0.1.0 \

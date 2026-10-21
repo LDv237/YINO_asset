@@ -151,7 +151,7 @@
       "resyncs": 0,
       "factor_snapshots": 41265,
       "signals": 41265,
-      "fills": 2131,
+      "fills": 2133,
       "trade_duplicates": 0,
       "trade_backwards": 0,
       "trade_gaps": 0,
@@ -5427,7 +5427,7 @@
       "resyncs": 0,
       "factor_snapshots": 41265,
       "signals": 41265,
-      "fills": 2131,
+      "fills": 2133,
       "trade_duplicates": 0,
       "trade_backwards": 0,
       "trade_gaps": 0,
@@ -5571,7 +5571,7 @@
       "cooldown_suppressed": 0,
       "invalid": 0,
       "bid_skipped": 0,
-      "ask_skipped": 31487,
+      "ask_skipped": 31484,
       "last_signal_ts_ms": {
         "ETHUSDT": 1792483155115,
         "XRPUSDT": 1792483155117,
@@ -5610,13 +5610,13 @@
           "position": 0.0,
           "avg_cost": 0.0,
           "mark": 81541.265,
-          "cash": 8810.306257015734,
+          "cash": 8810.553800358932,
           "initial_cash": 10000.0,
-          "realized_pnl": -1189.6937429842626,
+          "realized_pnl": -1189.4461996410682,
           "unrealized_pnl": 0.0,
-          "total_pnl": -1189.6937429842656,
-          "fees": 11.297451994862397,
-          "fills": 674,
+          "total_pnl": -1189.4461996410682,
+          "fees": 11.296335106067838,
+          "fills": 675,
           "open_bid": 81534.61,
           "open_ask": null,
           "open_bid_qty": 0.00613187,
@@ -5660,7 +5660,7 @@
           "unrealized_pnl": 0.0,
           "total_pnl": -857.3253188494764,
           "fees": 8.579104879787145,
-          "fills": 717,
+          "fills": 718,
           "open_bid": 2390.38,
           "open_ask": null,
           "open_bid_qty": 0.20915332,
@@ -5719,13 +5719,13 @@
       "totals": {
         "position": 76.07000001,
         "avg_cost": 0.7494461321901609,
-        "cash": 57373.59625556781,
+        "cash": 57373.84379891101,
         "initial_cash": 60000.0,
-        "realized_pnl": -2569.393377149006,
+        "realized_pnl": -2569.145833805812,
         "unrealized_pnl": -2.9999349992260768e-05,
-        "total_pnl": -2569.3934071483345,
-        "fees": 26.417037964645772,
-        "fills": 2131,
+        "total_pnl": -2569.145863805137,
+        "fees": 26.415921075851212,
+        "fills": 2133,
         "open_bid": 2998.237482667453,
         "open_ask": 56.89270726710001,
         "open_bid_qty": 6699.5833733399995,
@@ -5818,13 +5818,13 @@
         "position": 0.0,
         "avg_cost": 0.0,
         "mark": 81541.265,
-        "cash": 8810.306257015734,
+        "cash": 8810.553800358932,
         "initial_cash": 10000.0,
-        "realized_pnl": -1189.6937429842626,
+        "realized_pnl": -1189.4461996410682,
         "unrealized_pnl": 0.0,
-        "total_pnl": -1189.6937429842656,
-        "fees": 11.297451994862397,
-        "fills": 674,
+        "total_pnl": -1189.4461996410682,
+        "fees": 11.296335106067838,
+        "fills": 675,
         "open_bid": 81534.61,
         "open_ask": null,
         "open_bid_qty": 0.00613187,
@@ -5868,7 +5868,7 @@
         "unrealized_pnl": 0.0,
         "total_pnl": -857.3253188494764,
         "fees": 8.579104879787145,
-        "fills": 717,
+        "fills": 718,
         "open_bid": 2390.38,
         "open_ask": null,
         "open_bid_qty": 0.20915332,
@@ -5927,13 +5927,13 @@
     "totals": {
       "position": 76.07000001,
       "avg_cost": 0.7494461321901609,
-      "cash": 57373.59625556781,
+      "cash": 57373.84379891101,
       "initial_cash": 60000.0,
-      "realized_pnl": -2569.393377149006,
+      "realized_pnl": -2569.145833805812,
       "unrealized_pnl": -2.9999349992260768e-05,
-      "total_pnl": -2569.3934071483345,
-      "fees": 26.417037964645772,
-      "fills": 2131,
+      "total_pnl": -2569.145863805137,
+      "fees": 26.415921075851212,
+      "fills": 2133,
       "open_bid": 2998.237482667453,
       "open_ask": 56.89270726710001,
       "open_bid_qty": 6699.5833733399995,
@@ -5947,8 +5947,8 @@
   },
   "digests": {
     "factors_sha256": "b9339960ad39b88d0ffb1eceadbaec28e0ab03c700ec65d15545ccfd49faf414",
-    "signals_sha256": "412865d7dca384917cf8755a3ca70683acd14dfadf622706d4eb7c8f7c2db872",
-    "fills_sha256": "e67d98d8a76b3ffa1c15d9ed3236b51551266b0cd57ca2be17776a6991c78237"
+    "signals_sha256": "21859f319ecf694143c4299b69737c97b921a4c2f3d44b985f5efa05c04753ba",
+    "fills_sha256": "f1b58beb22e9bbc07c5a32ae0aecc001bcab383461553d47f091027490360eb4"
   },
   "derived": {
     "factors": {
@@ -5960,14 +5960,14 @@
     "signals": {
       "path": "C:\\Users\\HP\\Desktop\\一诺资产\\artifacts\\runs\\20261020T074416Z-91ac\\derived\\signals.jsonl",
       "records": 41265,
-      "bytes": 7222878,
-      "sha256": "412865d7dca384917cf8755a3ca70683acd14dfadf622706d4eb7c8f7c2db872"
+      "bytes": 7222904,
+      "sha256": "21859f319ecf694143c4299b69737c97b921a4c2f3d44b985f5efa05c04753ba"
     },
     "fills": {
       "path": "C:\\Users\\HP\\Desktop\\一诺资产\\artifacts\\runs\\20261020T074416Z-91ac\\derived\\fills.jsonl",
-      "records": 2131,
-      "bytes": 480797,
-      "sha256": "e67d98d8a76b3ffa1c15d9ed3236b51551266b0cd57ca2be17776a6991c78237"
+      "records": 2133,
+      "bytes": 481275,
+      "sha256": "f1b58beb22e9bbc07c5a32ae0aecc001bcab383461553d47f091027490360eb4"
     }
   },
   "reconciliation": {
@@ -6106,10 +6106,12 @@
   },
   "health_final_context": "after_intentional_shutdown",
   "execution_replay": {
-    "quote_time_guard": true,
-    "round_to_tick": true,
     "source": "WAL replay",
-    "replayed_at": "2026-10-20T17:58:10Z",
-    "note": "latency, resources, health and raw counts are from the original live capture"
+    "source_wal": "raw/",
+    "quote_time_guard": true,
+    "trade_time_field": "T",
+    "round_to_tick": true,
+    "replayed_at": "2026-10-21T05:56:47Z",
+    "note": "latency, resources, health and raw counts are from the original live capture; execution results use actual trade time T for the fill guard"
   }
 }

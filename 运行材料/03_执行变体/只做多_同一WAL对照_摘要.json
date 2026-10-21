@@ -1,13 +1,13 @@
 {
   "run_id": "20261020T072820Z-53b5",
-  "replayed_at": "2026-10-20T17:59:42Z",
-  "elapsed_s": 14.262,
+  "replayed_at": "2026-10-21T05:57:38Z",
+  "elapsed_s": 14.001,
   "records": 388394,
   "events": {
     "ws": 388388,
     "snapshot": 6
   },
-  "throughput_events_per_s": 27233.5,
+  "throughput_events_per_s": 27741.1,
   "scan": {
     "records": 388394,
     "records_by_kind": {
@@ -39,7 +39,7 @@
       "resyncs": 0,
       "factor_snapshots": 43309,
       "signals": 43309,
-      "fills": 3081,
+      "fills": 3077,
       "trade_duplicates": 0,
       "trade_backwards": 0,
       "trade_gaps": 0,
@@ -183,7 +183,7 @@
       "cooldown_suppressed": 0,
       "invalid": 0,
       "bid_skipped": 0,
-      "ask_skipped": 31698,
+      "ask_skipped": 31715,
       "last_signal_ts_ms": {
         "ETHUSDT": 1792482199315,
         "BTCUSDT": 1792482199314,
@@ -222,13 +222,13 @@
           "position": 0.0,
           "avg_cost": 0.0,
           "mark": 81616.005,
-          "cash": 8499.84834498667,
+          "cash": 8511.530202503289,
           "initial_cash": 10000.0,
-          "realized_pnl": -1500.1516550133244,
+          "realized_pnl": -1488.4697974967094,
           "unrealized_pnl": 0.0,
-          "total_pnl": -1500.1516550133292,
-          "fees": 13.71958878182389,
-          "fills": 757,
+          "total_pnl": -1488.4697974967112,
+          "fees": 13.644407206809312,
+          "fills": 759,
           "open_bid": 81608.27,
           "open_ask": null,
           "open_bid_qty": 0.00612633,
@@ -244,13 +244,13 @@
           "position": 0.0,
           "avg_cost": 0.0,
           "mark": 0.079255,
-          "cash": 9875.457229536576,
+          "cash": 9875.002872679592,
           "initial_cash": 10000.0,
-          "realized_pnl": -124.54277046342811,
+          "realized_pnl": -124.997127320413,
           "unrealized_pnl": 0.0,
-          "total_pnl": -124.54277046342395,
-          "fees": 1.4743444358299724,
-          "fills": 193,
+          "total_pnl": -124.99712732040825,
+          "fees": 1.474298995600251,
+          "fills": 192,
           "open_bid": 0.07925,
           "open_ask": null,
           "open_bid_qty": 6308.13520329,
@@ -266,13 +266,13 @@
           "position": 0.0,
           "avg_cost": 0.0,
           "mark": 2392.675,
-          "cash": 8815.82174341574,
+          "cash": 8827.276199049154,
           "initial_cash": 10000.0,
-          "realized_pnl": -1184.178256584239,
+          "realized_pnl": -1172.7238009508264,
           "unrealized_pnl": 0.0,
-          "total_pnl": -1184.1782565842605,
-          "fees": 11.895600040136507,
-          "fills": 1050,
+          "total_pnl": -1172.7238009508455,
+          "fees": 11.79674472292427,
+          "fills": 1045,
           "open_bid": 2392.01,
           "open_ask": null,
           "open_bid_qty": 0.20901018,
@@ -310,12 +310,12 @@
           "position": 0.0,
           "avg_cost": 0.0,
           "mark": 1.29745,
-          "cash": 9580.842982930388,
+          "cash": 9587.421377765173,
           "initial_cash": 10000.0,
-          "realized_pnl": -419.1570170695999,
+          "realized_pnl": -412.57862223481504,
           "unrealized_pnl": 0.0,
-          "total_pnl": -419.15701706961227,
-          "fees": 5.739273481968689,
+          "total_pnl": -412.578622234827,
+          "fees": 5.69158174842972,
           "fills": 377,
           "open_bid": 1.2973,
           "open_ask": null,
@@ -331,13 +331,13 @@
       "totals": {
         "position": 0.0,
         "avg_cost": 0.0,
-        "cash": 56283.24665984551,
+        "cash": 56312.50701097335,
         "initial_cash": 60000.0,
-        "realized_pnl": -3716.7533401544547,
+        "realized_pnl": -3687.4929890266276,
         "unrealized_pnl": 0.0,
-        "total_pnl": -3716.753340154488,
-        "fees": 38.84742812532156,
-        "fills": 3081,
+        "total_pnl": -3687.492989026654,
+        "fees": 38.625654059326045,
+        "fills": 3077,
         "open_bid": 2999.6654181260724,
         "open_ask": 0.0,
         "open_bid_qty": 6699.194033350001,
@@ -399,31 +399,31 @@
         "missing_ids": 0
       }
     },
-    "uptime_s": 15.4021448
+    "uptime_s": 15.0811863
   },
   "digests": {
     "factors_sha256": "df2fbee57a9b9268bc24050d76951ea59c8ae2b5c73a32b09a1d5495ea08b2a5",
-    "signals_sha256": "af330fff28ddc8c58bf77067444ec44c6e39758600468838f4fdf257157194c5",
-    "fills_sha256": "dd7631e3380f7ea54bb50ae9c29ac67e426f2f1cacdb5d664f484e6bdb336576"
+    "signals_sha256": "aa9d6148dcc45e8013c7dccec51b4ff4b8912bf9c8ef6d8d576d67cc768d2a9c",
+    "fills_sha256": "39a6b67ad11164981ded98f3c6a8781fe358879939cb024781c4639e76a48c4f"
   },
   "derived": {
     "factors": {
-      "path": "C:\\Users\\HP\\AppData\\Local\\Temp\\yino_release\\recompute\\spot_long_only_same_wal_final\\derived\\factors.jsonl",
+      "path": "artifacts\\private\\refresh\\variant_same_wal\\derived\\factors.jsonl",
       "records": 43309,
       "bytes": 16130416,
       "sha256": "df2fbee57a9b9268bc24050d76951ea59c8ae2b5c73a32b09a1d5495ea08b2a5"
     },
     "signals": {
-      "path": "C:\\Users\\HP\\AppData\\Local\\Temp\\yino_release\\recompute\\spot_long_only_same_wal_final\\derived\\signals.jsonl",
+      "path": "artifacts\\private\\refresh\\variant_same_wal\\derived\\signals.jsonl",
       "records": 43309,
-      "bytes": 7595840,
-      "sha256": "af330fff28ddc8c58bf77067444ec44c6e39758600468838f4fdf257157194c5"
+      "bytes": 7595583,
+      "sha256": "aa9d6148dcc45e8013c7dccec51b4ff4b8912bf9c8ef6d8d576d67cc768d2a9c"
     },
     "fills": {
-      "path": "C:\\Users\\HP\\AppData\\Local\\Temp\\yino_release\\recompute\\spot_long_only_same_wal_final\\derived\\fills.jsonl",
-      "records": 3081,
-      "bytes": 693144,
-      "sha256": "dd7631e3380f7ea54bb50ae9c29ac67e426f2f1cacdb5d664f484e6bdb336576"
+      "path": "artifacts\\private\\refresh\\variant_same_wal\\derived\\fills.jsonl",
+      "records": 3077,
+      "bytes": 692278,
+      "sha256": "39a6b67ad11164981ded98f3c6a8781fe358879939cb024781c4639e76a48c4f"
     }
   },
   "comparison": {
@@ -437,7 +437,7 @@
       "snapshots": 6,
       "factor_snapshots": 43309,
       "signals": 43309,
-      "fills": 3081
+      "fills": 3077
     }
   }
 }

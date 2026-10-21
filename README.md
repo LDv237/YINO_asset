@@ -18,7 +18,7 @@ TickForge 是我这次笔试交的实时高频数据流水线 demo，行情接�
 
 订单簿按 Binance 的 `U/u` 规则维护完整档位。检测到丢包或者交叉时，程序会自动进入缓冲，再用 REST 快照加增量重放把簿恢复回来。
 
-回放能不能对上，是这条流水线的底线。REST 快照会作为 `kind=2` 事件写进 WAL，回放走同一套流水线，所以因子、信号、成交三个 JSONL 的 SHA-256 必须和运行目录里的 derived 一致；对不上就说明中间有环节不可复现。本次交付的 15 分钟 run 的 derived 已按 quote-time guard + tick 取整从同一份 WAL 重算，回放对比的是重算后的 derived。
+回放能不能对上，是这条流水线的底线。REST 快照会作为 `kind=2` 事件写进 WAL，回放走同一套流水线，所以因子、信号、成交三个 JSONL 的 SHA-256 必须和运行目录里的 derived 一致；对不上就说明中间有环节不可复现。本次交付的 15 分钟 run 的 derived 已按基于实际成交时间 `T` 的 quote-time guard + tick 取整从同一份 WAL 重算，回放对比的是重算后的 derived。
 
 运行状态可以从 `/healthz`、`/readyz`、`/status`、`/metrics` 查，WAL 队列、处理滞后、逐阶段延迟、订单簿状态、反压次数都在里面。校验手段包括 WAL 的 CRC/seq/分段哈希、计数对账、单元/集成/混沌测试，以及回放摘要对比。跑法上，本地直接 `python -m tickforge`，也可以用 Docker 或 docker compose。
 
@@ -89,13 +89,13 @@ python -m tickforge live --config config/spot_long_only.toml   --duration 900 --
 python -m tickforge live --config config/spot_long_only_durable.toml   --duration 900 --out artifacts
 ```
 
-严格落盘版我实跑了一轮：272,784 帧、272,802 条 WAL、1,577 fills、0 负仓位/负现金；p50 3.444 ms / p99 5.793 ms。中间有 2 次网络重连，出现了 data gap，但收到的原始帧 0 丢失，订单簿靠快照恢复了。异常终止恢复的实验在 `docs/正确性与可靠性验证.md`。
+严格落盘版我实跑了一轮：272,784 帧、272,802 条 WAL、1,578 fills、0 负仓位/负现金；p50 3.444 ms / p99 5.793 ms。中间有 2 次网络重连，出现了 data gap，但收到的原始帧 0 丢失，订单簿靠快照恢复了。异常终止恢复的实验在 `docs/正确性与可靠性验证.md`。
 
 ## Docker 的现状
 
-Docker 这块本机没跑起来：Docker Desktop 装了，但 WSL2 虚拟化组件不完整，引擎起不来。不过镜像已经在 GitHub Actions 的干净环境里用当前 main 完成 build、容器版本、离线 sample replay、60 秒 live、verify 和 replay，全部通过；run 是 https://github.com/LDv237/YINO_asset/actions/runs/39533252435，commit `beae9ee`，image ID 是 `sha256:75014967…`。CI 证据在 `artifacts/experiments/docker/ci/`，本机或其他 Docker 主机可以按 [docs/Docker构建验证.md](docs/Docker构建验证.md) 和 [scripts/docker_verify.sh](scripts/docker_verify.sh) 复跑。
+Docker 这块本机没跑起来：Docker Desktop 装了，但 WSL2 虚拟化组件不完整，引擎起不来。不过镜像已经在 GitHub Actions 的干净环境里用当前 main 完成 build、容器版本、离线 sample replay、60 秒 live、verify 和 replay，全部通过；run 是 https://github.com/LDv237/YINO_asset/actions/runs/39552903429，commit `83d4c1a`，image ID 是 `sha256:a960d6c2…`。CI 证据在 `artifacts/experiments/docker/ci/`，本机或其他 Docker 主机可以按 [docs/Docker构建验证.md](docs/Docker构建验证.md) 和 [scripts/docker_verify.sh](scripts/docker_verify.sh) 复跑。
 
-不想本机构建，可以直接加载 Release 里的镜像包（linux/amd64，48.54 MiB，`docker load` 后约 141.5 MiB）：
+不想本机构建，可以直接加载 Release 里的镜像包（linux/amd64，48.55 MiB，`docker load` 后约 141.6 MiB）：
 
 ```bash
 curl -L -O https://github.com/LDv237/YINO_asset/releases/download/delivery-20261020/tickforge-0.1.0.tar.gz
@@ -105,7 +105,7 @@ docker run --rm -p 9100:9100 -v "$PWD/artifacts:/data" tickforge:0.1.0 \
   live --config config/default.toml --duration 60 --out /data
 ```
 
-镜像包 SHA-256：`6f188ec6e427f9ab1987ab853563ffd4f644fb9e99080f806a3e222776b09b90`。也可以从源码构建：
+镜像包 SHA-256：`147821262e09c09094d6ee4eb1175f355f97a6d0c528b5185a335c3162601a61`。也可以从源码构建：
 
 ```bash
 docker compose build
@@ -150,18 +150,18 @@ python -m pytest -q
 | 测量窗口 | 900.116 s |
 | WebSocket 原始帧 | 388,388 |
 | WAL 原始记录 / 字节 | 388,394 / 92.61 MiB |
-| 处理事件 / 信号 / 成交 | 388,394 / 43,309 / 10,131 |
+| 处理事件 / 信号 / 成交 | 388,394 / 43,309 / 10,177 |
 | 端到端延迟 p50 / p99 / p999 | 0.512 ms / 2.435 ms / 27.554 ms |
 | 原始帧丢失 / 未处理（正常关闭） | 0 / 0 |
 | 回放摘要一致性 | 回放与 run 目录 derived 的因子/信号/成交 SHA-256 全部一致 |
-| 最终代码单源复跑 | 178,954 帧，35,128 信号，4,908 fills，0 原始帧丢失；queue/durable 字段完整（`20261021T033309Z-4ac9`，见 `docs/性能实测.md` §3.6） |
+| 最终代码单源复跑 | 244,570 帧，39,716 信号，6,370 fills，0 原始帧丢失；queue/durable 字段完整（`20261021T055305Z-af19`，见 `docs/性能实测.md` §3.6） |
 | 交易活跃度 | 抽象/interval 与只做多/interval 在 07:00–08:00 UTC 桶排名 3/47；严格版在 08:00–09:00 UTC 桶排名 4/47（47 个完整小时） |
 
 ## 已知的局限
 
 - 公开行情 WebSocket 不提供断线补发，断线期间真实成交补不回来，缺口会写进 `summary.json` 的 `data_gaps`；
 - Python 单进程不是生产级 HFT，这些延迟数据只用于工程验证，不能拿去和 C++/FPGA 系统比；
-- 模拟撮合没有建模排队位置、撤单延迟和市场冲击；历史 15 分钟 run 的执行结果由同一份 WAL 用 quote-time guard + tick 取整重算，延迟/资源仍是原始 live 采集；
+- 模拟撮合没有建模排队位置、撤单延迟和市场冲击；历史 15 分钟 run 的执行结果由同一份 WAL 用基于实际成交时间 `T` 的 quote-time guard + tick 取整重算，延迟/资源仍是原始 live 采集；
 - `Simulator` 是抽象记账器，允许负仓位/负现金，不代表 Binance 现货账户的可执行性，也没有建模借币、保证金或强平；
 - 没有接私有下单 API 和真实风控前置。
 

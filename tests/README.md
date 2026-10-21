@@ -1,6 +1,6 @@
 # tests 目录说明
 
-这里是 TickForge 的测试集，当前 **272 passed**。测试不连接真实 Binance：单元测试用纯函数/本地数据结构，集成测试用本地 WebSocket + REST 交易所替身；真实公网行情由 `live` 运行单独验证。
+这里是 TickForge 的测试集，当前 **274 passed**。测试不连接真实 Binance：单元测试用纯函数/本地数据结构，集成测试用本地 WebSocket + REST 交易所替身；真实公网行情由 `live` 运行单独验证。
 
 ## 1. 怎么跑
 
@@ -9,7 +9,7 @@ python -m pip install -r requirements-dev-lock.txt
 python -m pytest -q
 ```
 
-预期输出：`272 passed`。测试通常 8–10 秒跑完，不需要 API Key，也不访问外网。
+预期输出：`274 passed`。测试通常 8–10 秒跑完，不需要 API Key，也不访问外网。
 
 ## 2. 测试分层
 
@@ -17,7 +17,7 @@ python -m pytest -q
 |---|---|---|
 | 单元 | `test_book.py`、`test_wal.py`、`test_normalize.py`、`test_factors.py`、`test_strategy.py`、`test_simulator.py`、`test_config.py`、`test_derived.py`、`test_metrics.py`、`test_trade_quality.py` | 每个模块的边界、公式、序列规则和确定性 |
 | 集成 | `test_integration_live.py`、`test_feed.py`、`test_rest.py`、`test_http.py` | 本地交易所替身 → live 引擎 → WAL → replay；WebSocket 重连、REST 重试、HTTP 健康接口 |
-| 变体/执行语义 | `test_spot_long_only.py`、`test_simulator.py` | 现货只做多、现金/持仓约束、quote-time guard |
+| 变体/执行语义 | `test_spot_long_only.py`、`test_simulator.py` | 现货只做多、现金/持仓约束、基于 T 的 quote-time guard |
 | 交付安全 | `test_verify_fail_closed.py`、`test_replay_config.py` | 缺 summary/manifest、坏 derived、缺失 config 时必须失败，不能静默回退 |
 
 ## 3. 各文件覆盖什么

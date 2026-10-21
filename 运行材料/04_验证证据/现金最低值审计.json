@@ -1,32 +1,32 @@
 {
   "abstract": {
     "initial_cash_per_symbol": 0.0,
-    "running_min": -9484.283917348623,
-    "ending_min": -9404.220354505622,
+    "running_min": -9588.115036916677,
+    "ending_min": -9340.863602250776,
     "per_symbol_running_min": {
       "BNBUSDT": -1542.539267,
-      "BTCUSDT": -9484.283917,
+      "BTCUSDT": -9588.115037,
       "DOGEUSDT": -835.298032,
-      "ETHUSDT": -5648.721784,
+      "ETHUSDT": -5687.780911,
       "SOLUSDT": -1701.851087,
-      "XRPUSDT": -2297.260426
+      "XRPUSDT": -2337.862782
     },
     "fills": {
       "BNBUSDT": 1400,
-      "BTCUSDT": 3187,
-      "DOGEUSDT": 406,
-      "ETHUSDT": 3064,
+      "BTCUSDT": 3230,
+      "DOGEUSDT": 405,
+      "ETHUSDT": 3072,
       "SOLUSDT": 992,
-      "XRPUSDT": 1082
+      "XRPUSDT": 1078
     }
   },
   "long_only_live": {
     "initial_cash_per_symbol": 10000.0,
-    "running_min": 8318.716244619365,
-    "ending_min": 8810.306257015734,
+    "running_min": 8318.963787962562,
+    "ending_min": 8810.553800358932,
     "per_symbol_running_min": {
       "BNBUSDT": 9398.272954,
-      "BTCUSDT": 8318.716245,
+      "BTCUSDT": 8318.963788,
       "DOGEUSDT": 9444.321821,
       "ETHUSDT": 8652.627407,
       "SOLUSDT": 9340.659328,
@@ -34,42 +34,41 @@
     },
     "fills": {
       "BNBUSDT": 222,
-      "BTCUSDT": 674,
+      "BTCUSDT": 675,
       "DOGEUSDT": 118,
-      "ETHUSDT": 717,
+      "ETHUSDT": 718,
       "SOLUSDT": 237,
       "XRPUSDT": 163
     }
   },
   "long_only_same_wal": {
     "initial_cash_per_symbol": 10000.0,
-    "running_min": 8010.060524723064,
-    "ending_min": 8499.84834498667,
+    "running_min": 8021.742382239682,
+    "ending_min": 8511.530202503289,
     "per_symbol_running_min": {
       "BNBUSDT": 9265.510606,
-      "BTCUSDT": 8010.060525,
+      "BTCUSDT": 8021.742382,
       "DOGEUSDT": 9384.576393,
-      "ETHUSDT": 8326.834663,
+      "ETHUSDT": 8338.289119,
       "SOLUSDT": 9267.445307,
-      "XRPUSDT": 9107.561479
+      "XRPUSDT": 9114.139873
     },
     "fills": {
       "BNBUSDT": 362,
-      "BTCUSDT": 757,
-      "DOGEUSDT": 193,
-      "ETHUSDT": 1050,
+      "BTCUSDT": 759,
+      "DOGEUSDT": 192,
+      "ETHUSDT": 1045,
       "SOLUSDT": 342,
       "XRPUSDT": 377
     }
   },
-  "method": "min(initial_cash, cash after every fill) per symbol; ending_min is the minimum of final cash balances; not portfolio mark-to-market",
   "strict_long_only": {
     "initial_cash_per_symbol": 10000.0,
     "running_min": 8967.919400146824,
     "ending_min": 9458.203816736232,
     "per_symbol_running_min": {
       "BNBUSDT": 9403.84274,
-      "BTCUSDT": 9032.096546,
+      "BTCUSDT": 9037.648213,
       "DOGEUSDT": 9456.86982,
       "ETHUSDT": 8967.9194,
       "SOLUSDT": 9285.09351,
@@ -77,11 +76,12 @@
     },
     "fills": {
       "BNBUSDT": 220,
-      "BTCUSDT": 306,
+      "BTCUSDT": 305,
       "DOGEUSDT": 89,
-      "ETHUSDT": 559,
+      "ETHUSDT": 561,
       "SOLUSDT": 205,
       "XRPUSDT": 198
     }
-  }
+  },
+  "method": "min(initial_cash, cash after every fill) per symbol; ending_min is the minimum of final cash balances; not portfolio mark-to-market"
 }
