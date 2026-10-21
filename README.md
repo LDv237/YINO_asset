@@ -123,7 +123,7 @@ docker compose run --rm tickforge replay --run /data/runs/<run_id> --out /data/r
 tickforge/           核心包（feed/store/book/factor/strategy/exec/runtime/replay/metrics/server；模块地图见 tickforge/README.md）
 tests/               单元、集成、混沌与端到端回放测试（测试矩阵见 tests/README.md）
 tools/               运行分析、导出、追溯和样本裁剪（工具说明见 tools/README.md）
-scripts/             15 分钟运行、回放校验、Docker 运行
+scripts/             15 分钟运行、回放校验、复现和 Docker 运行（脚本说明见 scripts/README.md）
 config/default.toml  默认配置
 docs/                架构、接口、性能、验证、开发过程、人工智能协作、依赖说明、运行手册
 笔试报告.md            笔试交付报告
