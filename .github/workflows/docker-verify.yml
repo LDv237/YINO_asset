@@ -17,7 +17,7 @@ on:
       - ".github/workflows/docker-verify.yml"
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   docker-verify:
@@ -53,6 +53,29 @@ jobs:
         run: |
           set -euo pipefail
           docker run --rm tickforge:ci --version 2>&1 | tee ci_artifacts/container_version.log
+
+      - name: Save image for delivery
+        run: |
+          set -euo pipefail
+          mkdir -p image_artifacts
+          docker tag tickforge:ci tickforge:0.1.0
+          docker save tickforge:0.1.0 | gzip -9 > image_artifacts/tickforge-0.1.0.tar.gz
+          sha256sum image_artifacts/tickforge-0.1.0.tar.gz \
+            | tee image_artifacts/tickforge-0.1.0.tar.gz.sha256
+          ls -lh image_artifacts/tickforge-0.1.0.tar.gz
+          docker image inspect --format '{{.Id}}' tickforge:0.1.0 \
+            | tee image_artifacts/tickforge-0.1.0.image-id.txt
+
+      - name: Upload image to release
+        if: github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release upload delivery-20261020 \
+            image_artifacts/tickforge-0.1.0.tar.gz \
+            image_artifacts/tickforge-0.1.0.tar.gz.sha256 \
+            --clobber --repo "$GITHUB_REPOSITORY"
 
       - name: Offline sample replay (verified)
         run: |
