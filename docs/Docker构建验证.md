@@ -114,7 +114,7 @@ docker run --rm -p 9100:9100 -v "$PWD/artifacts:/data" tickforge:0.1.0 \
   live --config config/default.toml --duration 60 --out /data
 ```
 
-镜像构建于 `beae9ee`；之后的提交只改文档和 host-side 的 `tools/trace_signal.py`，`tickforge/`、`config/`、`scripts/`、`Dockerfile` 和依赖都没有变化，运行时代码与当前 main 一致。镜像标签和 `docker-compose.yml` 里的 `tickforge:0.1.0` 一致；入口是 `python -m tickforge`，离线样本在 `/app/samples/demo_run`，没有交易所网络也能验证：
+镜像构建于 `beae9ee`；之后的提交只改文档和宿主机工具（`tools/trace_signal.py`、`scripts/reproduce_from_delivery.py`），`tickforge/`、`config/`、`Dockerfile` 和依赖等核心运行代码与配置没有变化，运行时代码与当前 main 一致。镜像标签和 `docker-compose.yml` 里的 `tickforge:0.1.0` 一致；入口是 `python -m tickforge`，离线样本在 `/app/samples/demo_run`，没有交易所网络也能验证：
 
 ```bash
 docker run --rm tickforge:0.1.0 \

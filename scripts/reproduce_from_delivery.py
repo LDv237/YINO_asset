@@ -13,6 +13,10 @@ script rebuilds the exact layout expected by ``tickforge verify``/``replay``:
 Then it runs ``verify`` and ``replay --verify``.  Use the full Release
 artifacts zip instead if you want the pre-built run directory.
 
+By default the workdir is derived from ``run_id`` in 正式运行摘要.json, so
+02_正式运行 (53b5) and 07_最终代码单源复跑 (4ac9) do not collide.  Existing
+non-empty workdirs and replay outputs are refused unless ``--force``.
+
 Usage::
 
     python scripts/reproduce_from_delivery.py
@@ -24,6 +28,7 @@ Usage::
 from __future__ import annotations
 
 import argparse
+import json
 import shutil
 import subprocess
 import sys
@@ -32,7 +37,6 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_DELIVERY = ROOT / "交付材料" / "02_正式运行"
-DEFAULT_RUN_ID = "20261020T072820Z-53b5"
 
 
 def extract(tar_path: Path, dest: Path) -> None:
@@ -48,9 +52,14 @@ def main() -> int:
     parser.add_argument("--delivery", default=str(DEFAULT_DELIVERY))
     parser.add_argument(
         "--workdir",
-        default=str(ROOT / "artifacts" / "reproduced" / DEFAULT_RUN_ID),
+        default=None,
+        help="default: artifacts/reproduced/<run_id from 正式运行摘要.json>",
     )
-    parser.add_argument("--force", action="store_true")
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="replace an existing non-empty workdir and replay output",
+    )
     args = parser.parse_args()
 
     src = Path(args.delivery)
@@ -72,8 +81,22 @@ def main() -> int:
             "(the classified copy alone is not a complete run directory)."
         )
 
-    work = Path(args.workdir)
-    if work.exists() and any(work.iterdir()):
+    try:
+        summary = json.loads((src / "正式运行摘要.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        raise SystemExit(f"cannot read 正式运行摘要.json: {exc}")
+    run_id = str(summary.get("run_id") or "").strip()
+    if args.workdir:
+        work = Path(args.workdir)
+    elif run_id:
+        work = ROOT / "artifacts" / "reproduced" / run_id
+    else:
+        raise SystemExit("cannot determine run_id from 正式运行摘要.json; pass --workdir")
+    print(f"run_id: {run_id or '<custom>'}", flush=True)
+    print(f"workdir: {work}", flush=True)
+    if work.exists() and not work.is_dir():
+        raise SystemExit(f"workdir exists and is not a directory: {work}")
+    if work.is_dir() and any(work.iterdir()):
         if not args.force:
             raise SystemExit(f"workdir is not empty: {work} (use --force)")
         shutil.rmtree(work)
@@ -90,7 +113,14 @@ def main() -> int:
 
     replay_out = work.parent / f"{work.name}-replay"
     if replay_out.exists():
-        shutil.rmtree(replay_out)
+        if not replay_out.is_dir():
+            raise SystemExit(f"replay output exists and is not a directory: {replay_out}")
+        if any(replay_out.iterdir()):
+            if not args.force:
+                raise SystemExit(f"replay output is not empty: {replay_out} (use --force)")
+            shutil.rmtree(replay_out)
+        else:
+            replay_out.rmdir()
     commands = [
         [sys.executable, "-m", "tickforge", "verify", "--run", str(work)],
         [
