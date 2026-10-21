@@ -3,7 +3,8 @@ __pycache__/
 .pytest_cache/
 .idea/
 .venv/
-artifacts/
+artifacts/*
+!artifacts/README.md
 *.log
 
 # generated delivery archive

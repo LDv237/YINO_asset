@@ -8,6 +8,8 @@
 
 53b5、6db8 等历史 run 的完整目录、WAL、JSONL、CSV 在 GitHub Release 的 `YINO_artifacts_complete_20261020.zip`；报告里只保留对照表，不随邮件提交。
 
+**本邮件包不含完整 `artifacts/`**（约 1,011 MiB，7 个 run）；主结果 3049 的完整 run 就在上面的 `运行材料/20261021T075925Z-3049/`，完整历史 artifacts 在 Release。详见包根目录的 `artifacts/README.md`。
+
 主结果复现：
 
 ```bash

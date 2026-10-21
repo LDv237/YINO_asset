@@ -45,7 +45,7 @@ curl http://127.0.0.1:9100/healthz
 curl http://127.0.0.1:9100/metrics
 ```
 
-> 路径约定：文档里的 `artifacts/runs/<run_id>` 指新跑 live 的输出；提交包内主结果在 `运行材料/20261021T075925Z-3049/`，不需要找 `artifacts/`。
+> 路径约定：**本邮件包不含完整 `artifacts/`**（约 1,011 MiB，7 个 run 在 GitHub Release 的 `YINO_artifacts_complete_20261020.zip`）。文档里的 `artifacts/runs/<run_id>` 指新跑 live 或 Release/仓库；提交包内主结果在 `运行材料/20261021T075925Z-3049/`，不需要找 `artifacts/`。`artifacts/README.md` 有更详细的说明。
 
 包内已经带了主结果的完整 run 目录，不需要重新采集就能验证：
 
