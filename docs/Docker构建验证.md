@@ -31,62 +31,11 @@ bash scripts/docker_verify.sh
 
 ## 3. 手动命令
 
-不想用脚本，或者某一步要单独重跑，就按下面的命令来：
+一键脚本 [`scripts/docker_verify.sh`](../scripts/docker_verify.sh) 已覆盖 build、容器版本、离线 sample replay、60 秒 live、verify、replay 和证据收集。手动复跑时按脚本里的同名步骤执行即可；镜像入口是 `python -m tickforge`，`docker compose run --rm tickforge` 后面直接接 `--version` / `live` / `verify` / `replay`。
 
-镜像已设置 `ENTRYPOINT ["python", "-m", "tickforge"]`，因此 `docker compose run --rm tickforge` 后面直接接 `--version`、`live`、`verify` 或 `replay`，无需再次填写 `python -m tickforge`。
+## 4. 验收判定
 
-```bash
-# 构建
-mkdir -p artifacts/experiments/docker
-docker compose build 2>&1 | tee artifacts/experiments/docker/build.log
-
-# 容器内版本
-docker compose run --rm tickforge --version
-
-# 镜像自带样本的离线 replay（不要用 --no-derived，否则 digest 对比会失败）
-docker compose run --rm tickforge \
-  replay --run /app/samples/demo_run --out /tmp/sample-replay --verify
-
-# 60 秒真实行情（挂载 artifacts -> /data）
-docker compose run --rm tickforge \
-  live --config config/default.toml --duration 60 --out /data --http-port 0
-
-# 找到容器写入的 run
-RUN_DIR=$(ls -td artifacts/runs/*/ | grep -v -- '-replay/' | head -1)
-RUN_ID=$(basename "${RUN_DIR%/}")
-
-# WAL 校验
-docker compose run --rm tickforge \
-  verify --run "/data/runs/$RUN_ID"
-
-# 确定性回放
-docker compose run --rm tickforge \
-  replay --run "/data/runs/$RUN_ID" --out "/data/runs/$RUN_ID-replay" --verify
-```
-
-## 4. 需要保存的证据
-
-提交材料里至少要有这些：
-
-- `artifacts/experiments/docker/build.log`：本机构建日志；CI 证据在 `artifacts/experiments/docker/ci/docker_build.log`；
-- `docker compose run --rm tickforge --version` 输出；
-- 容器内 live 运行生成的 `artifacts/runs/<run_id>/summary.json`（`clean_shutdown=true`、`lost_raw_frames=0`）；
-- 容器内 `verify` 输出（`ok=true`）；
-- 容器内 `replay --verify` 输出（`verified=true`、三个摘要一致）；
-- 可选：`docker image inspect tickforge:0.1.0` 的镜像 ID/大小。
-
-## 5. 验收判定
-
-下面六条全部满足，我才会认为 P0 关闭：
-
-- [x] `docker compose build` 退出码 0；
-- [x] 容器内 `python -m tickforge --version` 正常；
-- [x] 容器内离线样本 replay 返回 `verified=true`；
-- [x] 容器内 live 运行生成 `summary.json` 且 `clean_shutdown=true`；
-- [x] 容器内 `verify` 返回 `ok=true`；
-- [x] 容器内 `replay --verify` 返回 `verified=true`，三个 SHA-256 与 live 一致。
-
-2026-10-21 的 GitHub Actions run 39552903429 已满足以上六条；本机仍受 WSL2 限制，下面保留本机/其他 Docker 主机的复跑步骤。
+六项验收（build、容器版本、sample replay、60 秒 live、verify、replay）在 2026-10-21 的 GitHub Actions run 39552903429 上全部通过；结果和证据见 §5.1。本机仍受 WSL2 限制，其他 Docker 主机可按 `scripts/docker_verify.sh` 复跑。
 
 ## 5.1 CI 证据
 

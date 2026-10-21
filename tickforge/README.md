@@ -2,21 +2,7 @@
 
 这是 TickForge 的核心运行时包。入口是 `python -m tickforge`（`__main__.py` → `cli.py`），支持 `live`、`replay`、`verify`、`show`、`bench` 五个子命令。
 
-一次 live 的数据流：
-
-```text
-WebSocket frame
-  → 原始字节进有界 WAL 队列
-  → 单写线程按 seq 落盘（CRC32 + 分段 SHA-256）
-  → 解析 / 标准化
-  → L2 订单簿（U/u 连续性，丢包时 REST 快照 + 缓冲重放）
-  → 因子快照（默认 100 ms）
-  → 做市策略报价
-  → 模拟 maker 成交
-  → factors / signals / fills JSONL + 指标 + 日志
-```
-
-REST 快照作为 `kind=2` 事件写进 WAL 的同一顺序位置；replay 走完全相同的 `runtime/pipeline.py`，不需要网络，也不使用墙钟或随机数。
+一次 live 的顺序：WS frame → 有界 WAL 队列 → 单写线程落盘（CRC32/seq/分段 SHA-256）→ 解析 → L2 订单簿 → 因子 → 做市报价 → 模拟成交 → JSONL/指标/日志。REST 快照作为 `kind=2` 事件写进 WAL，replay 走同一个 `runtime/pipeline.py`，不需要网络，也不使用墙钟或随机数。
 
 ## 1. 模块地图
 
@@ -57,19 +43,10 @@ REST 快照作为 `kind=2` 事件写进 WAL 的同一顺序位置；replay 走�
 
 ## 3. 确定性约束
 
-- 派生记录（factors/signals/fills）不使用 `time.time()`、随机数或墙钟做决策；接收时间只用于延迟统计，不写进派生记录；
-- WAL 的 seq 在 append 前分配，seq 顺序、物理写顺序、处理顺序一致；
-- 快照当普通输入事件处理，live 和 replay 的插入位置一致；
-- 相同 WAL + 相同 `config.json` 必须得到相同的三个 SHA-256。
+派生记录不用墙钟/随机数；seq 在 append 前分配；快照当普通事件处理；同一 WAL + `config.json` 必须得到同一组 SHA-256。完整契约见 `docs/接口设计.md`。
 
 ## 4. 常用命令
 
-```bash
-python -m tickforge live --config config/default.toml --duration 900 --out artifacts
-python -m tickforge verify --run artifacts/runs/<run_id>
-python -m tickforge replay --run artifacts/runs/<run_id> --out artifacts/runs/<run_id>-replay --verify
-python -m tickforge show --run artifacts/runs/<run_id>
-python -m tickforge bench --run artifacts/runs/<run_id> --repeat 3
-```
+运行、校验和回放命令见 `README.md` 的“怎么跑”和 `docs/运行手册.md`，这里不重复。
 
 接口和字段细节见 `docs/接口设计.md`，数据流与失败模式见 `docs/系统架构.md`，实测见 `docs/性能实测.md`。
