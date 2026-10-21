@@ -93,7 +93,19 @@ python -m tickforge live --config config/spot_long_only_durable.toml   --duratio
 
 ## Docker 的现状
 
-Docker 这块本机没跑起来：Docker Desktop 装了，但 WSL2 虚拟化组件不完整，引擎起不来。不过镜像已经在 GitHub Actions 的干净环境里完成 build、容器版本、离线 sample replay、60 秒 live、verify 和 replay，全部通过；run 是 https://github.com/LDv237/YINO_asset/actions/runs/39466053190 ，image ID 是 sha256:adc2aafb000f7adb28790972260bc9d14902d7bab88cbafe3cdc54f12bec7710。CI 证据在 `artifacts/experiments/docker/ci/`，本机或其他 Docker 主机可以按 [docs/Docker构建验证.md](docs/Docker构建验证.md) 和 [scripts/docker_verify.sh](scripts/docker_verify.sh) 复跑。
+Docker 这块本机没跑起来：Docker Desktop 装了，但 WSL2 虚拟化组件不完整，引擎起不来。不过镜像已经在 GitHub Actions 的干净环境里用当前 main 完成 build、容器版本、离线 sample replay、60 秒 live、verify 和 replay，全部通过；run 是 https://github.com/LDv237/YINO_asset/actions/runs/39533252435，commit `beae9ee`，image ID 是 `sha256:75014967…`。CI 证据在 `artifacts/experiments/docker/ci/`，本机或其他 Docker 主机可以按 [docs/Docker构建验证.md](docs/Docker构建验证.md) 和 [scripts/docker_verify.sh](scripts/docker_verify.sh) 复跑。
+
+不想本机构建，可以直接加载 Release 里的镜像包（linux/amd64，48.54 MiB，`docker load` 后约 141.5 MiB）：
+
+```bash
+curl -L -O https://github.com/LDv237/YINO_asset/releases/download/delivery-20261020/tickforge-0.1.0.tar.gz
+docker load -i tickforge-0.1.0.tar.gz
+docker run --rm tickforge:0.1.0 --version
+docker run --rm -p 9100:9100 -v "$PWD/artifacts:/data" tickforge:0.1.0 \
+  live --config config/default.toml --duration 60 --out /data
+```
+
+镜像包 SHA-256：`6f188ec6e427f9ab1987ab853563ffd4f644fb9e99080f806a3e222776b09b90`。也可以从源码构建：
 
 ```bash
 docker compose build
