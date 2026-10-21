@@ -27,6 +27,6 @@ python -m tickforge replay --run 运行材料/01_主结果_现货_9821 \
 
 https://github.com/LDv237/YINO_asset/releases/tag/delivery-20261020
 
-文件名 `YINO_artifacts_complete_20261020.zip`；大小和 SHA-256 以 Release 里的 `SHA256SUMS.txt` 为准，下载后先校验。本 zip 内的 `artifacts/目录说明.md` 是历史产物快照，当前主结果在邮件包的 `运行材料/01_主结果_现货_9821/`。
+文件名 `YINO_artifacts_complete_20261020.zip`；大小和 SHA-256 以 Release 里的 `SHA256SUMS.txt` 为准，下载后先校验。Release 的 artifacts zip 内的 `artifacts/目录说明.md` 是历史产物快照；当前主结果在邮件包的 `运行材料/01_主结果_现货_9821/`。
 
 说明：文档里的 `artifacts/runs/<run_id>` 路径指 Release/仓库的完整 artifacts，不是本邮件包内的路径；本包内请用 `运行材料/01_主结果_现货_9821/`。
