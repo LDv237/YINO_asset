@@ -95,7 +95,7 @@ docker compose run --rm tickforge \
 - 容器版本: `tickforge 0.1.0`
 - 离线 sample replay: `verified=true`，counts/digests 全部一致
 - 60 秒 live: `run_id=20261021T022948Z-1b8c`，19,538 帧，19,548 条 WAL，2,752 信号，627 fills，`clean_shutdown=true`，`lost_raw_frames=0`
-- 队列峰值 / durable lag: `wal_queue_max=62`、`pipeline_queue_max=16`；durable p50/p95 约 262 ms
+- 队列峰值（CI 60 秒进程内计数器值）/ durable lag: `wal_queue_max=62`、`pipeline_queue_max=16`；durable p50/p95 约 262 ms（`interval` 批次口径，不是逐条）
 - `verify`: `ok=true`，`summary_clean_shutdown=true`，`truncated_tail_bytes=0`
 - `replay --verify`: `verified=true`、`deterministic=true`，三个 SHA-256 与 live 一致
 - 证据: `artifacts/experiments/docker/ci/`，GitHub Actions artifact `docker-verify-evidence`

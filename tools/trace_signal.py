@@ -63,11 +63,13 @@ def _pick_signal(
 
     if index < 0:
         raise SystemExit("--index must be >= 0")
-    for i, row in enumerate(_iter_jsonl(path)):
+    matched = 0
+    for global_index, row in enumerate(_iter_jsonl(path)):
         if symbol is not None and row.get("symbol") != symbol:
             continue
-        if i == index:
-            return i, row
+        if matched == index:
+            return global_index, row
+        matched += 1
     raise SystemExit(f"no signal at index {index} symbol={symbol!r} in {path}")
 
 
@@ -146,8 +148,14 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--run", required=True, help="run directory with raw/ and derived/")
     parser.add_argument("--symbol", default=None)
-    parser.add_argument("--seq", type=int, default=None)
-    parser.add_argument("--index", type=int, default=0, help="signal index when --seq is not given")
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("--seq", type=int, default=None)
+    group.add_argument(
+        "--index",
+        type=int,
+        default=0,
+        help="index within signals matching --symbol (default 0)",
+    )
     parser.add_argument("--raw", action="store_true", help="include the full raw payload")
     args = parser.parse_args()
 

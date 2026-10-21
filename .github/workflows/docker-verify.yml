@@ -67,7 +67,9 @@ jobs:
             | tee image_artifacts/tickforge-0.1.0.image-id.txt
 
       - name: Upload image to release
-        if: github.ref == 'refs/heads/main'
+        # Publish only on an explicit manual dispatch so routine code/doc
+        # pushes do not silently replace the pinned delivery image.
+        if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
