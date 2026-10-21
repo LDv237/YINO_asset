@@ -150,6 +150,7 @@ def parse_trade(
     try:
         symbol = _symbol(data)
         event_time = int(data["E"])
+        trade_time = int(data.get("T", event_time))
         agg_id = int(data["a"])
         price = str_to_ticks(data["p"])
         qty = str_to_ticks(data["q"])
@@ -161,6 +162,7 @@ def parse_trade(
     return TradeEvent(
         symbol=symbol,
         event_time_ms=event_time,
+        trade_time_ms=trade_time,
         agg_trade_id=agg_id,
         price_ticks=price,
         qty_ticks=qty,

@@ -219,8 +219,9 @@ class Simulator:
             return []
 
         fills: list[Fill] = []
-        bid_visible = state.bid_ts_ms is None or ev.event_time_ms >= state.bid_ts_ms
-        ask_visible = state.ask_ts_ms is None or ev.event_time_ms >= state.ask_ts_ms
+        trade_ts = ev.effective_trade_time_ms
+        bid_visible = state.bid_ts_ms is None or trade_ts >= state.bid_ts_ms
+        ask_visible = state.ask_ts_ms is None or trade_ts >= state.ask_ts_ms
         if (
             bid_visible
             and state.bid_price_ticks is not None
@@ -311,7 +312,7 @@ class Simulator:
         )
         return Fill(
             symbol=ev.symbol,
-            ts_ms=ev.event_time_ms,
+            ts_ms=ev.effective_trade_time_ms,
             trade_id=ev.agg_trade_id,
             side=side,
             price=price,

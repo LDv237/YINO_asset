@@ -53,11 +53,13 @@ def make_trade(
     qty: float = 1.0,
     trade_id: int = 1,
     ts_ms: int = 1_000,
+    trade_time_ms: int | None = None,
     seq: int = 1,
 ) -> TradeEvent:
     return TradeEvent(
         symbol=symbol,
         event_time_ms=ts_ms,
+        trade_time_ms=trade_time_ms,
         agg_trade_id=trade_id,
         price_ticks=to_ticks(price),
         qty_ticks=to_ticks(qty),
@@ -96,6 +98,35 @@ def test_trade_before_quote_timestamp_does_not_fill() -> None:
     sell = sim.on_trade(make_trade(price=102.0, ts_ms=200_001, trade_id=4, seq=4))
     assert len(buy) == 1 and buy[0].side == "BUY"
     assert len(sell) == 1 and sell[0].side == "SELL"
+
+def test_trade_execution_time_controls_fill_not_event_time() -> None:
+    """E >= quote_ts > T must not fill; T is the actual trade time."""
+
+    sim = make_sim()
+    sim.apply_signal(
+        make_signal(bid=100.0, bid_qty=1.0, ask=101.0, ask_qty=1.0, ts_ms=150_000)
+    )
+
+    # Trade happened before the quote, but the exchange published it after.
+    assert sim.on_trade(
+        make_trade(price=99.0, ts_ms=150_002, trade_time_ms=149_999, seq=1)
+    ) == []
+    assert sim.on_trade(
+        make_trade(price=102.0, ts_ms=150_002, trade_time_ms=149_999, trade_id=2, seq=2)
+    ) == []
+
+    # Same millisecond as the quote is allowed; the fill carries T, not E.
+    fills = sim.on_trade(
+        make_trade(
+            price=99.0,
+            ts_ms=150_010,
+            trade_time_ms=150_000,
+            trade_id=3,
+            seq=3,
+        )
+    )
+    assert len(fills) == 1 and fills[0].side == "BUY"
+    assert fills[0].ts_ms == 150_000
 
 
 def test_buy_fill_at_quote_price_with_fee() -> None:

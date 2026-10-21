@@ -59,6 +59,14 @@ class TradeEvent:
     recv_mono_ns: int
     recv_wall_ns: int
     seq: int
+    # Binance ``T`` (actual trade time); ``None`` falls back to ``E`` for
+    # synthetic/legacy events.  ``E`` stays the event/publication time used by
+    # factor snapshots and ordering.
+    trade_time_ms: int | None = None
+
+    @property
+    def effective_trade_time_ms(self) -> int:
+        return self.event_time_ms if self.trade_time_ms is None else self.trade_time_ms
 
     @property
     def aggressor_side(self) -> str:

@@ -66,6 +66,7 @@ def test_trade_parse_and_side() -> None:
     data = {
         "e": "aggTrade",
         "E": 1700000001000,
+        "T": 1700000000990,
         "s": "BTCUSDT",
         "a": 42,
         "p": "100.25",
@@ -79,6 +80,26 @@ def test_trade_parse_and_side() -> None:
     assert ev.price == 100.25
     assert ev.qty == 0.5
     assert ev.aggressor_side == "sell"
+    assert ev.event_time_ms == 1700000001000
+    assert ev.trade_time_ms == 1700000000990
+    assert ev.effective_trade_time_ms == 1700000000990
+
+
+def test_trade_time_falls_back_to_event_time() -> None:
+    data = {
+        "e": "aggTrade",
+        "E": 1700000001000,
+        "s": "BTCUSDT",
+        "a": 43,
+        "p": "100.25",
+        "q": "0.5",
+        "m": False,
+    }
+    frame = {"stream": "btcusdt@aggTrade", "data": data}
+    ev = parse_ws_message(orjson.dumps(frame), seq=2, recv_mono_ns=3, recv_wall_ns=4)
+    assert isinstance(ev, TradeEvent)
+    assert ev.trade_time_ms == 1700000001000
+    assert ev.effective_trade_time_ms == 1700000001000
 
 
 def test_book_ticker_parse() -> None:
