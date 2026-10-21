@@ -19,7 +19,7 @@ run_id: `20261021T055305Z-af19`
 ## 复现
 
 ```bash
-python scripts/reproduce_from_delivery.py --delivery 交付材料/07_最终代码单源复跑
+python scripts/reproduce_from_delivery.py --delivery 运行材料/07_最终代码单源复跑
 ```
 
 脚本会解压 `原始WAL.tar.gz` 和 `derived.tar.gz`，复制 config/summary/manifest，然后执行 `verify` 和 `replay --verify`。

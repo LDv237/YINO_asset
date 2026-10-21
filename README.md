@@ -1,6 +1,6 @@
 # TickForge
 
-TickForge 是我这次笔试交的实时高频数据流水线 demo，行情接的是 Binance 现货公开接口。WebSocket 原始帧先原样落盘，然后做 L2 订单簿重建、因子计算、做市信号和模拟成交；一次跑完可以从 WAL 按字节做确定性回放，把回放结果和运行目录里的派生文件逐项对上；本次交付的 15 分钟 run 的执行结果已按统一口径从同一份 WAL 重算。
+TickForge 是我这次笔试交的实时高频数据流水线 demo，行情接的是 Binance 现货公开接口。WebSocket 原始帧先原样落盘，然后做 L2 订单簿重建、因子计算、做市信号和模拟成交；一次跑完可以从 WAL 按字节做确定性回放，把回放结果和运行目录里的派生文件逐项对上。历史 15 分钟 run（53b5 等）的执行结果按统一口径从同一份 WAL 重算；本次交付的主结果——最终代码单源 run af19——日志、信号、成交、性能和回放全部同源，未经过重算。
 
 > 笔试题目：YINO ASSET 量化开发工程师（实时高频行情交易系统 demo）。
 > GitHub: https://github.com/LDv237/YINO_asset
@@ -14,11 +14,11 @@ TickForge 是我这次笔试交的实时高频数据流水线 demo，行情接�
 
 实时行情最怕的是看起来在跑、其实已经丢了数据，所以我先把落盘做扎实：每条 WebSocket 帧在解析前先进有界队列，由一个独立线程按顺序写进带 CRC32 的分段 WAL；队列满了就反压 socket，不静默丢包。正常关闭会把队列排空，再 flush+fsync，实测 0 丢失。
 
-持久化策略我在配置里都留了口子。`fsync_policy=interval` 每 250ms 尝试组提交，崩溃时没同步的尾部可能丢；250ms 是目标间隔，不是硬上界，队列和磁盘都会影响它。`always` 要每条记录 fsync 之后才进处理，延迟更高，但异常终止后已 fsync 的前缀仍然能校验读取。`never` 只在关闭或轮转时同步。这些边界报告里都按实际表现写了。
+持久化策略我在配置里都留了口子。`fsync_policy=interval` 每 250ms 尝试组提交，崩溃时没同步的尾部可能丢；250ms 是目标间隔，不是硬上界，队列和磁盘都会影响它。`always` 要每条记录 fsync 之后才进处理，延迟更高，但异常终止后已 fsync 的前缀仍然能校验读取（本交付的崩溃实验只证明强杀后可读前缀，不逐条证明 fsync）。`never` 只在关闭或轮转时同步。这些边界报告里都按实际表现写了。
 
 订单簿按 Binance 的 `U/u` 规则维护完整档位。检测到丢包或者交叉时，程序会自动进入缓冲，再用 REST 快照加增量重放把簿恢复回来。
 
-回放能不能对上，是这条流水线的底线。REST 快照会作为 `kind=2` 事件写进 WAL，回放走同一套流水线，所以因子、信号、成交三个 JSONL 的 SHA-256 必须和运行目录里的 derived 一致；对不上就说明中间有环节不可复现。本次交付的 15 分钟 run 的 derived 已按基于实际成交时间 `T` 的 quote-time guard + tick 取整从同一份 WAL 重算，回放对比的是重算后的 derived。
+回放能不能对上，是这条流水线的底线。REST 快照会作为 `kind=2` 事件写进 WAL，回放走同一套流水线，所以因子、信号、成交三个 JSONL 的 SHA-256 必须和运行目录里的 derived 一致；对不上就说明中间有环节不可复现。历史 15 分钟 run（53b5 等）的 derived 已按基于实际成交时间 `T` 的 quote-time guard + tick 取整从同一份 WAL 重算；最终单源 af19 的 derived 为 live 采集产物，回放直接对比该 derived。
 
 运行状态可以从 `/healthz`、`/readyz`、`/status`、`/metrics` 查，WAL 队列、处理滞后、逐阶段延迟、订单簿状态、反压次数都在里面。校验手段包括 WAL 的 CRC/seq/分段哈希、计数对账、单元/集成/混沌测试，以及回放摘要对比。跑法上，本地直接 `python -m tickforge`，也可以用 Docker 或 docker compose。
 
@@ -89,7 +89,7 @@ python -m tickforge live --config config/spot_long_only.toml   --duration 900 --
 python -m tickforge live --config config/spot_long_only_durable.toml   --duration 900 --out artifacts
 ```
 
-严格落盘版我实跑了一轮：272,784 帧、272,802 条 WAL、1,578 fills、0 负仓位/负现金；p50 3.444 ms / p99 5.793 ms。中间有 2 次网络重连，出现了 data gap，但收到的原始帧 0 丢失，订单簿靠快照恢复了。异常终止恢复的实验在 `docs/正确性与可靠性验证.md`。
+严格落盘版我实跑了一轮：272,784 帧、272,802 条 WAL、1,578 fills、0 负仓位/负现金；p50 3.444 ms / p99 5.793 ms。该次运行观察到 2 次网络重连，出现了 data gap；重连的具体原因尚未隔离，不能唯一归因到 fsync。收到的原始帧 0 丢失，订单簿靠快照恢复。异常终止恢复的实验在 `docs/正确性与可靠性验证.md`。
 
 ## Docker 的现状
 
@@ -162,6 +162,8 @@ python -m pytest -q
 延迟从 `ws.recv()` 返回后开始计时，不含 WebSocket 库、内核缓冲和网络 RTT；它只证明接收后的处理延迟，不能证明行情从交易所产生到策略完成同样只用几毫秒。离线回放吞吐约为实时平均帧率的 42 倍，这是两种运行方式的速率比，不是实时容量证明。
 
 ### 历史性能基准（53b5）
+
+历史基准的 signals/fills/PnL/digests 是从同一份 WAL 按统一口径重算的（混合口径），只作为较活跃窗口的负载/性能对照；最终交付结论以最终代码单源 run af19 为准。
 
 | 指标 | 结果 |
 |---|---|

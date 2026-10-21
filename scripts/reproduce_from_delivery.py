@@ -14,7 +14,7 @@ Then it runs ``verify`` and ``replay --verify``.  Use the full Release
 artifacts zip instead if you want the pre-built run directory.
 
 By default the workdir is derived from ``run_id`` in 正式运行摘要.json, so
-02_正式运行 (53b5) and 07_最终代码单源复跑 (4ac9) do not collide.  Existing
+02_正式运行 (53b5) and 07_最终代码单源复跑 (af19) do not collide.  Existing
 non-empty workdirs and replay outputs are refused unless ``--force``.
 
 Usage::

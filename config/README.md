@@ -28,7 +28,7 @@ symbols = ["BTCUSDT", "ETHUSDT"]
 
 | 文件 | 用途 | 关键差异 | 对应 run |
 |---|---|---|---|
-| `default.toml` | 默认抽象做市，性能/链路基准 | `allow_short = true`、`initial_cash_usd = 0`、`fsync_policy = "interval"` | 53b5 正式基准 |
+| `default.toml` | 默认抽象做市，性能/链路基准 | `allow_short = true`、`initial_cash_usd = 0`、`fsync_policy = "interval"` | 53b5 历史基准 |
 | `spot_long_only.toml` | 现货只做多执行语义 | `allow_short = false`、`initial_cash_usd = 10000.0`；feed/因子/策略其余相同 | 91ac、同一 WAL 对照 |
 | `spot_long_only_durable.toml` | 现货只做多 + 严格落盘 | 在 `spot_long_only` 基础上把 `fsync_policy` 改成 `"always"` | 6db8 严格版 |
 
@@ -107,7 +107,7 @@ python -m tickforge live --config config/spot_long_only_durable.toml --duration 
 
 | 字段 | 含义 |
 |---|---|
-| `duration_s` | 采集窗口，正式基准为 900 秒 |
+| `duration_s` | 采集窗口，15 分钟 run 为 900 秒 |
 | `output_dir` | 运行产物根目录，默认 `artifacts` |
 | `run_id` | 留空则自动生成时间戳+随机后缀 |
 | `log_level` | `DEBUG` / `INFO` / `WARNING` / `ERROR` |
