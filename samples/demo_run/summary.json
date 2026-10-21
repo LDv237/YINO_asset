@@ -8,13 +8,13 @@
       "snapshots": 6,
       "factor_snapshots": 2771,
       "signals": 2771,
-      "fills": 425
+      "fills": 424
     }
   },
   "digests": {
     "factors_sha256": "3466919e4ea399ea541b3f7ad5c97312682e3a9a221e31824a286caeec132e3e",
-    "signals_sha256": "547f9aefa38830a0dba39b98c2c901562edec77f4882bbcc601901c7da3ed8d6",
-    "fills_sha256": "dc819bc39220dcce47b268dc376f12a845e8d494bc0e556f0e65d0230ff9b4ca"
+    "signals_sha256": "7e74f30f26657a92d7dbcf3429a193399e10a7db3683afa76fd08ea560e289a8",
+    "fills_sha256": "b133d3d564689240a268a256b49b9e8e35bbe09193a966419d228ac2b4b57430"
   },
   "wal": {
     "records_total": 20000,
