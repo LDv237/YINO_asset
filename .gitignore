@@ -10,8 +10,8 @@ artifacts/
 tickforge_delivery.zip
 
 # generated delivery archive
-一诺笔试交付包.zip
-!交付材料/01_代码与文档/一诺笔试交付包.zip
+代码包.zip
+!交付材料/01_代码与文档/代码包.zip
 
 !交付材料/05_运行日志/*.log
 
