@@ -1,6 +1,6 @@
-# Docker 构建与运行验证（P0）
+# Docker 构建与运行验证
 
-题目要求打包 Docker image，保证代码能正常运行。本机的情况是：开发机装了 Docker Desktop，但 WSL2 虚拟化组件不完整，Docker 引擎无法启动，所以本机没有构建和运行。为了不把这个缺口留到交付，我在 GitHub Actions 的干净 Docker 环境里用**最终 main** 跑了一遍：build、容器版本、离线 sample replay、60 秒 live、verify 和 replay 全部通过（run 39622339780，commit `e9886ea`，image `sha256:1df56a07…`，60 秒运行 78,815 帧、1,899 fills、0 丢失、`clean_shutdown=true`），并生成了可直接 `docker load` 的镜像包。邮件包内的证据在 `运行材料/03_验证证据/docker_ci/`；完整 Actions 日志在 run 39622339780 的 `docker-verify-evidence` artifact，2026-10-20 的历史 artifacts 仍在 Release 的 `YINO_artifacts_complete_20261020.zip` 内。下面的命令是给本机或其他 Docker 主机复跑用的。
+题目要求打包 Docker image，保证代码能正常运行。本机开发机安装了 Docker Desktop，但 WSL2 虚拟化组件不完整，Docker 引擎无法启动，因此本机未进行构建和运行。构建与验证在 GitHub Actions 的干净 Docker 环境中完成，代码取自 main 分支：build、容器版本、离线 sample replay、60 秒 live、verify 和 replay 全部通过（run 39622339780，commit `e9886ea`，image `sha256:1df56a07…`，60 秒运行 78,815 帧、1,899 fills、0 丢失、`clean_shutdown=true`），并生成了可直接 `docker load` 的镜像包。提交包内的证据在 `运行材料/03_验证证据/docker_ci/`；完整 Actions 日志在 run 39622339780 的 `docker-verify-evidence` artifact，2026-10-20 的 artifacts 归档在 Release 的 `YINO_artifacts_complete_20261020.zip` 内。以下命令用于本机或其他 Docker 主机复跑。
 
 ## 1. 环境要求
 
@@ -13,10 +13,10 @@
 
 ## 2. 一键验证
 
-有 Docker 的机器上，我一般直接跑这个脚本：
+在有 Docker 的机器上，可直接执行以下脚本：
 
 ```bash
-cd YINO_asset   # git clone 得到的目录；如果是解压邮件包，cd 到包根目录
+cd YINO_asset   # git clone 得到的目录；如果是解压提交包，cd 到包根目录
 bash scripts/docker_verify.sh
 ```
 
@@ -42,7 +42,7 @@ bash scripts/docker_verify.sh
 - Run: https://github.com/LDv237/YINO_asset/actions/runs/39622339780
 - Commit: `e9886ea`
 - Image: `sha256:1df56a0769367ce7d8b6501dc625e7334df045a11669bd82d751a79da9913c03`
-- Build: 成功；完整日志在 run 39622339780 的 `docker-verify-evidence` artifact，邮件包 `docker_ci/` 保留 container/verify/replay 证据
+- Build: 成功；完整日志在 run 39622339780 的 `docker-verify-evidence` artifact，提交包 `docker_ci/` 保留 container/verify/replay 证据
 - 容器版本: `tickforge 0.1.0`
 - 离线 sample replay: `verified=true`，counts/digests 全部一致
 - 60 秒 live: `run_id=20261021T150432Z-6058`，78,815 帧，78,826 条 WAL，3,470 信号，1,899 fills，`clean_shutdown=true`，`lost_raw_frames=0`
@@ -50,11 +50,11 @@ bash scripts/docker_verify.sh
 - `verify`: `ok=true`，`summary_clean_shutdown=true`、`derived_complete=true`、`derived_digests_complete=true`，`truncated_tail_bytes=0`
 - `replay --verify`: `verified=true`、`deterministic=true`，三个 SHA-256 与 live 一致
 - 健康快照: `health_before_shutdown.ok=true` / `health_final.ok=true`，`oldest_pending_ms=0.0`
-- 证据: 邮件包内 `运行材料/03_验证证据/docker_ci/`；完整 Actions artifact 为 `docker-verify-evidence`（run 39622339780）；2026-10-20 的历史 artifacts 在 Release 的 `YINO_artifacts_complete_20261020.zip` 内
+- 证据: 提交包内 `运行材料/03_验证证据/docker_ci/`；完整 Actions artifact 为 `docker-verify-evidence`（run 39622339780）；2026-10-20 的历史 artifacts 在 Release 的 `YINO_artifacts_complete_20261020.zip` 内
 
 ## 5.2 镜像包交付
 
-Release 里附了 `tickforge-0.1.0.tar.gz`（`docker save` 生成，linux/amd64，49,313,243 字节 / 47.03 MiB；`docker load` 后镜像约 136.4 MiB），SHA-256 为 `c27c7bbe2f297460cec4f09b53c4707f578e980ca344711a22c533f0d39d2ac9`，同名 `.sha256` 文件也在 Release 里。评审不需要本机构建，直接：
+Release 里附了 `tickforge-0.1.0.tar.gz`（`docker save` 生成，linux/amd64，49,313,243 字节 / 47.03 MiB；`docker load` 后镜像约 136.4 MiB），SHA-256 为 `c27c7bbe2f297460cec4f09b53c4707f578e980ca344711a22c533f0d39d2ac9`，同名 `.sha256` 文件也在 Release 里。无需在本机构建，可直接加载镜像：
 
 ```bash
 curl -L -O https://github.com/LDv237/YINO_asset/releases/download/delivery-20261020/tickforge-0.1.0.tar.gz
@@ -66,7 +66,7 @@ docker run --rm -p 9100:9100 -v "$PWD/artifacts:/data" tickforge:0.1.0 \
   live --config config/default.toml --duration 60 --out /data
 ```
 
-镜像由最终 main `e9886ea` 构建，已包含成交时间 `T` 修正、派生 sink 关闭失败的 fail-closed 处理和 `oldest_pending_ms` 健康指标。镜像标签和 `docker-compose.yml` 里的 `tickforge:0.1.0` 一致；入口是 `python -m tickforge`，离线样本在 `/app/samples/demo_run`，没有交易所网络也能验证：
+镜像由 main 分支 `e9886ea` 构建，成交时间以交易所返回的 `T` 为准，派生 sink 关闭失败时采用 fail-closed 处理，健康指标包含 `oldest_pending_ms`。镜像标签和 `docker-compose.yml` 里的 `tickforge:0.1.0` 一致；入口是 `python -m tickforge`，离线样本在 `/app/samples/demo_run`，没有交易所网络也能验证：
 
 ```bash
 docker run --rm tickforge:0.1.0 \

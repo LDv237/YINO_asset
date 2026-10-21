@@ -2,7 +2,7 @@
 
 这里是 TickForge 的测试集，当前 **276 passed**。测试不连接真实 Binance：单元测试用纯函数/本地数据结构，集成测试用本地 WebSocket + REST 交易所替身；真实公网行情由 `live` 运行单独验证。
 
-## 1. 怎么跑
+## 1. 运行方式
 
 ```bash
 python -m pip install -r requirements-dev-lock.txt
@@ -43,11 +43,11 @@ python -m pytest -q
 | `test_trade_quality.py` | 按 symbol 检查 `aggTrade.a` 重复、回退、gap、缺失 ID |
 | `test_verify_fail_closed.py` | 空目录、损坏 summary/manifest、被改过的 derived 必须 `ok=false` |
 
-## 4. 阅读建议
+## 4. 关键测试入口
 
-- 想理解订单簿：先看 `test_book.py`，里面的随机对拍最能说明状态机规则；
-- 想理解确定性：看 `test_simulator.py`、`test_factors.py`、`test_derived.py`；
-- 想理解交付校验：看 `test_verify_fail_closed.py` 和 `test_replay_config.py`；
-- 想理解完整链路：看 `test_integration_live.py`。
+- 订单簿状态机规则：`test_book.py` 的随机对拍用例；
+- 确定性覆盖：`test_simulator.py`、`test_factors.py`、`test_derived.py`；
+- 交付校验：`test_verify_fail_closed.py` 与 `test_replay_config.py`；
+- 完整链路：`test_integration_live.py`。
 
 更完整的测试矩阵、故障注入和异常终止实验见 `docs/正确性与可靠性验证.md`。

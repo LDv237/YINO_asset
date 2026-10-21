@@ -1,6 +1,6 @@
 # scripts 目录说明
 
-这里放可重复执行的入口脚本。它们只是把 `python -m tickforge ...` 和 `docker compose ...` 包了一层，方便复跑；不改变程序行为。所有脚本都默认从仓库根目录执行，依赖安装见 `docs/依赖说明.md`。
+本目录提供可重复执行的入口脚本，对 `python -m tickforge ...` 与 `docker compose ...` 做轻量封装，便于重复运行，不改变程序行为。所有脚本都默认从仓库根目录执行，依赖安装见 `docs/依赖说明.md`。
 
 ## 1. 脚本列表
 
@@ -33,7 +33,7 @@ bash scripts/run_fsync_experiments.sh
 ## 3. 注意事项
 
 - `run_live_15m*` 需要能访问 Binance 公开行情，不需要 API Key；
-- `docker_verify.sh` / `run_live_15m_docker.sh` 需要 Docker 引擎；本机 WSL2 组件不完整，Docker 证据是在 GitHub Actions 的干净环境跑的（见 `docs/Docker构建验证.md`）；
+- `docker_verify.sh` / `run_live_15m_docker.sh` 需要 Docker 引擎；本机 WSL2 组件不完整，Docker 证据在 GitHub Actions 的干净环境中生成（见 `docs/Docker构建验证.md`）；
 - `replay_verify.sh` 的 `--out` 是 `<run_dir>-replay`，目录已存在时会由 replay 拒绝覆盖，先换输出目录或手动清理；
 - 所有脚本只用于本地复现和验证，不会真实下单。
 

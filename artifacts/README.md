@@ -1,8 +1,8 @@
 # 关于 artifacts/
 
-本邮件提交包**不包含完整的 `artifacts/` 目录**（约 1,011 MiB：7 个历史 run + exports + experiments + summaries + evidence + logs）。这是为了把邮件附件控制在 25 MiB 内，避免评审下载一个 193MB 的压缩包。
+完整 `artifacts/` 目录约 1,011 MiB（7 个历史 run 及 exports、experiments、summaries、evidence、logs），压缩后约 193 MB，超过 25 MiB 的附件限制，改由 GitHub Release 提供。
 
-主结果 `20261021T162501Z-9821` 的完整 run 已经放在邮件包里：
+主结果 `20261021T162501Z-9821` 的完整 run 位于 `运行材料/01_主结果_现货_9821/`：
 
 ```text
 运行材料/01_主结果_现货_9821/
@@ -14,7 +14,7 @@
   logs/ console.log  结构化日志 / 控制台日志
 ```
 
-先解压再验证：
+解压后可执行以下命令：
 
 ```bash
 python scripts/extract_main_run.py 运行材料/01_主结果_现货_9821
@@ -27,6 +27,6 @@ python -m tickforge replay --run 运行材料/01_主结果_现货_9821 \
 
 https://github.com/LDv237/YINO_asset/releases/tag/delivery-20261020
 
-文件名 `YINO_artifacts_complete_20261020.zip`；大小和 SHA-256 以 Release 里的 `SHA256SUMS.txt` 为准，下载后先校验。Release 的 artifacts zip 内的 `artifacts/目录说明.md` 是历史产物快照；当前主结果在邮件包的 `运行材料/01_主结果_现货_9821/`。
+文件名 `YINO_artifacts_complete_20261020.zip`，大小和 SHA-256 以 Release 的 `SHA256SUMS.txt` 为准。Release 的 artifacts 压缩包内 `artifacts/目录说明.md` 对应 2026-10-20 的产物状态；本次主结果位于 `运行材料/01_主结果_现货_9821/`。
 
-说明：文档里的 `artifacts/runs/<run_id>` 路径指 Release/仓库的完整 artifacts，不是本邮件包内的路径；本包内请用 `运行材料/01_主结果_现货_9821/`。
+说明：文档中的 `artifacts/runs/<run_id>` 路径指 Release 与仓库中的完整 artifacts；本次提交中对应路径为 `运行材料/01_主结果_现货_9821/`。
