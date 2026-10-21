@@ -9,7 +9,7 @@
 | `交易活跃度.json` | 主结果起始小时桶（16:00–17:00 UTC）的活跃度排名：9/47，82.98 分位 |
 | `现金与仓位审计.json` | 逐笔 running min cash、min position、期末 cash/position：全部 ≥ 0 |
 | `异常终止恢复.json` | 应用层强制终止后的 WAL 可读前缀（229 条记录）；完整 crash WAL 在 Release |
-| `docker_ci/` | 60 秒容器 live 的关键证据（节选）；完整 build/日志在 run 39622339780 的 GitHub Actions artifact `docker-verify-evidence`（Release 的 artifacts zip 内为 2026-10-20 的 Docker 证据） |
+| `docker_ci/` | 60 秒容器 live 的关键证据（节选）；完整 build/日志在 run 39654447001 的 GitHub Actions artifact `docker-verify-evidence`（Release 的 artifacts zip 内为 2026-10-20 的 Docker 证据） |
 
 说明：
 

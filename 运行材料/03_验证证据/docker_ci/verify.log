@@ -1,5 +1,5 @@
 {
-  "run_id": "20261021T150432Z-6058",
+  "run_id": "20261021T183841Z-992f",
   "ok": true,
   "errors": [],
   "checks": {
@@ -46,38 +46,38 @@
       {
         "path": "derived/factors.jsonl",
         "ok": true,
-        "sha256": "d8b6ebfe12e9221038c19a71354ef5456e0c16ba1be6dbf7ea0ecc6471b883cd"
+        "sha256": "c1ea59dcf78b93d15ee912ff575a4c2e64f5c57a1c01f13dfdb47b36ab4e6e9d"
       },
       {
         "path": "derived/signals.jsonl",
         "ok": true,
-        "sha256": "13499de1e74342a0e7921468c6ce76bf83719f1bb3e3bcbf26fa48cd3d1090a2"
+        "sha256": "5db9ab3a4614f5117fd1ebe61c41ceb3466b99c63d3ccfab2dff42e06c9035f4"
       },
       {
         "path": "derived/fills.jsonl",
         "ok": true,
-        "sha256": "8212defd65a688c07bf28104973cc37cb5480122f686559cc889535fcc895f05"
+        "sha256": "425e7c21dc19d45548c7ee9e32b17188d9e394d0fbb1e86b34c37bf66246f02c"
       }
     ]
   },
   "scan": {
-    "records": 78826,
+    "records": 18296,
     "records_by_kind": {
-      "1": 78815,
-      "2": 11
+      "1": 18286,
+      "2": 10
     },
-    "bytes": 22247202,
+    "bytes": 7384955,
     "segments": [
       "raw-000001.wal"
     ],
     "first_seq": 1,
-    "last_seq": 78826,
+    "last_seq": 18296,
     "truncated_tail_bytes": 0
   },
   "summary_clean_shutdown": true,
   "summary_digests": {
-    "factors_sha256": "d8b6ebfe12e9221038c19a71354ef5456e0c16ba1be6dbf7ea0ecc6471b883cd",
-    "signals_sha256": "13499de1e74342a0e7921468c6ce76bf83719f1bb3e3bcbf26fa48cd3d1090a2",
-    "fills_sha256": "8212defd65a688c07bf28104973cc37cb5480122f686559cc889535fcc895f05"
+    "factors_sha256": "c1ea59dcf78b93d15ee912ff575a4c2e64f5c57a1c01f13dfdb47b36ab4e6e9d",
+    "signals_sha256": "5db9ab3a4614f5117fd1ebe61c41ceb3466b99c63d3ccfab2dff42e06c9035f4",
+    "fills_sha256": "425e7c21dc19d45548c7ee9e32b17188d9e394d0fbb1e86b34c37bf66246f02c"
   }
 }

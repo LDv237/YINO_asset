@@ -70,7 +70,7 @@ python -m tickforge replay --run samples/demo_run --out samples/demo_run-replay 
 
 ## Docker
 
-本机 Docker Desktop 的 WSL2 组件不完整，Docker 引擎无法启动；已在 GitHub Actions 干净环境用最终代码完成 build、60 秒 live、verify、replay，CI 通过。镜像包 `tickforge-0.1.0.tar.gz` 在 Release，`docker load` 后可直接运行。复跑方法见 [`docs/Docker构建验证.md`](docs/Docker构建验证.md)。
+本机 Docker Desktop 的 WSL2 组件不完整，Docker 引擎无法启动；已在 GitHub Actions 干净环境用当前 main 分支完成 build、60 秒 live、verify、replay，CI 通过。镜像包 `tickforge-0.1.0.tar.gz` 在 Release，`docker load` 后可直接运行。复跑方法见 [`docs/Docker构建验证.md`](docs/Docker构建验证.md)。
 
 ## 目录与测试
 
