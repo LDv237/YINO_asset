@@ -2,7 +2,7 @@
 
 TickForge 是我这次笔试交的实时高频数据流水线 demo，行情接 Binance 现货公开接口。WebSocket 原始帧先进入 WAL 队列，再进入处理队列；独立写线程负责异步写入分段 WAL。默认 `interval` 按目标间隔组提交，处理不等待写入或 fsync 完成，正常关闭时 flush+fsync；`always` 则等待 fsync 完成后才进入处理队列。处理队列再做 L2 订单簿重建、因子计算、做市信号和模拟成交；一次跑完可以从 WAL 做确定性回放，并把回放结果和运行目录里的派生文件逐项对上。
 
-本次提交的**主结果**是 15 分钟 live 单源 run `20261021T075925Z-3049`：303,784 条原始帧、41,470 个信号、8,828 笔模拟成交，原始帧 0 丢失、0 data gap、0 订单簿 resync，回放三项 SHA-256 一致。53b5、6db8、同一 WAL 只做多只在报告里作为对照表，完整数据在 GitHub Release。
+本次提交的**主结果**是 15 分钟 live 单源 run `20261021T075925Z-3049`：303,784 条原始帧、41,470 个信号、8,828 笔模拟成交，原始帧 0 丢失、0 data gap、0 订单簿 resync，回放三项 SHA-256 一致。历史基准和变体对照见报告，完整数据在 GitHub Release。
 
 > 笔试题目：YINO ASSET 量化开发工程师（实时高频行情交易系统 demo）。
 > GitHub：https://github.com/LDv237/YINO_asset
@@ -10,9 +10,9 @@ TickForge 是我这次笔试交的实时高频数据流水线 demo，行情接 B
 
 ## 这个项目重点解决什么
 
-- **原始数据不丢**：WebSocket 帧在解析前进入有界队列，由独立线程顺序写入带 CRC32 的分段 WAL；队列满了反压 socket，正常关闭排空队列再 flush+fsync。主结果 0 丢失。
+- **原始数据不丢**：WebSocket 帧在解析前进入有界队列，由独立线程顺序写入带 CRC32 的分段 WAL；REST 快照以规范化 JSON 作为 `kind=2` 事件写入（原始 HTTP body 不单独保存）。队列满了反压 socket，正常关闭排空队列再 flush+fsync。主结果 0 丢失。
 - **状态可恢复**：订单簿按 Binance `U/u` 规则维护；检测到丢包或交叉时进入缓冲，用 REST 快照加增量重放恢复。
-- **结果可复现**：回放走同一套 Pipeline，`factors` / `signals` / `fills` 三个 SHA-256 必须和运行目录里的 derived 一致。主结果 live 同源；历史基准 53b5 是同一份 WAL 重算。
+- **结果可复现**：回放走同一套 Pipeline，`factors` / `signals` / `fills` 三个 SHA-256 必须和运行目录里的 derived 一致。主结果 live 同源。
 - **可观测**：`/healthz`、`/readyz`、`/status`、`/metrics` 暴露 WAL 队列、处理滞后、逐阶段延迟、订单簿状态和反压次数。
 
 更完整的设计在 [`docs/系统架构.md`](docs/系统架构.md)，事件/WAL/模块 API 在 [`docs/接口设计.md`](docs/接口设计.md)。
@@ -61,11 +61,11 @@ python -m tickforge replay --run samples/demo_run --out samples/demo_run-replay 
 
 ## 两套执行语义
 
-默认抽象做市（`config/default.toml`）允许负仓位/负现金，用于从零库存跑双边做市；它是链路/性能基准，不代表 Binance 现货账户。主结果 3049 用的就是这套配置。
+默认抽象做市（`config/default.toml`）允许负仓位/负现金，用于从零库存跑双边做市；它是主结果和性能基准，不代表 Binance 现货账户。
 
-`config/spot_long_only.toml` 禁止裸卖、卖出不超过持仓、买入受 10,000 USDT/symbol 初始现金限制。同一份 53b5 WAL 的只做多对照是 3,077 fills、0 负仓位/负现金，见 [`docs/现货只做多设计.md`](docs/现货只做多设计.md)。
+`config/spot_long_only.toml` 是现货语义对照：禁止裸卖、卖出不超过持仓、买入受 USDT 现金限制。对照结果和设计见 [`docs/现货只做多设计.md`](docs/现货只做多设计.md)。
 
-严格落盘用 `config/spot_long_only_durable.toml`（`fsync=always`）；15 分钟样本 6db8 的完整数字和网络缺口边界见 `交付说明.md` §6 / Release。
+`config/spot_long_only_durable.toml` 增加 `fsync=always`；严格落盘的完整数字和边界见 [`docs/性能实测.md`](docs/性能实测.md)。
 
 ## Docker
 
@@ -110,8 +110,6 @@ python -m pytest -q
 
 ## 已知的局限
 
-- 公开 WS 不自动补发，本 demo 尚未实现 REST 补采；缺口记在 `summary.data_gaps`。
-- Python 单进程不是生产级 HFT，延迟不能和 C++/FPGA/colocation 比；策略收益不具解释力。
-- `Simulator` 是抽象记账器，主结果允许负仓位/负现金；成交用 `@aggTrade` 而非逐笔 `@trade`。完整边界见 `交付说明.md` §6。
+公开 WS 不自动补发，本 demo 尚未实现 REST 补采；Python 单进程不是生产级 HFT；`Simulator` 是抽象记账器，主结果允许负仓位/负现金，成交用 `@aggTrade` 而非逐笔 `@trade`。完整边界见 [`交付说明.md`](交付说明.md) §6 和 [`docs/正确性与可靠性验证.md`](docs/正确性与可靠性验证.md)。
 
 MIT，见 [LICENSE](LICENSE)。
