@@ -61,9 +61,13 @@ curl -L -O https://github.com/LDv237/YINO_asset/releases/download/delivery-20261
 docker load -i tickforge-0.1.0.tar.gz
 docker run --rm tickforge:0.1.0 --version
 
-# 60 秒实时行情（需要外网）
+# 60 秒实时行情（需要外网；default.toml 是抽象做市对照）
 docker run --rm -p 9100:9100 -v "$PWD/artifacts:/data" tickforge:0.1.0 \
   live --config config/default.toml --duration 60 --out /data
+
+# 复现主结果的现货 long-only 语义（15 分钟）
+docker run --rm -p 9100:9100 -v "$PWD/artifacts:/data" tickforge:0.1.0 \
+  live --config config/spot_long_only.toml --duration 900 --out /data
 ```
 
 镜像由 main 分支 `3bfd6ed` 构建，成交时间以交易所返回的 `T` 为准，派生 sink 关闭失败时采用 fail-closed 处理，健康指标包含 `oldest_pending_ms`。镜像标签和 `docker-compose.yml` 里的 `tickforge:0.1.0` 一致；入口是 `python -m tickforge`，离线样本在 `/app/samples/demo_run`，没有交易所网络也能验证：

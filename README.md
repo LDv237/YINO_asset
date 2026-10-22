@@ -70,7 +70,7 @@ python -m tickforge replay --run samples/demo_run --out samples/demo_run-replay 
 
 ## Docker
 
-本机 Docker Desktop 的 WSL2 组件不完整，Docker 引擎无法启动；已在 GitHub Actions 干净环境用当前 main 分支完成 build、60 秒 live、verify、replay，CI 通过。镜像包 `tickforge-0.1.0.tar.gz` 在 Release，`docker load` 后可直接运行。复跑方法见 [`docs/10_Docker构建与运行验证.md`](docs/10_Docker构建与运行验证.md)。
+本机 Docker Desktop 的 WSL2 组件不完整，Docker 引擎无法启动；已在 GitHub Actions 干净环境用当前 main 分支完成 build、60 秒 live、verify、replay，CI 通过。镜像包 `tickforge-0.1.0.tar.gz`（49,316,109 bytes，SHA-256 `a07d37e9dcb88805f991e57a646aca5c30651c39076695cdbd6acfa6d2552909`）在 Release；`docker load` 后用 `--config config/spot_long_only.toml` 复现主结果现货语义（默认 CMD 是 `config/default.toml` 抽象对照）。复跑方法见 [`docs/10_Docker构建与运行验证.md`](docs/10_Docker构建与运行验证.md)。
 
 ## 目录与测试
 
@@ -102,7 +102,7 @@ python -m pytest -q
 | 原始帧 / WAL 记录 | 650,532 / 650,542 |
 | 信号 / fills | 47,127 / 6,437 |
 | depth / aggTrade / bookTicker | 47,830 / 43,593 / 559,109 |
-| depth e2e p50 / p99 | 0.609 / 2.897 ms |
+| depth e2e p50 / p99 | 0.609 / 2.896 ms |
 | 聚合 e2e p50 / p99 | 0.724 / 2.435 ms（bookTicker 约占 86.0%） |
 | 原始帧丢失 / data gap / resync | 0 / 0 / 0 |
 | 负仓位 / 负现金 | 0 / 0 |

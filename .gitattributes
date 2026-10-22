@@ -1,0 +1,3 @@
+# Keep run-material bytes identical across checkouts: manifest.json records
+# SHA-256 for these files, so Git must not normalize CRLF/LF here.
+运行材料/** -text

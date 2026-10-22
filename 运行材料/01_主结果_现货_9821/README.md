@@ -13,7 +13,7 @@
 | 原始帧丢失 / clean_shutdown | 0 / true |
 | data gap / 订单簿 resync | 0 / 0 |
 | 负仓位 / 负现金 symbol 数 | 0 / 0 |
-| depth e2e p50 / p95 / p99 / p999 | 0.609 / 1.722 / 2.897 / 4.871 ms |
+| depth e2e p50 / p95 / p99 / p999 | 0.609 / 1.722 / 2.896 / 4.871 ms |
 | 聚合 e2e p50 / p99 / p999 | 0.724 / 2.435 / 5.793 ms（bookTicker 约占 86.0%） |
 | wal_queue_max / pipeline_queue_max | 735 / 16 |
 | recv→fsync p50 / p95（批次） | 262.144 / 311.744 ms（`interval` 批次口径） |
