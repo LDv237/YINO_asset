@@ -113,4 +113,4 @@ python -m tickforge live --config config/default.toml \
 - `fsync_policy = "interval"` 不是掉电零丢失：正常关闭会排空并 fsync，崩溃时未同步尾部可能丢；严格口径用 `always`；
 - 配置里没有 API Key、Cookie 或账户信息，只有公开行情地址和运行参数。
 
-更完整的运行说明见 `docs/运行手册.md`，持久化边界见 `docs/性能实测.md`。
+更完整的运行说明见 `docs/09_运行与复现手册.md`，持久化边界见 `docs/03_性能测试与实测结果.md`。

@@ -15,7 +15,7 @@ TickForge 是我这次笔试交的实时高频数据流水线 demo，行情接 B
 - **结果可复现**：回放走同一套 Pipeline，`factors` / `signals` / `fills` 三个 SHA-256 必须和运行目录里的 derived 一致。主结果 live 同源。
 - **可观测**：`/healthz`、`/readyz`、`/status`、`/metrics` 暴露 WAL 队列、处理滞后、逐阶段延迟、订单簿状态和反压次数。
 
-更完整的设计在 [`docs/系统架构.md`](docs/系统架构.md)，事件/WAL/模块 API 在 [`docs/接口设计.md`](docs/接口设计.md)。
+更完整的设计在 [`docs/01_系统架构设计.md`](docs/01_系统架构设计.md)，事件/WAL/模块 API 在 [`docs/02_接口与数据契约.md`](docs/02_接口与数据契约.md)。
 
 ## 行情数据源
 
@@ -62,15 +62,15 @@ python -m tickforge replay --run samples/demo_run --out samples/demo_run-replay 
 
 ## 两套执行语义
 
-**主结果用 `config/spot_long_only.toml`**：禁止裸卖、卖出不超过持仓、买入受每 symbol 10,000 USDT 现金限制；本次 650,532 帧里所有 symbol position/cash ≥ 0。完整设计和对照见 [`docs/现货语义设计.md`](docs/现货语义设计.md)。
+**主结果用 `config/spot_long_only.toml`**：禁止裸卖、卖出不超过持仓、买入受每 symbol 10,000 USDT 现金限制；本次 650,532 帧里所有 symbol position/cash ≥ 0。完整设计和对照见 [`docs/05_现货执行语义设计.md`](docs/05_现货执行语义设计.md)。
 
 默认抽象做市（`config/default.toml`）允许负仓位/负现金，是执行语义对照；3049 抽象做市 run（健康指标修正前）的摘要放在 `运行材料/02_对照_抽象做市_3049/`，完整 run 在 Release。
 
-`config/spot_long_only_durable.toml` 增加 `fsync=always`；严格落盘的完整数字和边界见 [`docs/性能实测.md`](docs/性能实测.md)。
+`config/spot_long_only_durable.toml` 增加 `fsync=always`；严格落盘的完整数字和边界见 [`docs/03_性能测试与实测结果.md`](docs/03_性能测试与实测结果.md)。
 
 ## Docker
 
-本机 Docker Desktop 的 WSL2 组件不完整，Docker 引擎无法启动；已在 GitHub Actions 干净环境用当前 main 分支完成 build、60 秒 live、verify、replay，CI 通过。镜像包 `tickforge-0.1.0.tar.gz` 在 Release，`docker load` 后可直接运行。复跑方法见 [`docs/Docker构建验证.md`](docs/Docker构建验证.md)。
+本机 Docker Desktop 的 WSL2 组件不完整，Docker 引擎无法启动；已在 GitHub Actions 干净环境用当前 main 分支完成 build、60 秒 live、verify、replay，CI 通过。镜像包 `tickforge-0.1.0.tar.gz` 在 Release，`docker load` 后可直接运行。复跑方法见 [`docs/10_Docker构建与运行验证.md`](docs/10_Docker构建与运行验证.md)。
 
 ## 目录与测试
 
@@ -79,7 +79,7 @@ tickforge/         核心包（feed/store/book/factor/strategy/exec/runtime/repl
 tests/             单元、集成、混沌与端到端回放测试（276 passed）
 tools/ scripts/    运行分析、导出、追溯、样本裁剪、15 分钟运行和 Docker 校验
 config/            默认、现货、严格落盘三套配置
-docs/              架构、接口、性能、验证、开发过程、AI 协作、依赖、运行手册
+docs/              系统架构、接口与数据契约、性能测试、正确性与可靠性、现货语义、开发过程、AI 协作、依赖、运行与复现、Docker
 samples/demo_run/  20,000 条 WAL 的离线样本（来自 53b5，仅验证 replay 机制）
 运行材料/          01_主结果_现货_9821/、02_对照_抽象做市_3049/、03_验证证据/
 交付说明.md        提交说明（材料位置与复现入口）
@@ -108,10 +108,10 @@ python -m pytest -q
 | 负仓位 / 负现金 | 0 / 0 |
 | 回放 | `verified=true`、`deterministic=true`，三项 SHA 一致 |
 
-延迟从 `ws.recv()` 返回后开始计时，不含网络/内核缓冲，只证明接收后的处理延迟；完整分位数和资源数据见 [`docs/性能实测.md`](docs/性能实测.md)。
+延迟从 `ws.recv()` 返回后开始计时，不含网络/内核缓冲，只证明接收后的处理延迟；完整分位数和资源数据见 [`docs/03_性能测试与实测结果.md`](docs/03_性能测试与实测结果.md)。
 
 ## 已知的局限
 
-公开 WS 不自动补发，本 demo 尚未实现 REST 补采；Python 单进程不是生产级 HFT；`Simulator` 是抽象记账器，主结果用现货配置、所有 position/cash ≥ 0，但仍不是真实交易所账户；3049 抽象对照允许负仓位/负现金。成交用 `@aggTrade` 而非逐笔 `@trade`。完整边界见 [`交付说明.md`](交付说明.md) §6 和 [`docs/正确性与可靠性验证.md`](docs/正确性与可靠性验证.md)。
+公开 WS 不自动补发，本 demo 尚未实现 REST 补采；Python 单进程不是生产级 HFT；`Simulator` 是抽象记账器，主结果用现货配置、所有 position/cash ≥ 0，但仍不是真实交易所账户；3049 抽象对照允许负仓位/负现金。成交用 `@aggTrade` 而非逐笔 `@trade`。完整边界见 [`交付说明.md`](交付说明.md) §6 和 [`docs/04_正确性与可靠性验证.md`](docs/04_正确性与可靠性验证.md)。
 
 MIT，见 [LICENSE](LICENSE)。

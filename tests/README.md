@@ -50,4 +50,4 @@ python -m pytest -q
 - 交付校验：`test_verify_fail_closed.py` 与 `test_replay_config.py`；
 - 完整链路：`test_integration_live.py`。
 
-更完整的测试矩阵、故障注入和异常终止实验见 `docs/正确性与可靠性验证.md`。
+更完整的测试矩阵、故障注入和异常终止实验见 `docs/04_正确性与可靠性验证.md`。

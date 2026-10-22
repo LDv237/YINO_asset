@@ -46,4 +46,4 @@ python tools/replay_spot_long_only.py --run "$RUN" \
 - `crash_recovery_check.py` 是应用层强制终止测试，不等同于掉电或物理介质测试；
 - `market_activity.py` 只使用已完成的整小时 K 线，运行窗口落在未完成小时时无法排名。
 
-正式运行、回放和校验命令见 `docs/运行手册.md`；指标和延迟口径见 `docs/性能实测.md`。
+正式运行、回放和校验命令见 `docs/09_运行与复现手册.md`；指标和延迟口径见 `docs/03_性能测试与实测结果.md`。
