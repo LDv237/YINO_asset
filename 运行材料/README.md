@@ -10,6 +10,8 @@
 
 [`03_验证证据/`](03_验证证据/) 收录主结果的成交编号、活跃度、现金/仓位审计、`pytest`（280 passed）、crash 和 Docker 证据。
 
+[`04_容量探针/`](04_容量探针/)：9821 WAL 的 2x/5x 组件级容量探针结果；不含 WAL/网络/派生 I/O，不是端到端容量证明。口径见 `docs/11_容量与过载实验.md`。
+
 53b5、6db8、同一 WAL 现货对照等历史对照的完整目录、WAL、JSONL、CSV 见 Release；报告中的对照表汇总关键数字。
 
 完整 `artifacts/` 目录约 1,011 MiB，含 7 个历史 run，见 GitHub Release；主结果完整数据在 `run_data.tar.xz`。说明见 `artifacts/README.md`。

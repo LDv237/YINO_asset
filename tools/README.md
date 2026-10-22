@@ -15,6 +15,7 @@
 | `trace_signal.py` | 按 `(symbol, seq)` 追溯一条信号到因子快照和 WAL 原始帧，并说明 fills 的 `trade_id` 链接 | `python tools/trace_signal.py --run artifacts/runs/<run_id> --index 0` |
 | `market_activity.py` | 拉 Binance 小时 K 线，给运行窗口所在小时桶做成交额/笔数排名 | `python tools/market_activity.py --target 2026-10-21T16:25:05Z --out artifacts/evidence/market_activity.json` |
 | `crash_recovery_check.py` | 起一个短时 live、强制杀进程，再恢复读取 WAL 前缀，检查记录数、CRC/seq 和残缺尾部；该检查不证明哪些记录已完成 fsync | `python tools/crash_recovery_check.py --help` |
+| `capacity_probe.py` | 用一次 run 的 WAL 以 2x/5x 节拍驱动同一 Pipeline，测处理阶段容量余量、队列峰值和反压；不含 WAL 写线程/网络/派生 I/O | `python tools/capacity_probe.py --run 运行材料/01_主结果_现货_9821 --rates 2,5 --out 运行材料/04_容量探针` |
 
 ## 2. 使用顺序
 
@@ -44,6 +45,7 @@ python tools/replay_spot_long_only.py --run "$RUN" \
 - `trim_run.py` 和 `make_sample_reference.py` 会写输出目录；对已有目录先看 `--help`，不要覆盖正式 run；
 - `replay_spot_long_only.py` 不比较参考 run 的派生 digest，因为执行语义变了，signals/fills 本来就应该不同；
 - `crash_recovery_check.py` 是应用层强制终止测试，不等同于掉电或物理介质测试；
+- `capacity_probe.py` 是组件级容量探针，不含 WAL 写线程/网络/派生 I/O，不等同于端到端 live 容量证明；
 - `market_activity.py` 只使用已完成的整小时 K 线，运行窗口落在未完成小时时无法排名。
 
 正式运行、回放和校验命令见 `docs/09_运行与复现手册.md`；指标和延迟口径见 `docs/03_性能测试与实测结果.md`。
