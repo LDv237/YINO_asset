@@ -2,7 +2,7 @@
 
 TickForge 是我这次笔试交的实时高频数据流水线 demo，行情接 Binance 现货公开接口。WebSocket 原始帧先进入 WAL 队列，再进入处理队列；独立写线程负责异步写入分段 WAL。默认 `interval` 按目标间隔组提交，处理不等待写入或 fsync 完成，正常关闭时 flush+fsync；`always` 则等待 fsync 完成后才进入处理队列。处理队列再做 L2 订单簿重建、因子计算、做市信号和模拟成交；一次跑完可以从 WAL 做确定性回放，并把回放结果和运行目录里的派生文件逐项对上。
 
-本次提交的**主结果**是最终代码的 15 分钟**现货 live 单源 run** `20261021T162501Z-9821`：650,532 条原始帧、47,127 个信号、6,437 笔模拟成交，原始帧 0 丢失、0 data gap、0 订单簿 resync、0 负仓位/0 负现金，回放三项 SHA-256 一致。3049 抽象做市、53b5 历史基准、6db8 严格落盘只作为报告里的对照，完整数据在 GitHub Release。
+本次提交的**主结果**是15 分钟**现货 live 单源 run** `20261021T162501Z-9821`：650,532 条原始帧、47,127 个信号、6,437 笔模拟成交，原始帧 0 丢失、0 data gap、0 订单簿 resync、0 负仓位/0 负现金，回放三项 SHA-256 一致。3049 抽象做市、53b5 历史基准、6db8 严格落盘只作为报告里的对照，完整数据在 GitHub Release。
 
 > 笔试题目：YINO ASSET 量化开发工程师（实时高频行情交易系统 demo）。
 > GitHub：https://github.com/LDv237/YINO_asset
@@ -70,7 +70,7 @@ python -m tickforge replay --run samples/demo_run --out samples/demo_run-replay 
 
 ## Docker
 
-本机 Docker Desktop 的 WSL2 组件不完整，Docker 引擎无法启动；已在 GitHub Actions 干净环境用当前 main 分支完成 build、60 秒 live、verify、replay，CI 通过。镜像包 `tickforge-0.1.0.tar.gz`（49,330,888 bytes，SHA-256 `8fc46c270afb7340cf1ff4fd69c6a7d85614606484ccf818436da0b7abc7d449`）在 Release；`docker load` 后用 `--config config/spot_long_only.toml` 复现主结果现货语义（默认 CMD 是 `config/default.toml` 抽象对照）。复跑方法见 [`docs/10_Docker构建与运行验证.md`](docs/10_Docker构建与运行验证.md)。
+本机 Docker Desktop 的 WSL2 组件不完整，Docker 引擎无法启动；已在 GitHub Actions 干净环境用 commit `71af930` 完成 build、60 秒 live、verify、replay，CI 通过。镜像包 `tickforge-0.1.0.tar.gz`（49,330,888 bytes，SHA-256 `8fc46c270afb7340cf1ff4fd69c6a7d85614606484ccf818436da0b7abc7d449`）在 Release；`docker load` 后用 `--config config/spot_long_only.toml` 复现主结果现货语义（默认 CMD 是 `config/default.toml` 抽象对照）。复跑方法见 [`docs/10_Docker构建与运行验证.md`](docs/10_Docker构建与运行验证.md)。
 
 ## 目录与测试
 

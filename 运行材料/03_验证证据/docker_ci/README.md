@@ -1,6 +1,6 @@
 # Docker CI 证据（节选）
 
-本目录保留 main 分支 `71af930` 的 60 秒容器 live 关键证据：`run_info.txt`、`container_summary.json`、`container_replay_summary.json`、`verify.log`、`replay_verify.log`、`image_id.txt`、`tickforge-0.1.0.tar.gz.sha256`。
+本目录保留 commit `71af930` 的 60 秒容器 live 关键证据：`run_info.txt`、`container_summary.json`、`container_replay_summary.json`、`verify.log`、`replay_verify.log`、`image_id.txt`、`tickforge-0.1.0.tar.gz.sha256`。
 
 - CI run: 39731008808（workflow_dispatch，commit `71af930`）
 - 镜像: `tickforge:0.1.0`，49,330,888 bytes，SHA-256 `8fc46c270afb7340cf1ff4fd69c6a7d85614606484ccf818436da0b7abc7d449`

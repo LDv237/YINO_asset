@@ -10,7 +10,7 @@
 | `spot_long_only.toml` | 现货执行语义 | `allow_short = false`、`initial_cash_usd = 10000.0`；feed/因子/策略其余相同 | **9821 主结果** / 同一 WAL 对照 |
 | `spot_long_only_durable.toml` | 现货 + 严格落盘 | 在 `spot_long_only` 基础上把 `fsync_policy` 改成 `"always"` | 6db8 严格落盘（Release） |
 
-运行命令见 [`README.md`](../README.md) 的“怎么跑”；把 `--config` 换成对应文件即可。
+运行命令见 [`README.md`](../README.md) 的“运行方式”；把 `--config` 换成对应文件即可。
 
 ## 2. 字段分组
 

@@ -2,7 +2,7 @@
 
 本次提交的主结果：
 
-- [`01_主结果_现货_9821/`](01_主结果_现货_9821/)：最终代码的 15 分钟**现货 live** run。`run_data.tar.xz` 里是 raw/ 和 derived/，其余是 summary/manifest/config/replay/logs/console；解压后可直接 `verify` / `replay --verify`。
+- [`01_主结果_现货_9821/`](01_主结果_现货_9821/)：15 分钟**现货 live** run。`run_data.tar.xz` 里是 raw/ 和 derived/，其余是 summary/manifest/config/replay/logs/console；解压后可直接 `verify` / `replay --verify`。
 
 对照：
 

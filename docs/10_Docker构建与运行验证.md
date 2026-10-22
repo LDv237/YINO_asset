@@ -1,6 +1,6 @@
 # Docker 构建与运行验证
 
-题目要求打包 Docker image，保证代码能正常运行。本机开发机安装了 Docker Desktop，但 WSL2 虚拟化组件不完整，Docker 引擎无法启动，因此本机未进行构建和运行。构建与验证在 GitHub Actions 的干净 Docker 环境中完成，代码取自 main 分支：build、容器版本、离线 sample replay、60 秒 live、verify 和 replay 全部通过（run 39731008808，commit `71af930`，image `sha256:ab31b0af…`，60 秒运行 21,993 帧、632 fills、0 丢失、`clean_shutdown=true`），并生成了可直接 `docker load` 的镜像包。提交包内的证据在 `运行材料/03_验证证据/docker_ci/`；完整 Actions 日志在 run 39731008808 的 `docker-verify-evidence` artifact，2026-10-20 的 artifacts 归档在 Release 的 `YINO_artifacts_complete_20261020.zip` 内。以下命令用于本机或其他 Docker 主机复跑。
+题目要求打包 Docker image，保证代码能正常运行。本机开发机安装了 Docker Desktop，但 WSL2 虚拟化组件不完整，Docker 引擎无法启动，因此本机未进行构建和运行。构建与验证在 GitHub Actions 的干净 Docker 环境中完成，代码取自当时 main 的 commit `71af930`：build、容器版本、离线 sample replay、60 秒 live、verify 和 replay 全部通过（run 39731008808，image `sha256:ab31b0af…`，60 秒运行 21,993 帧、632 fills、0 丢失、`clean_shutdown=true`），并生成了可直接 `docker load` 的镜像包。提交包内的证据在 `运行材料/03_验证证据/docker_ci/`；完整 Actions 日志在 run 39731008808 的 `docker-verify-evidence` artifact，2026-10-20 的 artifacts 归档在 Release 的 `YINO_artifacts_complete_20261020.zip` 内。以下命令用于本机或其他 Docker 主机复跑。
 
 ## 1. 环境要求
 
@@ -70,7 +70,7 @@ docker run --rm -p 9100:9100 -v "$PWD/artifacts:/data" tickforge:0.1.0 \
   live --config config/spot_long_only.toml --duration 900 --out /data
 ```
 
-镜像由 main 分支 `71af930` 构建，成交时间以交易所返回的 `T` 为准，派生 sink 关闭失败时采用 fail-closed 处理，健康指标包含 `oldest_pending_ms`。镜像标签和 `docker-compose.yml` 里的 `tickforge:0.1.0` 一致；入口是 `python -m tickforge`，离线样本在 `/app/samples/demo_run`，没有交易所网络也能验证：
+镜像由 commit `71af930` 构建，成交时间以交易所返回的 `T` 为准，派生 sink 关闭失败时采用 fail-closed 处理，健康指标包含 `oldest_pending_ms`。镜像标签和 `docker-compose.yml` 里的 `tickforge:0.1.0` 一致；入口是 `python -m tickforge`，离线样本在 `/app/samples/demo_run`，没有交易所网络也能验证：
 
 ```bash
 docker run --rm tickforge:0.1.0 \
