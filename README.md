@@ -76,7 +76,7 @@ python -m tickforge replay --run samples/demo_run --out samples/demo_run-replay 
 
 ```text
 tickforge/         核心包（feed/store/book/factor/strategy/exec/runtime/replay/metrics/server）
-tests/             单元、集成、混沌与端到端回放测试（276 passed）
+tests/             单元、集成、混沌与端到端回放测试（280 passed）
 tools/ scripts/    运行分析、导出、追溯、样本裁剪、15 分钟运行和 Docker 校验
 config/            默认、现货、严格落盘三套配置
 docs/              系统架构、接口与数据契约、性能测试、正确性与可靠性、现货语义、开发过程、AI 协作、依赖、运行与复现、Docker
@@ -91,7 +91,7 @@ python -m pip install -r requirements-dev-lock.txt
 python -m pytest -q
 ```
 
-测试覆盖订单簿序列/随机对拍、WAL 轮转/CRC/截断/fsync、因子手算、策略与模拟执行、断线重连和 REST 重试、指标/HTTP，以及“本地模拟交易所 → 实时引擎 → WAL → 回放摘要一致”的端到端链路。完整结果 **276 passed**。
+测试覆盖订单簿序列/随机对拍、WAL 轮转/CRC/截断/fsync、因子手算、策略与模拟执行、断线重连和 REST 重试、指标/HTTP，以及“本地模拟交易所 → 实时引擎 → WAL → 回放摘要一致”的端到端链路。完整结果 **280 passed**。
 
 ## 15 分钟主结果
 

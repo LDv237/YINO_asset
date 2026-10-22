@@ -352,6 +352,33 @@ class ReplayRunner:
         elif not all(wal_match.values()):
             reasons.append("wal_count_mismatch")
 
+        # A replay can reproduce the same derived bytes even when the original
+        # live run failed to close its sinks.  Those are separate judgments:
+        # ``verified`` must not be true for a live run that was not clean.
+        live_mode = live.get("mode")
+        is_live = live_mode == "live"
+        live_state: dict[str, bool | None] = {}
+        if is_live:
+            live_state = {
+                "clean_shutdown": live.get("clean_shutdown") is True,
+                "derived_complete": (
+                    None
+                    if "derived_complete" not in live
+                    else live.get("derived_complete") is True
+                ),
+                "derived_errors_empty": not bool(live.get("derived_errors")),
+            }
+            if live_state["clean_shutdown"] is False:
+                reasons.append("live_clean_shutdown_failed")
+            if live_state["derived_complete"] is False:
+                reasons.append("live_derived_complete_failed")
+            if live_state["derived_errors_empty"] is False:
+                reasons.append("live_derived_errors_present")
+            if not live_manifest_present:
+                reasons.append("live_manifest_missing")
+            if not live_derived_dir.is_dir():
+                reasons.append("live_derived_missing")
+
         if scan.truncated_tail_bytes:
             reasons.append("truncated_wal_tail")
         if scan.errors:
@@ -365,6 +392,8 @@ class ReplayRunner:
             "digest_match": digest_match,
             "live_derived_digest_match": live_derived_match,
             "wal_match": wal_match,
+            "live_mode": live_mode,
+            "live_state": live_state,
             "live_counts": {key: live_counts.get(key) for key in count_keys},
             "replay_counts": {key: replay_counts.get(key) for key in count_keys},
             "live_summary_present": bool(live),
@@ -501,6 +530,76 @@ def verify_run(run_dir: str | Path) -> dict:
         if not ok:
             errors.append(f"segment hash mismatch: {name}")
     checks["segment_hashes"] = hash_results
+
+    # Cross-check the manifest's aggregate accounting against the actual WAL
+    # scan.  Hashing the listed segments alone is not enough: a manifest with
+    # a wrong record count, sequence range or durable seq would otherwise
+    # still verify ok.
+    manifest_wal = manifest.get("wal") or {}
+    if not manifest_wal:
+        checks["manifest_wal_match"] = None
+        errors.append("manifest.json is missing wal accounting")
+    else:
+        manifest_wal_match: dict[str, bool | None] = {
+            "records": manifest_wal.get("records") == scan.records,
+            "first_seq": manifest_wal.get("first_seq") == scan.first_seq,
+            "last_seq": manifest_wal.get("last_seq") == scan.last_seq,
+        }
+        durable_seq = manifest_wal.get("durable_seq")
+        if durable_seq is None:
+            # Older manifests may predate durable_seq; the summary-level
+            # clean-shutdown check still applies.
+            manifest_wal_match["durable_seq"] = None
+        elif summary.get("clean_shutdown") is True:
+            manifest_wal_match["durable_seq"] = durable_seq == scan.last_seq
+        else:
+            manifest_wal_match["durable_seq"] = durable_seq <= (scan.last_seq or 0)
+        checks["manifest_wal_match"] = manifest_wal_match
+        for key, ok in manifest_wal_match.items():
+            if ok is False:
+                errors.append(f"manifest.wal.{key} does not match WAL scan")
+
+        if manifest_segments:
+            segment_records = sum(
+                int(seg.get("records", 0))
+                for seg in manifest_segments
+                if isinstance(seg, dict)
+            )
+            segment_bytes = sum(
+                int(seg.get("bytes", 0))
+                for seg in manifest_segments
+                if isinstance(seg, dict)
+            )
+            totals_match = {
+                "records": segment_records == manifest_wal.get("records"),
+                "bytes": segment_bytes == manifest_wal.get("bytes"),
+            }
+            checks["manifest_segment_totals"] = totals_match
+            for key, ok in totals_match.items():
+                if not ok:
+                    errors.append(f"manifest segment {key} do not add up")
+
+    # Every WAL segment on disk must be listed, and every listed segment must
+    # exist.  The per-segment hash loop above only covers listed names.
+    actual_segments = {path.name for path in raw_dir.glob("raw-*.wal")}
+    listed_segments = {
+        seg.get("name")
+        for seg in manifest_segments
+        if isinstance(seg, dict) and seg.get("name")
+    }
+    coverage = {
+        "missing": sorted(actual_segments - listed_segments),
+        "extra": sorted(listed_segments - actual_segments),
+    }
+    checks["manifest_segment_coverage"] = coverage
+    if coverage["missing"]:
+        errors.append(
+            "manifest is missing WAL segments: " + ", ".join(coverage["missing"])
+        )
+    if coverage["extra"]:
+        errors.append(
+            "manifest lists absent WAL segments: " + ", ".join(coverage["extra"])
+        )
 
     manifest_files = manifest.get("files") or []
     if not manifest_files:

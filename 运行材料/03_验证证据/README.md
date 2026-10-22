@@ -4,7 +4,7 @@
 
 | 文件 | 内容 |
 |---|---|
-| `pytest_276_passed.txt` | 完整测试套件：276 passed |
+| `pytest_280_passed.txt` | 完整测试套件：280 passed |
 | `成交编号完整性.json` | 主结果 6 个 symbol 的 `pipeline.trade_quality`：0 duplicates / 0 backwards / 0 gaps / 0 missing_ids |
 | `交易活跃度.json` | 主结果起始小时桶（16:00–17:00 UTC）的活跃度排名：9/47，82.98 分位 |
 | `现金与仓位审计.json` | 逐笔 running min cash、min position、期末 cash/position：全部 ≥ 0 |
