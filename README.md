@@ -70,7 +70,7 @@ python -m tickforge replay --run samples/demo_run --out samples/demo_run-replay 
 
 ## Docker
 
-本机 Docker Desktop 的 WSL2 组件不完整，Docker 引擎无法启动；已在 GitHub Actions 干净环境用当前 main 分支完成 build、60 秒 live、verify、replay，CI 通过。镜像包 `tickforge-0.1.0.tar.gz`（49,316,109 bytes，SHA-256 `a07d37e9dcb88805f991e57a646aca5c30651c39076695cdbd6acfa6d2552909`）在 Release；`docker load` 后用 `--config config/spot_long_only.toml` 复现主结果现货语义（默认 CMD 是 `config/default.toml` 抽象对照）。复跑方法见 [`docs/10_Docker构建与运行验证.md`](docs/10_Docker构建与运行验证.md)。
+本机 Docker Desktop 的 WSL2 组件不完整，Docker 引擎无法启动；已在 GitHub Actions 干净环境用当前 main 分支完成 build、60 秒 live、verify、replay，CI 通过。镜像包 `tickforge-0.1.0.tar.gz`（49,330,888 bytes，SHA-256 `8fc46c270afb7340cf1ff4fd69c6a7d85614606484ccf818436da0b7abc7d449`）在 Release；`docker load` 后用 `--config config/spot_long_only.toml` 复现主结果现货语义（默认 CMD 是 `config/default.toml` 抽象对照）。复跑方法见 [`docs/10_Docker构建与运行验证.md`](docs/10_Docker构建与运行验证.md)。
 
 ## 目录与测试
 

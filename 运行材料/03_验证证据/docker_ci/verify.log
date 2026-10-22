@@ -1,5 +1,5 @@
 {
-  "run_id": "20261021T183841Z-992f",
+  "run_id": "20261022T055829Z-02a3",
   "ok": true,
   "errors": [],
   "checks": {
@@ -16,6 +16,20 @@
         "ok": true
       }
     ],
+    "manifest_wal_match": {
+      "records": true,
+      "first_seq": true,
+      "last_seq": true,
+      "durable_seq": true
+    },
+    "manifest_segment_totals": {
+      "records": true,
+      "bytes": true
+    },
+    "manifest_segment_coverage": {
+      "missing": [],
+      "extra": []
+    },
     "manifest_files": [
       {
         "path": "config.json",
@@ -46,38 +60,38 @@
       {
         "path": "derived/factors.jsonl",
         "ok": true,
-        "sha256": "c1ea59dcf78b93d15ee912ff575a4c2e64f5c57a1c01f13dfdb47b36ab4e6e9d"
+        "sha256": "79b0bc6aaf5168060767269fdd409493bb744639ec8c20a4baaffaaf78c8f5f7"
       },
       {
         "path": "derived/signals.jsonl",
         "ok": true,
-        "sha256": "5db9ab3a4614f5117fd1ebe61c41ceb3466b99c63d3ccfab2dff42e06c9035f4"
+        "sha256": "fc1a08e6045a6181dfea79f763a3cb0a2140a5331d599b42dba01474d142fd21"
       },
       {
         "path": "derived/fills.jsonl",
         "ok": true,
-        "sha256": "425e7c21dc19d45548c7ee9e32b17188d9e394d0fbb1e86b34c37bf66246f02c"
+        "sha256": "22a5b9902c5ea482c7203bef66459f701c595f2e0076edff7916f3358e4fcf25"
       }
     ]
   },
   "scan": {
-    "records": 18296,
+    "records": 22002,
     "records_by_kind": {
-      "1": 18286,
-      "2": 10
+      "1": 21993,
+      "2": 9
     },
-    "bytes": 7384955,
+    "bytes": 8163524,
     "segments": [
       "raw-000001.wal"
     ],
     "first_seq": 1,
-    "last_seq": 18296,
+    "last_seq": 22002,
     "truncated_tail_bytes": 0
   },
   "summary_clean_shutdown": true,
   "summary_digests": {
-    "factors_sha256": "c1ea59dcf78b93d15ee912ff575a4c2e64f5c57a1c01f13dfdb47b36ab4e6e9d",
-    "signals_sha256": "5db9ab3a4614f5117fd1ebe61c41ceb3466b99c63d3ccfab2dff42e06c9035f4",
-    "fills_sha256": "425e7c21dc19d45548c7ee9e32b17188d9e394d0fbb1e86b34c37bf66246f02c"
+    "factors_sha256": "79b0bc6aaf5168060767269fdd409493bb744639ec8c20a4baaffaaf78c8f5f7",
+    "signals_sha256": "fc1a08e6045a6181dfea79f763a3cb0a2140a5331d599b42dba01474d142fd21",
+    "fills_sha256": "22a5b9902c5ea482c7203bef66459f701c595f2e0076edff7916f3358e4fcf25"
   }
 }

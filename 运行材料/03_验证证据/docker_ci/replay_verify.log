@@ -1,13 +1,13 @@
-18:39:46 INFO    tickforge.replay.runner: book synced symbol=XRPUSDT last_update_id=26791801653 buffered=0
-18:39:46 INFO    tickforge.replay.runner: book synced symbol=BNBUSDT last_update_id=21025113095 buffered=0
-18:39:46 INFO    tickforge.replay.runner: book synced symbol=DOGEUSDT last_update_id=25728682260 buffered=0
-18:39:46 INFO    tickforge.replay.runner: book synced symbol=BTCUSDT last_update_id=101745818562 buffered=0
-18:39:46 INFO    tickforge.replay.runner: book synced symbol=SOLUSDT last_update_id=30424124722 buffered=0
-18:39:46 INFO    tickforge.replay.runner: book synced symbol=ETHUSDT last_update_id=82337451349 buffered=0
-18:39:47 INFO    tickforge.replay.runner: replay complete  records=18296 elapsed_s=0.762 deterministic=True verified=True
+05:59:33 INFO    tickforge.replay.runner: book synced symbol=DOGEUSDT last_update_id=25731681820 buffered=0
+05:59:33 INFO    tickforge.replay.runner: book synced symbol=BNBUSDT last_update_id=21028247878 buffered=0
+05:59:33 INFO    tickforge.replay.runner: book synced symbol=SOLUSDT last_update_id=30428303550 buffered=0
+05:59:33 INFO    tickforge.replay.runner: book synced symbol=XRPUSDT last_update_id=26796291321 buffered=0
+05:59:33 INFO    tickforge.replay.runner: book synced symbol=BTCUSDT last_update_id=101766302095 buffered=0
+05:59:33 INFO    tickforge.replay.runner: book synced symbol=ETHUSDT last_update_id=82355026074 buffered=0
+05:59:34 INFO    tickforge.replay.runner: replay complete  records=22002 elapsed_s=0.576 deterministic=True verified=True
 {
-  "records": 18296,
-  "throughput_events_per_s": 24021.6,
+  "records": 22002,
+  "throughput_events_per_s": 38218.1,
   "deterministic": true,
   "verified": true,
   "reasons": [],

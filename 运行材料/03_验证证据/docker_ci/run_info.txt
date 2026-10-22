@@ -1,5 +1,5 @@
-run_url=https://github.com/LDv237/YINO_asset/actions/runs/39654447001
-commit=3bfd6ed130983f494ce0c9a4c2ccf408ae66cd74
+run_url=https://github.com/LDv237/YINO_asset/actions/runs/39731008808
+commit=71af9308d872f0c4c52826cb9af3ea0f767d4062
 live_outcome=success
 build_log=ci_artifacts/docker_build.log
 sample_replay_log=ci_artifacts/sample_replay.log
