@@ -22,6 +22,7 @@
 ## 复现
 
 ```bash
+python scripts/extract_main_run.py 运行材料/01_主结果_现货_9821
 python tools/capacity_probe.py --run 运行材料/01_主结果_现货_9821 \
   --rates 2,5 --out 运行材料/04_容量探针
 ```

@@ -54,6 +54,13 @@ def run_probe(
     *,
     max_records: int | None = None,
 ) -> dict[str, Any]:
+    raw_dir = run_dir / "raw"
+    if not raw_dir.is_dir() or not any(raw_dir.glob("raw-*.wal")):
+        raise FileNotFoundError(
+            f"raw WAL not found in {raw_dir}; run "
+            f"python scripts/extract_main_run.py {run_dir} first"
+        )
+
     cfg = config_from_run(run_dir)
     summary = _read_summary(run_dir)
     base_rate = float(
@@ -209,9 +216,13 @@ def main() -> int:
     results = []
     for multiplier in rates:
         print(f"probing {multiplier:g}x ...", flush=True)
-        result = run_probe(
-            run_dir, multiplier, max_records=args.max_records
-        )
+        try:
+            result = run_probe(
+                run_dir, multiplier, max_records=args.max_records
+            )
+        except FileNotFoundError as exc:
+            print(f"error: {exc}", file=sys.stderr)
+            return 2
         results.append(result)
         path = out_dir / f"summary_{multiplier:g}x.json"
         path.write_text(
